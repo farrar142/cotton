@@ -1,0 +1,68 @@
+/* syncfusion */
+@import '../../node_modules/@syncfusion/ej2-base/styles/material.css';
+@import '../../node_modules/@syncfusion/ej2-icons/styles/material.css';
+@import '../../node_modules/@syncfusion/ej2-buttons/styles/material.css';
+@import '../../node_modules/@syncfusion/ej2-splitbuttons/styles/material.css';
+@import '../../node_modules/@syncfusion/ej2-inputs/styles/material.css';
+@import '../../node_modules/@syncfusion/ej2-lists/styles/material.css';
+@import '../../node_modules/@syncfusion/ej2-navigations/styles/material.css';
+@import '../../node_modules/@syncfusion/ej2-popups/styles/material.css';
+@import '../../node_modules/@syncfusion/ej2-richtexteditor/styles/material.css';
+
+
+
+/* import the Mention dependency styles */
+
+/* @import "../../node_modules/@syncfusion/ej2-base/styles/bootstrap5.css"; */
+/* @import "../../node_modules/@syncfusion/ej2-react-buttons/styles/bootstrap5.css";
+@import "../../node_modules/@syncfusion/ej2-react-popups/styles/bootstrap5.css";
+@import "../../node_modules/@syncfusion/ej2-react-list/styles/bootstrap5.css"; */
+/* @import "../../node_modules/@syncfusion/ej2-react-dropdowns/styles/bootstrap5.css"; */
+:root{
+  --mention-default:#000;
+  --mention-selected: #222428;
+  --mention-hover: #111;
+}
+html,body, #__next{
+  height:100%;
+  margin:0;
+  --line:1
+}
+
+.hide-scrollbar {
+  
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.hide-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.single-line {
+  display: -webkit-box;
+  -webkit-line-clamp:  var(--line);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+  color-scheme: dark;
+    --mui-palette-primary-main: #90caf9;
+  }
+}
+
+/* mention */
+.e-list-item {
+  width:100%;
+  background-color: var(--mention-default);
+  backdrop-filter: blur(5px);
+}
+.e-hover {
+  background-color: var(--mention-hover);
+}
+
+.e-active {
+  background-color: var(--mention-selected);
+}
