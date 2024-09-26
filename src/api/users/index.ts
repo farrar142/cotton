@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from 'axios';
 import { client } from '../client';
 import { Paginated } from '../general';
 import { User } from './types';
@@ -11,6 +12,15 @@ export const Auth = {
     client.post<StringMap<['access', 'refresh']>>('/auth/signin/', params),
   refresh: (params: StringMap<['refresh']>) =>
     client.post<StringMap<['access', 'refresh']>>('/auth/refresh/', params),
+  send_email: (tokens: { access: string }) => {
+    return client.post('/auth/send_register_email/', tokens);
+  },
+  register_email: (code_key: { code_key: string }) => {
+    return client.post<StringMap<['access', 'refresh']>>(
+      '/auth/register/',
+      code_key
+    );
+  },
 };
 
 export const Users = {

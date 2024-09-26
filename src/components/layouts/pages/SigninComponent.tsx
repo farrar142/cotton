@@ -16,6 +16,7 @@ import {
 import API from '#/api';
 import * as React from 'react';
 import TextInput, { ErrorTypeMap } from '#/components/inputs/TextInput';
+import { client } from '#/api/client';
 
 const SigninComponent: React.FC<{ onClose: () => void; open?: boolean }> = ({
   open = true,
@@ -26,13 +27,21 @@ const SigninComponent: React.FC<{ onClose: () => void; open?: boolean }> = ({
   const username = useValue('');
   const password = useValue('');
   const password2 = useValue('');
+  const tokens = useValue({ access: '', refresh: '' });
   const signInErrors = useValue<ErrorTypeMap>({});
   const signUpErrors = useValue<ErrorTypeMap>({});
+
   const onSignin = () => {
     API.Auth.signin({ email: email.get, password: password.get })
       .then((e) => e.data)
-      .then(console.log)
-      .catch((e) => signInErrors.set(e.response.data));
+      .then(client.instance.setTokens)
+      .then(tokens.set)
+      .then(API.Users.me)
+      .then(({ data }) => {
+        if (!data.is_registered) tabValue.set('3');
+        else onClose();
+      })
+      .catch((e) => signInErrors.set(e.response.data.detail));
   };
   const onSignup = () => {
     API.Auth.signup({
@@ -42,8 +51,12 @@ const SigninComponent: React.FC<{ onClose: () => void; open?: boolean }> = ({
       password2: password2.get,
     })
       .then((e) => e.data)
-      .then(console.log)
-      .catch((e) => signUpErrors.set(e.response.data));
+      .then(tokens.set)
+      .then(() => tabValue.set('4'))
+      .catch((e) => signUpErrors.set(e.response.data.detail));
+  };
+  const onSendEmail = () => {
+    API.Auth.send_email(tokens.get).then(() => tabValue.set('4'));
   };
   return (
     <Dialog
@@ -172,6 +185,46 @@ const SigninComponent: React.FC<{ onClose: () => void; open?: boolean }> = ({
                 />
                 <Button fullWidth variant='contained' type='submit'>
                   Sign up
+                </Button>
+                <Divider />
+              </Stack>
+            </Fade>
+          </TabPanel>
+          <TabPanel value='3'>
+            <Fade in={tabValue.get === '3'} timeout={1000}>
+              <Stack
+                spacing={2}
+                alignItems='center'
+                component='form'
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  onSendEmail();
+                }}
+              >
+                <Typography variant='h5'>Send Verify Email</Typography>
+                <Divider />
+                <Button fullWidth variant='contained' type='submit'>
+                  Send Email
+                </Button>
+                <Divider />
+              </Stack>
+            </Fade>
+          </TabPanel>
+          <TabPanel value='4'>
+            <Fade in={tabValue.get === '4'} timeout={1000}>
+              <Stack
+                spacing={2}
+                alignItems='center'
+                component='form'
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  onClose();
+                }}
+              >
+                <Typography variant='h5'>Check Your Email</Typography>
+                <Divider />
+                <Button fullWidth variant='contained' type='submit'>
+                  Close
                 </Button>
                 <Divider />
               </Stack>

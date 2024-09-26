@@ -49,6 +49,7 @@ export class AxiosWrapper {
   setTokens = ({ access, refresh }: { access: string; refresh: string }) => {
     nookies.set(this.context, 'access', access);
     nookies.set(this.context, 'refresh', refresh);
+    return { access, refresh };
   };
   deleteTokens = () => {
     nookies.destroy(this.context, 'access');
@@ -76,12 +77,12 @@ export class AxiosWrapper {
     if (error.response?.data?.code === 'invalid_token')
       return this.invalidToken(error);
     if (
-      error.response?.data?.code === 'token_not_valid' ||
+      error.response?.data?.code === 'token_not_valid' &&
       error.response?.status === 401
     ) {
-      console.log('token not valid');
       return this.tokenNotValid(error);
     }
+    console.log('return error');
     throw error;
   };
 
@@ -99,6 +100,7 @@ export class AxiosWrapper {
           .then(({ data }) => {
             this.onRefresh = false;
             this.tempTokens = data;
+            this.setTokens(data);
             resolve(
               this.client({
                 ...error.config,

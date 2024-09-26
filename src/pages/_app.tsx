@@ -23,6 +23,8 @@ import { SnackbarProvider } from 'notistack';
 import NotAuthenticated from './401';
 import React from 'react';
 import { useMentionColor } from '#/hooks/useMentionColor';
+import useUser from '#/hooks/useUser';
+import API from '#/api';
 
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false;
 
@@ -52,7 +54,6 @@ function ProviderWrapper(props: CustomAppProps) {
     breakpoints: customTheme.breakpoints,
     palette: { mode: isDark ? 'dark' : 'light' },
   });
-  console.log(isDark);
   return (
     <AppCacheProvider>
       <SnackbarProvider>
@@ -64,6 +65,31 @@ function ProviderWrapper(props: CustomAppProps) {
     </AppCacheProvider>
   );
 }
+
+const ExternalTokenHandler: React.FC<CustomAppProps['pageProps']> = (
+  pageProps
+) => {
+  useEffect(() => {
+    if (pageProps.error) return;
+    if (pageProps.tokens === undefined) return;
+    nookies.set(undefined, 'access', pageProps.tokens.access, { path: '/' });
+    nookies.set(undefined, 'refresh', pageProps.tokens.refresh, { path: '/' });
+  }, [pageProps.tokens]);
+  return <></>;
+};
+const UserHandler: React.FC<CustomAppProps['pageProps']> = (pageProps) => {
+  //@ts-ignore
+  const [user, setUser] = useUser(pageProps?.user);
+  useEffect(() => {
+    if (user) return;
+    const { access } = API.client.instance.getTokens();
+    if (!access) return;
+    API.Users.me().then(({ data }) => {
+      setUser(data);
+    });
+  }, []);
+  return <></>;
+};
 
 function App({ Component, pageProps }: CustomAppProps) {
   useMentionColor();
@@ -77,18 +103,14 @@ function App({ Component, pageProps }: CustomAppProps) {
     if (Component.getMeta) return Component.getMeta(pageProps);
   }, [Component, pageProps]);
 
-  useEffect(() => {
-    if (pageProps.error) return;
-    if (pageProps.tokens === undefined) return;
-    nookies.set(undefined, 'access', pageProps.tokens.access, { path: '/' });
-    nookies.set(undefined, 'refresh', pageProps.tokens.refresh, { path: '/' });
-  }, [pageProps.tokens]);
   if (pageProps.error) {
     if (pageProps.statusCode === 401) return <NotAuthenticated />;
     return <Error statusCode={pageProps.statusCode} />;
   }
   return (
     <React.Fragment>
+      <ExternalTokenHandler {...pageProps} />
+      <UserHandler />
       <Head>
         {Meta}
         <meta

@@ -13,7 +13,6 @@ const TextInput: React.FC<TextFieldProps & { errors?: ErrorTypeMap }> = ({
     () => (errors || {})[name || ''],
     [name, errors]
   );
-  console.log(error);
   return (
     <TextField {...e} name={name} error={Boolean(error)} helperText={error} />
   );
