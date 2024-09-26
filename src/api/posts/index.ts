@@ -31,6 +31,11 @@ class PostAPIGenerator extends GenericAPI<Post, PostUpsert> {
       this.getEndpoint('/timeline/followings/')
     );
   }
+  get getGlobalTimeline() {
+    return this.getItemsRequest<Post, {}, Paginated<Post>>(
+      this.getEndpoint('/timeline/global/')
+    );
+  }
   getChildRelatedItem = (childUrl: PostChildUrl) => {
     const endpoint = this.getEndpoint(`/${childUrl}/`);
     return this.getItemsRequest(endpoint);

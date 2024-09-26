@@ -1,6 +1,7 @@
 import API from '#/api';
 import { Paginated } from '#/api/general';
 import { Post } from '#/api/posts';
+import useUser from '#/hooks/useUser';
 import useValue from '#/hooks/useValue';
 import DraftEditor from '#/PostWriter/DraftEditor';
 import { formatRelativeTime } from '#/utils/formatRelativeTime';
@@ -16,6 +17,7 @@ import {
 import {
   Avatar,
   Box,
+  ButtonGroup,
   Divider,
   Grid2,
   IconButton,
@@ -41,6 +43,7 @@ const useOverrideAtom = (field: string) => {
 };
 
 const PostItem: React.FC<{ post: Post }> = ({ post }) => {
+  const [user, setUser] = useUser();
   const [favorite, setFavorite] = useOverrideAtom('favorite');
   const [bookmark, setBookmark] = useOverrideAtom('bookmark');
   const [repost, setRepost] = useOverrideAtom('repost');
@@ -139,11 +142,17 @@ const PostItem: React.FC<{ post: Post }> = ({ post }) => {
             <Grid2 size={3}>
               <Tooltip title='cottoning'>
                 {hasRepost ? (
-                  <IconButton onClick={onRepost(false)}>
+                  <IconButton
+                    onClick={onRepost(false)}
+                    disabled={!Boolean(user)}
+                  >
                     <Cloud />
                   </IconButton>
                 ) : (
-                  <IconButton onClick={onRepost(true)}>
+                  <IconButton
+                    onClick={onRepost(true)}
+                    disabled={!Boolean(user)}
+                  >
                     <CloudOutlined />
                   </IconButton>
                 )}
@@ -152,11 +161,17 @@ const PostItem: React.FC<{ post: Post }> = ({ post }) => {
             <Grid2 size={3}>
               <Tooltip title='favorite'>
                 {hasFavorite ? (
-                  <IconButton onClick={onFavorite(false)}>
+                  <IconButton
+                    onClick={onFavorite(false)}
+                    disabled={!Boolean(user)}
+                  >
                     <Favorite />
                   </IconButton>
                 ) : (
-                  <IconButton onClick={onFavorite(true)}>
+                  <IconButton
+                    onClick={onFavorite(true)}
+                    disabled={!Boolean(user)}
+                  >
                     <FavoriteBorderOutlined />
                   </IconButton>
                 )}
@@ -165,11 +180,17 @@ const PostItem: React.FC<{ post: Post }> = ({ post }) => {
             <Grid2 size={3}>
               <Tooltip title='bookmark'>
                 {hasBookmark ? (
-                  <IconButton onClick={onBookmark(false)}>
+                  <IconButton
+                    onClick={onBookmark(false)}
+                    disabled={!Boolean(user)}
+                  >
                     <Bookmark />
                   </IconButton>
                 ) : (
-                  <IconButton onClick={onBookmark(true)}>
+                  <IconButton
+                    onClick={onBookmark(true)}
+                    disabled={!Boolean(user)}
+                  >
                     <BookmarkBorderOutlined />
                   </IconButton>
                 )}

@@ -5,9 +5,10 @@ import * as React from 'react';
 import SigninComponent from '../pages/SigninComponent';
 import useUser from '#/hooks/useUser';
 
-const CommonLayout: React.FC<{ children?: React.ReactNode }> = ({
-  children,
-}) => {
+const CommonLayout: React.FC<{
+  children?: React.ReactNode;
+  openLoginWindow?: React.MutableRefObject<() => void>;
+}> = ({ children, openLoginWindow }) => {
   const theme = useTheme();
   const [user] = useUser();
   const loginBackDrop = useValue(false);
@@ -15,6 +16,11 @@ const CommonLayout: React.FC<{ children?: React.ReactNode }> = ({
   const handleLoginBackdrop = () => {
     loginBackDrop.set((p) => !p);
   };
+
+  React.useImperativeHandle(openLoginWindow, () => () => {
+    handleLoginBackdrop();
+  });
+
   return (
     <Box
       display='flex'
