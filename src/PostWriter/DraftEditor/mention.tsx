@@ -57,7 +57,6 @@ export const MentionEntry: React.FC<EntryComponentProps> = (props) => {
 };
 
 export const MentionComponent: React.FC<SubMentionComponentProps> = (e) => {
-  console.log(e);
   //@ts-ignore
   const key = e.children[0].key;
   return (

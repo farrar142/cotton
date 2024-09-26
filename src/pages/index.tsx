@@ -71,7 +71,10 @@ const Home = () => {
           <TabPanel value='1'>{/* <PostWriter /> */}</TabPanel>
           <TabPanel value='2'>
             <DraftEditor onPost={onPost} />
-            <PostTimeline getter={API.Posts.post.getFollowingTimeline} />
+            <PostTimeline
+              getter={API.Posts.post.getFollowingTimeline}
+              type='followings'
+            />
           </TabPanel>
         </TabContext>
       </Box>
