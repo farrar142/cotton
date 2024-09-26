@@ -3,6 +3,7 @@ import {
   ContentState,
   DraftDecoratorComponentProps,
   CompositeDecorator,
+  DraftDecorator,
 } from 'draft-js';
 
 // 300글자 이상일 때 스타일을 적용하는 함수
@@ -34,10 +35,7 @@ export const OverLimitSpan: React.FC<DraftDecoratorComponentProps> = (
   return <span style={{ color: 'red' }}>{props.children}</span>;
 };
 
-export const textLimitDecorator = (limit: number) =>
-  new CompositeDecorator([
-    {
-      strategy: findOverLimitText(limit),
-      component: OverLimitSpan,
-    },
-  ]);
+export const textLimitDecorator = (limit: number): DraftDecorator => ({
+  strategy: findOverLimitText(limit),
+  component: OverLimitSpan,
+});

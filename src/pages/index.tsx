@@ -21,8 +21,11 @@ import {
 
 import DraftEditor from '#/PostWriter/DraftEditor';
 import API from '#/api';
-import * as React from 'react';
 import CommonLayout from '#/components/layouts/CommonLayout';
+import { Block } from '#/utils/textEditor/blockTypes';
+import { SyntheticEvent, useEffect } from 'react';
+import { Post } from '#/api/posts';
+import { PostTimeline } from '#/components/timelines';
 // import PostWriter from '#/PostWriter';
 // const DraftEditor = dynamic(() => import('#/PostWriter/DraftEditor'), {
 //   ssr: true,
@@ -30,10 +33,17 @@ import CommonLayout from '#/components/layouts/CommonLayout';
 
 const Home = () => {
   const theme = useTheme();
-  const tabValue = useValue('1');
+  const tabValue = useValue('2');
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleChange = (event: SyntheticEvent, newValue: string) => {
     tabValue.set(newValue);
+  };
+  const onPost = (text: string, blocks: Block[][]) => {
+    const mentions = blocks
+      .map((line) => line.filter((block) => block.type === 'mention'))
+      .flatMap((block) => block)
+      .map((block) => ({ mentioned_to: parseInt(block.id) }));
+    API.Posts.post.postItem({ text, blocks, mentions });
   };
 
   return (
@@ -58,23 +68,14 @@ const Home = () => {
               <Tab label='팔로우 중' value='2' />
             </TabList>
           </Box>
-          <TabPanel value='1'>
-            {/* <PostWriter /> */}
-            <DraftEditor />
+          <TabPanel value='1'>{/* <PostWriter /> */}</TabPanel>
+          <TabPanel value='2'>
+            <DraftEditor onPost={onPost} />
+            <PostTimeline getter={API.Posts.post.getFollowingTimeline} />
           </TabPanel>
-          <TabPanel value='2'>Item Two</TabPanel>
         </TabContext>
       </Box>
     </CommonLayout>
   );
 };
 export default Home;
-
-const lorem = `Lorem
-            ipsum dolor sit amet consectetur adipisicing elit. Explicabo
-            architecto ad at eius iste quos ipsam cum consectetur? Iure in illo
-            dolore eum maiores, repellendus vero ratione sequi asperiores ullam!
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod
-            assumenda quia consequuntur. Quidem nobis facilis nisi, iusto nemo
-            nihil earum optio quas in rerum nesciunt excepturi tenetur,
-            doloremque, explicabo voluptas?`;

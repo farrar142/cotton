@@ -16,6 +16,7 @@ import {
   CompositeDecorator,
   DraftDecorator,
   DraftDecoratorComponentProps,
+  RawDraftContentState,
 } from 'draft-js';
 import Editor from '@draft-js-plugins/editor';
 import createMentionPlugin, {
@@ -42,6 +43,8 @@ import { handleTextLength } from './functions';
 import { styleMap } from './plugins';
 import { textLimitDecorator } from './textLimitDecorator';
 import { userToMentonData, MentionEntry, MentionComponent } from './mention';
+import { Block } from '#/utils/textEditor/blockTypes';
+import { DraftContentParser } from '#/utils/textEditor/draftParser';
 
 const emptyContentState = convertFromRaw({
   entityMap: {},
@@ -57,11 +60,20 @@ const emptyContentState = convertFromRaw({
   ],
 });
 
-const DraftEditor: React.FC<{ maxLength?: number }> = ({ maxLength = 300 }) => {
+const DraftEditor: React.FC<{
+  maxLength?: number;
+  readOnly?: boolean;
+  onPost: (text: string, blocks: Block[][]) => void;
+  blocks?: Block[][];
+}> = ({ maxLength = 300, onPost, blocks, readOnly = false }) => {
   const theme = useTheme();
   const editorRef = useRef<Editor>(null);
   const [editorState, setEditorState] = useState(() =>
-    EditorState.createWithContent(emptyContentState)
+    blocks
+      ? EditorState.createWithContent(
+          DraftContentParser.blocksToContentState(blocks)
+        )
+      : EditorState.createWithContent(emptyContentState)
   );
   const [suggestions, setSuggestions] = useState<MentionData[]>([]);
   const textLength = useValue(0);
@@ -75,7 +87,7 @@ const DraftEditor: React.FC<{ maxLength?: number }> = ({ maxLength = 300 }) => {
       mentionComponent: MentionComponent,
     });
     const { MentionSuggestions } = mentionPlugin;
-    mentionPlugin.decorators = [textLimitDecorator(maxLength)];
+    (mentionPlugin.decorators || []).push(textLimitDecorator(300));
     const plugins = [mentionPlugin];
     return { plugins, MentionSuggestions };
   }, []);
@@ -91,10 +103,14 @@ const DraftEditor: React.FC<{ maxLength?: number }> = ({ maxLength = 300 }) => {
       .then(setSuggestions);
     // setSuggestions(defaultSuggestionsFilter(value, mentions));
   };
-  const onPost = () => {
-    API;
+  const onPostText = () => {
+    const content = editorState.getCurrentContent();
+    const plainText = content.getPlainText();
+    const converted = convertToRaw(content);
+    const parser = new DraftContentParser(converted);
+    const blocks = parser.parseToTextBlocks();
+    onPost(plainText, blocks);
   };
-
   return (
     <Box
       sx={{
@@ -125,6 +141,7 @@ const DraftEditor: React.FC<{ maxLength?: number }> = ({ maxLength = 300 }) => {
         }}
         placeholder='무슨 일이 일어나고 있나요?'
         customStyleMap={styleMap}
+        readOnly={readOnly}
       />
       <MentionSuggestions
         open={open}
@@ -136,11 +153,14 @@ const DraftEditor: React.FC<{ maxLength?: number }> = ({ maxLength = 300 }) => {
         }}
         entryComponent={MentionEntry}
       />
-      <DraftEditorToolbar
-        maxLength={maxLength}
-        textLength={textLength}
-        editorState={editorState}
-      />
+      {readOnly === false && (
+        <DraftEditorToolbar
+          maxLength={maxLength}
+          textLength={textLength}
+          editorState={editorState}
+          onPost={onPostText}
+        />
+      )}
     </Box>
   );
 };

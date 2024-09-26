@@ -1,4 +1,8 @@
 import {
+  ContentState,
+  convertFromRaw,
+  EditorState,
+  RawDraftContentBlock,
   RawDraftContentState,
   RawDraftEntity,
   RawDraftEntityRange,
@@ -36,6 +40,7 @@ export class DraftContentParser {
       if (textBlock) textBlocks.push(textBlock);
       return textBlocks;
     });
+    return textBlocksList;
   }
   parseBlock(text: string, entityRange: RawDraftEntityRange) {
     const entity = this.content.entityMap[entityRange.key];
@@ -85,4 +90,49 @@ export class DraftContentParser {
     }
     return char;
   }
+  static blocksToContentState = (blocks: Block[][]): ContentState => {
+    const rawBlocks: RawDraftContentBlock[] = [];
+    const entityMap: { [key: number]: RawDraftEntity } = {};
+    for (const [index, lines] of blocks.entries()) {
+      let charCount = 0;
+      let text = '';
+      let entityKey = 0;
+      const entityRanges: RawDraftEntityRange[] = [];
+      for (const block of lines) {
+        const [charStart, charEnd] = [charCount, block.value.length];
+        charCount = charEnd;
+        text += block.value;
+        if (block.type === 'mention') {
+          entityRanges.push({
+            key: entityKey,
+            offset: charStart,
+            length: block.value.length,
+          });
+          entityMap[entityKey] = {
+            data: {
+              mention: {
+                username: block.username,
+                id: block.id,
+              },
+            },
+            type: 'mention',
+            mutability: 'IMMUTABLE',
+          };
+        }
+      }
+      const key = `${index}`;
+      const type = 'unstyled';
+      rawBlocks.push({
+        key,
+        type,
+        text,
+        depth: 0,
+        entityRanges,
+        inlineStyleRanges: [],
+      });
+    }
+    // let entitiy: RawDraftContentState =
+
+    return convertFromRaw({ blocks: rawBlocks, entityMap });
+  };
 }

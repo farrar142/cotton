@@ -10,21 +10,16 @@ import {
 } from '@mui/material';
 import { convertToRaw, EditorState } from 'draft-js';
 import { MouseEventHandler, useEffect, useMemo } from 'react';
+import { text } from 'stream/consumers';
 
 const DraftEditorToolbar: React.FC<{
   textLength: UseValue<number>;
   maxLength: number;
   editorState: EditorState;
-}> = ({ textLength, maxLength, editorState }) => {
+  onPost: () => void;
+}> = ({ textLength, maxLength, editorState, onPost }) => {
   const [user] = useUser();
   const isTextOver = maxLength < textLength.get;
-  const onPost: MouseEventHandler = (e) => {
-    e.preventDefault();
-    const content = editorState.getCurrentContent();
-    const converted = convertToRaw(content);
-    const parser = new DraftContentParser(converted);
-    parser.parseToTextBlocks();
-  };
   const [share, displayLength] = useMemo(() => {
     const remainder = textLength.get % maxLength;
     const share = Math.floor(textLength.get / maxLength);
@@ -45,7 +40,10 @@ const DraftEditorToolbar: React.FC<{
       >
         {textLength.get}/{maxLength}
       </Typography>
-      <Button onClick={onPost} disabled={isTextOver || !Boolean(user)}>
+      <Button
+        onClick={onPost}
+        disabled={isTextOver || !Boolean(user) || textLength.get === 0}
+      >
         게시
       </Button>
     </Stack>
