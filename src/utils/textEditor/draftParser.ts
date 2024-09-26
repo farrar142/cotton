@@ -36,7 +36,6 @@ export class DraftContentParser {
       if (textBlock) textBlocks.push(textBlock);
       return textBlocks;
     });
-    console.log(textBlocksList);
   }
   parseBlock(text: string, entityRange: RawDraftEntityRange) {
     const entity = this.content.entityMap[entityRange.key];
