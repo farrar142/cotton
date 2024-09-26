@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { NextPage } from 'next';
 import { User } from './api/users/types';
 
@@ -14,6 +14,7 @@ declare global {
     InitialProps = Props
   > = NextPage<Props, InitialProps> & {
     getMeta?: (props: InitialProps) => React.ReactNode;
+    getLayout?: React.FC<{ children?: ReactNode }>;
   };
 }
 

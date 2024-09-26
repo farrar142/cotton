@@ -17,7 +17,7 @@ import type { AppProps } from 'next/app';
 import Error from 'next/error';
 import Head from 'next/head';
 import nookies from 'nookies';
-import { useEffect, useMemo } from 'react';
+import { ReactElement, ReactNode, useEffect, useMemo } from 'react';
 import { RecoilEnv, RecoilRoot } from 'recoil';
 import { SnackbarProvider } from 'notistack';
 import NotAuthenticated from './401';
@@ -25,6 +25,7 @@ import React from 'react';
 import { useMentionColor } from '#/hooks/useMentionColor';
 import useUser from '#/hooks/useUser';
 import API from '#/api';
+import CommonLayout from '#/components/layouts/CommonLayout';
 
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false;
 
@@ -107,6 +108,9 @@ function App({ Component, pageProps }: CustomAppProps) {
     if (pageProps.statusCode === 401) return <NotAuthenticated />;
     return <Error statusCode={pageProps.statusCode} />;
   }
+  const Layout = useMemo(() => {
+    return Component.getLayout ? Component.getLayout : CommonLayout;
+  }, [Component.getLayout]);
   return (
     <React.Fragment>
       <ExternalTokenHandler {...pageProps} />
@@ -127,7 +131,9 @@ function App({ Component, pageProps }: CustomAppProps) {
           bgcolor: 'background.default',
         }}
       >
-        <Component {...pageProps} />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </Box>
     </React.Fragment>
   );

@@ -4,11 +4,14 @@ import { Box, Button, useMediaQuery, useTheme } from '@mui/material';
 import * as React from 'react';
 import SigninComponent from '../pages/SigninComponent';
 import useUser from '#/hooks/useUser';
+import LeftSidebar from './LeftSidebar';
+import { useLoginWindow } from '#/hooks/useLoginWindow';
 
 const CommonLayout: React.FC<{
   children?: React.ReactNode;
   openLoginWindow?: React.MutableRefObject<() => void>;
-}> = ({ children, openLoginWindow }) => {
+}> = ({ children }) => {
+  const [_, setOpenLoginWindow] = useLoginWindow();
   const theme = useTheme();
   const [user] = useUser();
   const loginBackDrop = useValue(false);
@@ -16,10 +19,9 @@ const CommonLayout: React.FC<{
   const handleLoginBackdrop = () => {
     loginBackDrop.set((p) => !p);
   };
-
-  React.useImperativeHandle(openLoginWindow, () => () => {
-    handleLoginBackdrop();
-  });
+  React.useEffect(() => {
+    setOpenLoginWindow(() => () => handleLoginBackdrop());
+  }, []);
 
   return (
     <Box
@@ -42,7 +44,9 @@ const CommonLayout: React.FC<{
           top={0}
           left='100%'
         >
-          <Box width='100%'>왼쪽사이드바</Box>
+          <Box width='100%' pt={1}>
+            <LeftSidebar />
+          </Box>
           <Box
             position='absolute'
             minWidth={100}

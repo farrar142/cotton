@@ -6,14 +6,17 @@ interface TransitionOptions {
   scroll?: boolean;
   unstable_skipClientCache?: boolean;
 }
+const RoutingFunc = (url: Url, as?: Url, options?: TransitionOptions) => {};
 export const useRouter = () => {
   const router = useLRouter();
+  console.log(router);
   const push =
     router?.push || ((url: Url, as?: Url, options?: TransitionOptions) => {});
   return {
     push: push,
-    pathname: '',
+    pathname: router?.pathname || '',
     query: router?.query || {},
     reload: router?.reload || (() => {}),
+    replace: router?.replace || RoutingFunc,
   };
 };

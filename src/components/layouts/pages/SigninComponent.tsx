@@ -17,11 +17,13 @@ import API from '#/api';
 import * as React from 'react';
 import TextInput, { ErrorTypeMap } from '#/components/inputs/TextInput';
 import { client } from '#/api/client';
+import useUser from '#/hooks/useUser';
 
 const SigninComponent: React.FC<{ onClose: () => void; open?: boolean }> = ({
   open = true,
   onClose,
 }) => {
+  const [user, setUser] = useUser();
   const tabValue = useValue('1');
   const email = useValue('');
   const username = useValue('');
@@ -38,6 +40,7 @@ const SigninComponent: React.FC<{ onClose: () => void; open?: boolean }> = ({
       .then(tokens.set)
       .then(API.Users.me)
       .then(({ data }) => {
+        setUser(data);
         if (!data.is_registered) tabValue.set('3');
         else onClose();
       })
