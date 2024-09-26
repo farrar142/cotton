@@ -40,79 +40,8 @@ import useValue from '#/hooks/useValue';
 import DraftEditorToolbar from './Toolbar';
 import { handleTextLength } from './functions';
 import { styleMap } from './plugins';
-
-export interface EntryComponentProps {
-  className?: string;
-  onMouseDown: MouseEventHandler<HTMLDivElement>;
-  onMouseUp: MouseEventHandler<HTMLDivElement>;
-  onMouseEnter: MouseEventHandler<HTMLDivElement>;
-  role: string;
-  id: string;
-  'aria-selected'?: boolean | 'false' | 'true';
-  theme?: MentionPluginTheme;
-  mention: MentionData;
-  isFocused: boolean;
-  searchValue?: string;
-}
-
-const Entry: React.FC<EntryComponentProps> = (props) => {
-  const {
-    onMouseDown,
-    onMouseEnter,
-    onMouseUp,
-    mention,
-    theme,
-    searchValue, // eslint-disable-line @typescript-eslint/no-unused-vars
-    isFocused, // eslint-disable-line @typescript-eslint/no-unused-vars
-    ...parentProps
-  } = props;
-  return (
-    <Box
-      id={props.id}
-      onMouseDown={onMouseDown}
-      onMouseUp={onMouseUp}
-      onMouseEnter={onMouseEnter}
-      onClick={onMouseDown}
-      bgcolor='transparent'
-      //   className={theme?.mentionSuggestions}
-      sx={{
-        bgcolor: isFocused ? 'var(--mention-selected)' : 'inherit',
-      }}
-    >
-      <Typography
-        component='span'
-        data-type='mention'
-        data-username={mention.username}
-        data-id={mention.id}
-        className='mention'
-        sx={{ color: 'primary.main' }}
-      >
-        @{mention.username}
-      </Typography>
-    </Box>
-  );
-};
-`data-offset-key="notmodified-1-0"`;
-const MentionComponent: React.FC<SubMentionComponentProps> = (e) => {
-  console.log(e);
-  //@ts-ignore
-  const key = e.children[0].key;
-  return (
-    <span
-      className={e.className}
-      spellCheck={false}
-      data-testid='mentionText'
-      style={{ cursor: 'pointer' }}
-      onClick={() => {
-        console.log(e.mention);
-      }}
-    >
-      <span data-offset-key={key}>
-        <span data-text={true}>@{e.mention.username}</span>
-      </span>
-    </span>
-  );
-};
+import { textLimitDecorator } from './textLimitDecorator';
+import { userToMentonData, MentionEntry, MentionComponent } from './mention';
 
 const emptyContentState = convertFromRaw({
   entityMap: {},
@@ -128,45 +57,6 @@ const emptyContentState = convertFromRaw({
   ],
 });
 
-const userToMentonData = (user: User): MentionData => ({
-  ...user,
-  name: user.username,
-});
-
-// 300글자 이상일 때 스타일을 적용하는 함수
-const findOverLimitText =
-  (limit: number) =>
-  (
-    contentBlock: ContentBlock,
-    callback: (max: number, currentLength: number) => void,
-    contentState: ContentState
-  ) => {
-    const blocksArray = contentState.getBlocksAsArray();
-    blocksArray.reduce((count, block) => {
-      const [blockStart, blockEnd] = [count, count + block.getText().length];
-
-      if (block.getKey() !== contentBlock.getKey()) return blockEnd;
-      if ((blockStart <= limit && limit <= blockEnd) || limit < blockStart) {
-        const text = contentBlock.getText();
-        console.log(limit, blockStart);
-        callback(Math.max(limit - blockStart, 0), text.length);
-      }
-      return blockEnd;
-    }, 0);
-  };
-
-// 데코레이터 컴포넌트
-const OverLimitSpan: React.FC<DraftDecoratorComponentProps> = (props) => {
-  return <span style={{ color: 'red' }}>{props.children}</span>;
-};
-
-const decorator = (limit: number) =>
-  new CompositeDecorator([
-    {
-      strategy: findOverLimitText(limit),
-      component: OverLimitSpan,
-    },
-  ]);
 const DraftEditor: React.FC<{ maxLength?: number }> = ({ maxLength = 300 }) => {
   const theme = useTheme();
   const editorRef = useRef<Editor>(null);
@@ -185,7 +75,7 @@ const DraftEditor: React.FC<{ maxLength?: number }> = ({ maxLength = 300 }) => {
       mentionComponent: MentionComponent,
     });
     const { MentionSuggestions } = mentionPlugin;
-    mentionPlugin.decorators = [decorator(maxLength)];
+    mentionPlugin.decorators = [textLimitDecorator(maxLength)];
     const plugins = [mentionPlugin];
     return { plugins, MentionSuggestions };
   }, []);
@@ -200,6 +90,9 @@ const DraftEditor: React.FC<{ maxLength?: number }> = ({ maxLength = 300 }) => {
       .then((d) => d.map(userToMentonData))
       .then(setSuggestions);
     // setSuggestions(defaultSuggestionsFilter(value, mentions));
+  };
+  const onPost = () => {
+    API;
   };
 
   return (
@@ -241,7 +134,7 @@ const DraftEditor: React.FC<{ maxLength?: number }> = ({ maxLength = 300 }) => {
         onAddMention={() => {
           // get the mention object selected
         }}
-        entryComponent={Entry}
+        entryComponent={MentionEntry}
       />
       <DraftEditorToolbar
         maxLength={maxLength}
