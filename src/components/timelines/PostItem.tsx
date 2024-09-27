@@ -2,8 +2,10 @@ import API from '#/api';
 import { Post } from '#/api/posts';
 import useUser from '#/hooks/useUser';
 import DraftEditor from '#/PostWriter/DraftEditor';
-import { formatRelativeTime } from '#/utils/formatRelativeTime';
+import { formatRelativeTime } from '#/utils/formats/formatRelativeTime';
 import {
+  BarChart,
+  BarChartOutlined,
   Bookmark,
   BookmarkBorderOutlined,
   Cloud,
@@ -22,9 +24,10 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { atomFamily, useRecoilState } from 'recoil';
 import { ImageViewer } from './ImageViewer';
+import { useObserver } from '#/hooks/useObserver';
 
 type PickBoolean<T> = {
   [K in keyof T]: T[K] extends boolean ? K : never;
@@ -46,6 +49,7 @@ export const PostItem: React.FC<{ post: Post }> = ({ post }) => {
   const [repost, setRepost] = useOverrideAtom('repost');
   const [view, setView] = useOverrideAtom('view');
 
+  // 부가기능
   const isChecked = (
     field: PickBoolean<Post>,
     target: Map<number, boolean>
@@ -55,7 +59,6 @@ export const PostItem: React.FC<{ post: Post }> = ({ post }) => {
     if (modified === undefined) return post[field];
     return modified;
   };
-
   const hasRepost = isChecked('has_repost', repost);
   const hasBookmark = isChecked('has_bookmark', bookmark);
   const hasFavorite = isChecked('has_favorite', favorite);
@@ -76,9 +79,23 @@ export const PostItem: React.FC<{ post: Post }> = ({ post }) => {
     getCaller(bool)(post, 'favorites');
     setFavorite((p) => new Map(p.entries()).set(post.id, bool));
   };
+  const onView = () => {
+    getCaller(true)(post, 'views');
+    setView((p) => new Map(p.entries()).set(post.id, true));
+  };
+
+  //조회수 기능
+  const observer = useObserver();
+  const target = useRef<HTMLElement>();
 
   useEffect(() => {
+    if (!target.current) return;
+    const t = target.current;
     if (hasView) return;
+    if (hasView === undefined) return;
+    observer.registerCallback(onView);
+    observer.observe(t);
+    return () => observer.unobserve(t);
   }, [hasView]);
 
   return (
@@ -103,7 +120,7 @@ export const PostItem: React.FC<{ post: Post }> = ({ post }) => {
           </Typography>
         </Stack>
       )}
-      <Box display='flex' flexDirection='row' width='100%' px={2}>
+      <Box ref={target} display='flex' flexDirection='row' width='100%' px={2}>
         <Box mt={1.5} mr={1}>
           <Avatar />
         </Box>
@@ -129,14 +146,14 @@ export const PostItem: React.FC<{ post: Post }> = ({ post }) => {
           <DraftEditor readOnly={true} blocks={post.blocks} />
           <ImageViewer post={post} />
           <Grid2 container width='100%'>
-            <Grid2 size={3}>
+            <Grid2 size={2}>
               <Tooltip title='reply'>
                 <IconButton>
                   <ModeCommentOutlined />
                 </IconButton>
               </Tooltip>
             </Grid2>
-            <Grid2 size={3}>
+            <Grid2 size={2}>
               <Tooltip title='cottoning'>
                 {hasRepost ? (
                   <IconButton
@@ -155,26 +172,31 @@ export const PostItem: React.FC<{ post: Post }> = ({ post }) => {
                 )}
               </Tooltip>
             </Grid2>
-            <Grid2 size={3}>
-              <Tooltip title='favorite'>
-                {hasFavorite ? (
-                  <IconButton
-                    onClick={onFavorite(false)}
-                    disabled={!Boolean(user)}
-                  >
-                    <Favorite />
-                  </IconButton>
-                ) : (
-                  <IconButton
-                    onClick={onFavorite(true)}
-                    disabled={!Boolean(user)}
-                  >
-                    <FavoriteBorderOutlined />
-                  </IconButton>
-                )}
-              </Tooltip>
+            <Grid2 size={2}>
+              <Stack direction='row' alignItems='center'>
+                <Tooltip title='favorite'>
+                  {hasFavorite ? (
+                    <IconButton
+                      onClick={onFavorite(false)}
+                      disabled={!Boolean(user)}
+                    >
+                      <Favorite />
+                    </IconButton>
+                  ) : (
+                    <IconButton
+                      onClick={onFavorite(true)}
+                      disabled={!Boolean(user)}
+                    >
+                      <FavoriteBorderOutlined />
+                    </IconButton>
+                  )}
+                </Tooltip>
+                <Typography variant='caption' color='textDisabled'>
+                  {post.favorites_count}
+                </Typography>
+              </Stack>
             </Grid2>
-            <Grid2 size={3}>
+            <Grid2 size={2}>
               <Tooltip title='bookmark'>
                 {hasBookmark ? (
                   <IconButton
@@ -192,6 +214,18 @@ export const PostItem: React.FC<{ post: Post }> = ({ post }) => {
                   </IconButton>
                 )}
               </Tooltip>
+            </Grid2>
+            <Grid2 size={3}>
+              <Stack direction='row' alignItems='center'>
+                <Tooltip title='views'>
+                  <IconButton>
+                    <BarChartOutlined />
+                  </IconButton>
+                </Tooltip>
+                <Typography variant='caption' color='textDisabled'>
+                  {post.views_count}
+                </Typography>
+              </Stack>
             </Grid2>
           </Grid2>
         </Stack>

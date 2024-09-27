@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-export function formatRelativeTime(inputTime: string) {
+export const formatRelativeTime = (inputTime: string) => {
   // 현재 시각
   const now = moment();
 
@@ -20,4 +20,4 @@ export function formatRelativeTime(inputTime: string) {
   } else {
     return `${Math.floor(duration.asDays())}일 전`;
   }
-}
+};
