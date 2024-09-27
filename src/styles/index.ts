@@ -31,6 +31,15 @@ const customTheme = createTheme({
       fontFamily,
     },
   },
+  components: {
+    MuiBackdrop: {
+      styleOverrides: {
+        root: {
+          zIndex: 10,
+        },
+      },
+    },
+  },
 });
 const threeDigitTranslate = (hex: string) => {
   const splitted = hex.split('#')[1];

@@ -127,7 +127,7 @@ export const PostItem: React.FC<{ post: Post }> = ({ post }) => {
             </Typography>
           </Stack>
           <DraftEditor readOnly={true} blocks={post.blocks} />
-          <ImageViewer images={post.images} />
+          <ImageViewer post={post} />
           <Grid2 container width='100%'>
             <Grid2 size={3}>
               <Tooltip title='reply'>

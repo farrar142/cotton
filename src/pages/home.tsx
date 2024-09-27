@@ -109,7 +109,7 @@ const Home = () => {
         >
           <Box px={2} display='flex' flexDirection='row'>
             <Avatar sx={{ mr: 1 }} />
-            <DraftEditor onPost={onPost} />
+            <DraftEditor onPost={onPost} additionalWidth={-48} />
           </Box>
           <Divider sx={{ mb: 1 }} />
           <PostTimeline

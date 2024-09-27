@@ -55,6 +55,7 @@ const DraftEditor: React.FC<
     maxLength?: number;
     blocks?: Block[][];
     images?: ImageType[];
+    additionalWidth?: number;
   } & (ReadOnly | EditOnly)
 > = ({
   maxLength = 300,
@@ -62,6 +63,7 @@ const DraftEditor: React.FC<
   blocks,
   readOnly = false,
   images: _images = [],
+  additionalWidth = 0,
 }) => {
   const theme = useTheme();
   const editorRef = useRef<Editor>(null);
@@ -137,6 +139,7 @@ const DraftEditor: React.FC<
   return (
     <Stack
       spacing={1}
+      flex={1}
       sx={{
         'div[role="listbox"]': {
           py: 0.5,
@@ -148,7 +151,7 @@ const DraftEditor: React.FC<
           zIndex: 10,
           ...glassmorphism(theme),
         },
-        width: '100%',
+        width: `calc(100% + ${additionalWidth}px);`,
       }}
     >
       <Editor
@@ -176,17 +179,14 @@ const DraftEditor: React.FC<
       />
       <ImageEditor images={images} />
       {readOnly === false && (
-        <Box>
-          <Divider />
-          <DraftEditorToolbar
-            maxLength={maxLength}
-            textLength={textLength}
-            editorState={editorState}
-            onPost={onPostText}
-            images={images}
-            onEmojiClick={onEmojiClick}
-          />
-        </Box>
+        <DraftEditorToolbar
+          maxLength={maxLength}
+          textLength={textLength}
+          editorState={editorState}
+          onPost={onPostText}
+          images={images}
+          onEmojiClick={onEmojiClick}
+        />
       )}
     </Stack>
   );
