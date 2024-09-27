@@ -63,7 +63,7 @@ const DraftEditorToolbar: React.FC<{
     if (blobs.length === 0) return;
     const files = Promise.all(blobs.map((file) => getBase64(file)));
     const resized = files.then((files) =>
-      Promise.all(files.map((file) => resizeImage(file, 1024)))
+      Promise.all(files.map((file) => resizeImage(file, 2048)))
     );
     const typed: Promise<ImageType[]> = resized.then((files) =>
       files.map((url) => ({ id: -1, url }))

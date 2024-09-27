@@ -20,7 +20,7 @@ export const resizeImage = (base64: string, maxSize: number) => {
     const context = canvas.getContext('2d');
     if (!context) throw Error;
     context.drawImage(image, 0, 0, width, height);
-    return canvas.toDataURL('image/jpeg');
+    return canvas.toDataURL('image/png');
   };
   return new Promise<string>(function (ok, no) {
     image.onload = function () {
