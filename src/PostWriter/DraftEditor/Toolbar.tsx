@@ -21,6 +21,7 @@ import { ChangeEventHandler, createRef, useId, useMemo } from 'react';
 import { getBase64 } from '#/utils/images/getBase64';
 import { resizeImage } from '#/utils/images/resizeImage';
 import { ImageType } from '#/api/commons/types';
+import { glassmorphism } from '#/styles';
 
 const DraftEditorToolbar: React.FC<{
   images: UseValue<ImageType[]>;
@@ -99,6 +100,20 @@ const DraftEditorToolbar: React.FC<{
           anchorEl={anchorEl.get}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
           onClose={() => anchorEl.set(null)}
+          sx={{
+            aside: {
+              ...glassmorphism(theme),
+            },
+            div: {
+              bgcolor: 'transparent',
+            },
+            h2: {
+              bgcolor: 'transparent',
+            },
+            input: {
+              bgcolor: 'transparent',
+            },
+          }}
         >
           <EmojiPicker
             //@ts-ignore

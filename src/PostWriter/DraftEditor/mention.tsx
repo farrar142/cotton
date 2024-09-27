@@ -44,6 +44,7 @@ export const MentionEntry: React.FC<EntryComponentProps> = (props) => {
         // borderColor: _theme.palette.info.light,
         // borderWidth: '1px',
         // borderStyle: 'solid',
+        pb: 0.5,
       }}
     >
       <Typography
