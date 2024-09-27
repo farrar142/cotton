@@ -105,11 +105,12 @@ function App({ Component, pageProps }: CustomAppProps) {
     if (Component.getMeta) return Component.getMeta(pageProps);
     else return <title>Cotton</title>;
   }, [Component, pageProps]);
-
-  if (pageProps.error) {
-    if (pageProps.statusCode === 401) return <NotAuthenticated />;
-    return <Error statusCode={pageProps.statusCode} />;
-  }
+  const isError = useMemo(() => {
+    if (pageProps.error) {
+      if (pageProps.statusCode === 401) return <NotAuthenticated />;
+      return <Error statusCode={pageProps.statusCode} />;
+    }
+  }, [pageProps]);
   const Layout = useMemo(() => {
     return Component.getLayout ? Component.getLayout : CommonLayout;
   }, [Component.getLayout]);
@@ -134,7 +135,10 @@ function App({ Component, pageProps }: CustomAppProps) {
         }}
       >
         <Layout>
-          <Component {...pageProps} />
+          {Boolean(isError) && isError}
+          {/* @ts-ignore */}
+          {!Boolean(isError) && <Component {...pageProps} />}
+          {/* @ts-ignore */}
         </Layout>
       </Box>
     </React.Fragment>
