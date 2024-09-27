@@ -129,7 +129,7 @@ const PostItem: React.FC<{ post: Post }> = ({ post }) => {
               {formatRelativeTime(post.created_at)}
             </Typography>
           </Stack>
-          <DraftEditor onPost={() => {}} readOnly={true} blocks={post.blocks} />
+          <DraftEditor readOnly={true} blocks={post.blocks} />
           <Grid2 container width='100%'>
             <Grid2 size={3}>
               <Tooltip title='reply'>

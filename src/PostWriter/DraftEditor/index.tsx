@@ -37,13 +37,26 @@ const emptyContentState = convertFromRaw({
   ],
 });
 
-const DraftEditor: React.FC<{
-  maxLength?: number;
-  readOnly?: boolean;
-  onPost: (text: string, blocks: Block[][]) => Promise<any>;
-  blocks?: Block[][];
-  images?: ImageType[];
-}> = ({
+type ReadOnly = {
+  readOnly: true;
+  onPost?: undefined;
+};
+type EditOnly = {
+  readOnly?: undefined;
+  onPost: (
+    text: string,
+    blocks: Block[][],
+    images: ImageType[]
+  ) => Promise<any>;
+};
+
+const DraftEditor: React.FC<
+  {
+    maxLength?: number;
+    blocks?: Block[][];
+    images?: ImageType[];
+  } & (ReadOnly | EditOnly)
+> = ({
   maxLength = 300,
   onPost,
   blocks,
@@ -97,12 +110,13 @@ const DraftEditor: React.FC<{
     // setSuggestions(defaultSuggestionsFilter(value, mentions));
   };
   const onPostText = () => {
+    if (readOnly || !onPost) return;
     const content = editorState.getCurrentContent();
     const plainText = content.getPlainText();
     const converted = convertToRaw(content);
     const parser = new DraftContentParser(converted);
     const blocks = parser.parseToTextBlocks();
-    onPost(plainText, blocks).then(() => {
+    onPost(plainText, blocks, images.get).then(() => {
       setEditorState(getInitialEditorState);
       images.set([]);
     });

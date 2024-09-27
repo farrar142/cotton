@@ -1,4 +1,5 @@
 import { Block } from '#/utils/textEditor/blockTypes';
+import { ImageType } from '../commons/types';
 import { GenericAPI, Paginated } from '../general';
 import { User } from '../users/types';
 
@@ -6,6 +7,7 @@ export type PostUpsert = {
   text: string;
   blocks: Block[][];
   mentions: { mentioned_to: number }[];
+  images: ImageType[];
 };
 export type Post = PostUpsert & {
   id: number;

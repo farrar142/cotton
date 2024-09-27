@@ -29,6 +29,7 @@ import { Post } from '#/api/posts';
 import { PostTimeline } from '#/components/timelines';
 import useUser from '#/hooks/useUser';
 import { useLoginWindow } from '#/hooks/useLoginWindow';
+import { ImageType } from '#/api/commons/types';
 // import PostWriter from '#/PostWriter';
 // const DraftEditor = dynamic(() => import('#/PostWriter/DraftEditor'), {
 //   ssr: true,
@@ -44,12 +45,12 @@ const Home = () => {
     if (!user) return openLoginWindow();
     tabValue.set(newValue);
   };
-  const onPost = (text: string, blocks: Block[][]) => {
+  const onPost = (text: string, blocks: Block[][], images: ImageType[]) => {
     const mentions = blocks
       .map((line) => line.filter((block) => block.type === 'mention'))
       .flatMap((block) => block)
       .map((block) => ({ mentioned_to: parseInt(block.id) }));
-    return API.Posts.post.postItem({ text, blocks, mentions });
+    return API.Posts.post.postItem({ text, blocks, mentions, images });
   };
 
   return (
