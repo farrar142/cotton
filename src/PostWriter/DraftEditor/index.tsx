@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 
 import API from '#/api';
 import useValue from '#/hooks/useValue';
@@ -21,6 +21,7 @@ import '@draft-js-plugins/image/lib/plugin.css';
 import 'draft-js/dist/Draft.css';
 import ImageEditor from './ImageEditor';
 import { ImageType } from '#/api/commons/types';
+import { glassmorphism } from '#/styles';
 
 const emptyContentState = convertFromRaw({
   entityMap: {},
@@ -35,22 +36,6 @@ const emptyContentState = convertFromRaw({
     },
   ],
 });
-
-const mentionPlugin = createMentionPlugin({
-  entityMutability: 'IMMUTABLE',
-  theme: mentionsStyles,
-  mentionPrefix: '@',
-  supportWhitespace: true,
-  mentionComponent: MentionComponent,
-});
-
-const { MentionSuggestions } = mentionPlugin;
-mentionPlugin.decorators = [
-  ...(mentionPlugin.decorators || []),
-  textLimitDecorator(300),
-];
-const imagePlugin = createImagePlugin();
-const plugins = [mentionPlugin, imagePlugin];
 
 const DraftEditor: React.FC<{
   maxLength?: number;
@@ -75,6 +60,27 @@ const DraftEditor: React.FC<{
       : EditorState.createWithContent(emptyContentState);
 
   const [editorState, setEditorState] = useState(getInitialEditorState);
+
+  //mentions
+  const { plugins, MentionSuggestions } = useMemo(() => {
+    const mentionPlugin = createMentionPlugin({
+      entityMutability: 'IMMUTABLE',
+      theme: mentionsStyles,
+      mentionPrefix: '@',
+      supportWhitespace: true,
+      mentionComponent: MentionComponent,
+    });
+
+    const { MentionSuggestions } = mentionPlugin;
+    mentionPlugin.decorators = [
+      ...(mentionPlugin.decorators || []),
+      textLimitDecorator(300),
+    ];
+    const imagePlugin = createImagePlugin();
+    const plugins = [mentionPlugin, imagePlugin];
+    return { plugins, MentionSuggestions };
+  }, []);
+
   const [suggestions, setSuggestions] = useState<MentionData[]>([]);
   const images = useValue<ImageType[]>(_images);
   const textLength = useValue(0);
@@ -119,16 +125,14 @@ const DraftEditor: React.FC<{
       spacing={1}
       sx={{
         'div[role="listbox"]': {
-          bgcolor: theme.palette.background.default,
-          py: 3,
+          py: 0.5,
           minWidth: '200px',
           width: '200px',
-          borderColor: 'transparent',
-          borderTopColor: 'transparent',
           div: {
             cursor: 'pointer',
           },
           zIndex: 10,
+          ...glassmorphism(theme),
         },
         width: '100%',
       }}
@@ -150,7 +154,8 @@ const DraftEditor: React.FC<{
         onOpenChange={onOpenChange}
         suggestions={suggestions}
         onSearchChange={onSearchChange}
-        onAddMention={() => {
+        onAddMention={(mention) => {
+          console.log(mention);
           // get the mention object selected
         }}
         entryComponent={MentionEntry}

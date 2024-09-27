@@ -103,6 +103,7 @@ function App({ Component, pageProps }: CustomAppProps) {
     //@ts-ignore
     if (pageProps.error) return <title>-</title>;
     if (Component.getMeta) return Component.getMeta(pageProps);
+    else return <title>Cotton</title>;
   }, [Component, pageProps]);
 
   if (pageProps.error) {

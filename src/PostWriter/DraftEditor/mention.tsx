@@ -1,7 +1,7 @@
 import { User } from '#/api/users/types';
 import { MentionPluginTheme, MentionData } from '@draft-js-plugins/mention';
 import { SubMentionComponentProps } from '@draft-js-plugins/mention/lib/Mention';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { MouseEventHandler } from 'react';
 
 export interface EntryComponentProps {
@@ -29,6 +29,7 @@ export const MentionEntry: React.FC<EntryComponentProps> = (props) => {
     isFocused, // eslint-disable-line @typescript-eslint/no-unused-vars
     ...parentProps
   } = props;
+  const _theme = useTheme();
   return (
     <Box
       id={props.id}
@@ -40,6 +41,9 @@ export const MentionEntry: React.FC<EntryComponentProps> = (props) => {
       //   className={theme?.mentionSuggestions}
       sx={{
         bgcolor: isFocused ? 'var(--mention-selected)' : 'inherit',
+        // borderColor: _theme.palette.info.light,
+        // borderWidth: '1px',
+        // borderStyle: 'solid',
       }}
     >
       <Typography

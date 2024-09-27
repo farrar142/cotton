@@ -32,13 +32,25 @@ const customTheme = createTheme({
     },
   },
 });
+const threeDigitTranslate = (hex: string) => {
+  const splitted = hex.split('#')[1];
+  if (splitted.length === 3)
+    return (
+      '#' +
+      Array(splitted)
+        .map((char) => char + char)
+        .join('')
+    );
+  return hex;
+};
 export const glassmorphism = (theme: Theme) => {
+  const hex = threeDigitTranslate(theme.palette.background.default);
   return {
     boxShadow: 3,
-    border: `1px solid ${theme.palette.background.default}88`,
-    borderBottom: `1px solid ${theme.palette.background.default}33`,
-    borderRight: `1px solid ${theme.palette.background.default}33`,
-    bgcolor: `${theme.palette.background.default}11`,
+    border: `1px solid ${hex}88`,
+    borderBottom: `1px solid ${hex}33`,
+    borderRight: `1px solid ${hex}33`,
+    bgcolor: `${hex}11`,
     backdropFilter: 'blur(5px)',
   };
 };
