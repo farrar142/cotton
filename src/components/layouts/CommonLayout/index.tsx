@@ -41,13 +41,7 @@ const CommonLayout: React.FC<{
       }}
     >
       <Box flex={1}>
-        <Box
-          position='sticky'
-          height='100vh'
-          minWidth={100}
-          top={0}
-          left='100%'
-        >
+        <Box position='sticky' height='100vh' minWidth={80} top={0} left='100%'>
           <Box
             width='100%'
             display='flex'
@@ -67,7 +61,7 @@ const CommonLayout: React.FC<{
         />
       </Box>
       <Box position='relative'>{children}</Box>
-      <Box flex={1} minWidth={100} display={media ? 'none' : 'block'}>
+      <Box flex={1} minWidth={80} display={media ? 'none' : 'block'}>
         <Box position='sticky' top={0}>
           오른쪽사이드바
         </Box>
