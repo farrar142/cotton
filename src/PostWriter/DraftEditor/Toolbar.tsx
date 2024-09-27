@@ -11,16 +11,19 @@ import {
 import { Image } from '@mui/icons-material';
 import { EditorState } from 'draft-js';
 import { ChangeEventHandler, createRef, useMemo } from 'react';
+import { getBase64 } from '#/utils/images/getBase64';
+import { resizeImage } from '#/utils/images/resizeImage';
+import { ImageType } from '#/api/commons/types';
 
 const DraftEditorToolbar: React.FC<{
+  images: UseValue<ImageType[]>;
   textLength: UseValue<number>;
   maxLength: number;
   editorState: EditorState;
   onPost: () => void;
-}> = ({ textLength, maxLength, editorState, onPost }) => {
+}> = ({ textLength, maxLength, images, editorState, onPost }) => {
   const [user] = useUser();
   const inputRef = createRef<HTMLInputElement>();
-  const images = useValue<string[]>([]);
 
   const isTextOver = useMemo(
     () => maxLength < textLength.get,
@@ -36,14 +39,25 @@ const DraftEditorToolbar: React.FC<{
 
   const onImageButtonClick = () => {
     if (!inputRef.current) return;
-    console.log('click?');
     inputRef.current.click();
   };
   const onInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     e.preventDefault();
-    const files = [...(e.target.files || [])].filter(
-      (file, index) => index <= 4
+    const availableImageLength = 4 - images.get.length;
+    const blobs = [...(e.target.files || [])].filter(
+      (file, index) => index <= availableImageLength
     );
+    e.currentTarget.value = '';
+    e.target.value = '';
+    if (blobs.length === 0) return;
+    const files = Promise.all(blobs.map((file) => getBase64(file)));
+    const resized = files.then((files) =>
+      Promise.all(files.map((file) => resizeImage(file, 1024)))
+    );
+    const typed: Promise<ImageType[]> = resized.then((files) =>
+      files.map((url) => ({ id: -1, url }))
+    );
+    typed.then((imgs) => images.set((p) => [...p, ...imgs]));
   };
 
   return (
@@ -56,6 +70,7 @@ const DraftEditorToolbar: React.FC<{
             multiple
             type='file'
             accept='image/png, image/gif, image/jpeg'
+            onChange={onInputChange}
             style={{ display: 'none', visibility: 'hidden' }}
           />
         </IconButton>

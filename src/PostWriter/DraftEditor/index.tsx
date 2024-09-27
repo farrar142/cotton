@@ -19,6 +19,8 @@ import { textLimitDecorator } from './textLimitDecorator';
 import '@draft-js-plugins/mention/lib/plugin.css';
 import '@draft-js-plugins/image/lib/plugin.css';
 import 'draft-js/dist/Draft.css';
+import ImageEditor from './ImageEditor';
+import { ImageType } from '#/api/commons/types';
 
 const emptyContentState = convertFromRaw({
   entityMap: {},
@@ -55,7 +57,14 @@ const DraftEditor: React.FC<{
   readOnly?: boolean;
   onPost: (text: string, blocks: Block[][]) => void;
   blocks?: Block[][];
-}> = ({ maxLength = 300, onPost, blocks, readOnly = false }) => {
+  images?: ImageType[];
+}> = ({
+  maxLength = 300,
+  onPost,
+  blocks,
+  readOnly = false,
+  images: _images = [],
+}) => {
   const theme = useTheme();
   const editorRef = useRef<Editor>(null);
   const [editorState, setEditorState] = useState(() =>
@@ -66,6 +75,7 @@ const DraftEditor: React.FC<{
       : EditorState.createWithContent(emptyContentState)
   );
   const [suggestions, setSuggestions] = useState<MentionData[]>([]);
+  const images = useValue<ImageType[]>(_images);
   const textLength = useValue(0);
 
   const [open, setOpen] = useState(false);
@@ -128,6 +138,7 @@ const DraftEditor: React.FC<{
         }}
         entryComponent={MentionEntry}
       />
+      <ImageEditor images={images} />
       {readOnly === false && (
         <Box>
           <Divider />
@@ -136,6 +147,7 @@ const DraftEditor: React.FC<{
             textLength={textLength}
             editorState={editorState}
             onPost={onPostText}
+            images={images}
           />
         </Box>
       )}

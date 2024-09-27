@@ -62,6 +62,7 @@ const Home = () => {
             position: 'sticky',
             top: 0,
             backdropFilter: 'blur(5px)',
+            zIndex: 2,
           }}
         >
           <TabList

@@ -4,7 +4,6 @@ import useUser from '#/hooks/useUser';
 import {
   Bookmark,
   BookmarkBorder,
-  BookmarkOutlined,
   Home,
   HomeOutlined,
   Login,
@@ -13,7 +12,6 @@ import {
   Person,
   PersonOutlineOutlined,
   SavedSearch,
-  Search,
   SearchOutlined,
   SvgIconComponent,
 } from '@mui/icons-material';
@@ -26,8 +24,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import React from 'react';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 const NavBarItem: React.FC<{
   url: string;
@@ -36,6 +33,7 @@ const NavBarItem: React.FC<{
   deactive: SvgIconComponent;
   isSmall: boolean;
 }> = ({ url, active, deactive, verbose, isSmall }) => {
+  const theme = useTheme();
   const router = useRouter();
   const isCurrentUrl = useMemo(() => {
     return router.asPath.startsWith(url);
@@ -43,22 +41,30 @@ const NavBarItem: React.FC<{
   const Active = active;
   const Deactive = deactive;
   return (
-    <Stack
-      direction='row'
-      width={isSmall ? undefined : '100%'}
-      alignItems='center'
+    <NextLink
+      href={url}
+      color='textPrimary'
+      sx={{
+        ':hover': {
+          color: theme.palette.info.light,
+        },
+      }}
     >
-      <NextLink href={url}>
-        <IconButton size='small'>
+      <Stack
+        direction='row'
+        width={isSmall ? undefined : '100%'}
+        alignItems='center'
+      >
+        <IconButton size='small' color='inherit'>
           {isCurrentUrl ? (
             <Active fontSize='large' />
           ) : (
             <Deactive fontSize='large' />
           )}
         </IconButton>
-      </NextLink>
-      {isSmall || <Typography>{verbose}</Typography>}
-    </Stack>
+        {isSmall || <Typography>{verbose}</Typography>}
+      </Stack>
+    </NextLink>
   );
 };
 
