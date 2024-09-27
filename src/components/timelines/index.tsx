@@ -86,9 +86,8 @@ const PostItem: React.FC<{ post: Post }> = ({ post }) => {
 
   return (
     <Stack>
-      <Divider sx={{ mb: 1 }} />
       {post.relavant_repost && (
-        <Stack direction='row' spacing={1} pl={2.5}>
+        <Stack direction='row' spacing={1} pl={4.5}>
           <Typography
             display='flex'
             alignItems='center'
@@ -107,8 +106,8 @@ const PostItem: React.FC<{ post: Post }> = ({ post }) => {
           </Typography>
         </Stack>
       )}
-      <Box display='flex' flexDirection='row' width='100%'>
-        <Box minWidth={25} mt={1.5} mr={1}>
+      <Box display='flex' flexDirection='row' width='100%' px={2}>
+        <Box mt={1.5} mr={1}>
           <Avatar />
         </Box>
         <Stack flex={1} width='100%'>
@@ -199,6 +198,7 @@ const PostItem: React.FC<{ post: Post }> = ({ post }) => {
           </Grid2>
         </Stack>
       </Box>
+      <Divider />
     </Stack>
   );
 };

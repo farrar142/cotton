@@ -101,6 +101,13 @@
     immutable "~3.7.4"
     prop-types "^15.8.1"
 
+"@draft-js-plugins/image@^4.1.4":
+  version "4.1.4"
+  resolved "https://registry.npmjs.org/@draft-js-plugins/image/-/image-4.1.4.tgz"
+  integrity sha512-gLEYjhG2n9v5Y+e9sH9OD0/XVbHOaBwSBo3loXScmwSOTFP+9GBwp6HxCXvnBJj15SOQqGVvEkf6W3Jlzu/8ng==
+  dependencies:
+    clsx "^1.2.1"
+
 "@draft-js-plugins/mention@^5.3.0":
   version "5.3.0"
   resolved "https://registry.npmjs.org/@draft-js-plugins/mention/-/mention-5.3.0.tgz"
@@ -1266,6 +1273,11 @@ client-only@0.0.1:
   integrity sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==
 
 clsx@^1.1.0:
+  version "1.2.1"
+  resolved "https://registry.npmjs.org/clsx/-/clsx-1.2.1.tgz"
+  integrity sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==
+
+clsx@^1.2.1:
   version "1.2.1"
   resolved "https://registry.npmjs.org/clsx/-/clsx-1.2.1.tgz"
   integrity sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==

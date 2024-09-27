@@ -1,50 +1,24 @@
-import {
-  MouseEventHandler,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 
-import {
-  EditorState,
-  ContentState,
-  convertFromRaw,
-  convertToRaw,
-  ContentBlock,
-  CompositeDecorator,
-  DraftDecorator,
-  DraftDecoratorComponentProps,
-  RawDraftContentState,
-} from 'draft-js';
-import Editor from '@draft-js-plugins/editor';
-import createMentionPlugin, {
-  defaultSuggestionsFilter,
-  MentionPluginTheme,
-  MentionData,
-} from '@draft-js-plugins/mention';
-import 'draft-js/dist/Draft.css';
-import '@draft-js-plugins/mention/lib/plugin.css';
-import mentionsStyles from './MentionsStyles.module.css';
 import API from '#/api';
-import { User } from '#/api/users/types';
-import {
-  Box,
-  CircularProgress,
-  Stack,
-  Typography,
-  useTheme,
-} from '@mui/material';
-import { SubMentionComponentProps } from '@draft-js-plugins/mention/lib/Mention';
 import useValue from '#/hooks/useValue';
-import DraftEditorToolbar from './Toolbar';
-import { handleTextLength } from './functions';
-import { styleMap } from './plugins';
-import { textLimitDecorator } from './textLimitDecorator';
-import { userToMentonData, MentionEntry, MentionComponent } from './mention';
 import { Block } from '#/utils/textEditor/blockTypes';
 import { DraftContentParser } from '#/utils/textEditor/draftParser';
+import Editor from '@draft-js-plugins/editor';
+import createImagePlugin from '@draft-js-plugins/image';
+import createMentionPlugin, { MentionData } from '@draft-js-plugins/mention';
+import { Box, Divider, Stack, useTheme } from '@mui/material';
+import { convertFromRaw, convertToRaw, EditorState } from 'draft-js';
+import mentionsStyles from './MentionsStyles.module.css';
+import DraftEditorToolbar from './Toolbar';
+import { handleTextLength } from './functions';
+import { MentionComponent, MentionEntry, userToMentonData } from './mention';
+import { styleMap } from './plugins';
+import { textLimitDecorator } from './textLimitDecorator';
+
+import '@draft-js-plugins/mention/lib/plugin.css';
+import '@draft-js-plugins/image/lib/plugin.css';
+import 'draft-js/dist/Draft.css';
 
 const emptyContentState = convertFromRaw({
   entityMap: {},
@@ -59,6 +33,22 @@ const emptyContentState = convertFromRaw({
     },
   ],
 });
+
+const mentionPlugin = createMentionPlugin({
+  entityMutability: 'IMMUTABLE',
+  theme: mentionsStyles,
+  mentionPrefix: '@',
+  supportWhitespace: true,
+  mentionComponent: MentionComponent,
+});
+
+const { MentionSuggestions } = mentionPlugin;
+mentionPlugin.decorators = [
+  ...(mentionPlugin.decorators || []),
+  textLimitDecorator(300),
+];
+const imagePlugin = createImagePlugin();
+const plugins = [mentionPlugin, imagePlugin];
 
 const DraftEditor: React.FC<{
   maxLength?: number;
@@ -77,20 +67,6 @@ const DraftEditor: React.FC<{
   );
   const [suggestions, setSuggestions] = useState<MentionData[]>([]);
   const textLength = useValue(0);
-
-  const { MentionSuggestions, plugins } = useMemo(() => {
-    const mentionPlugin = createMentionPlugin({
-      entityMutability: 'IMMUTABLE',
-      theme: mentionsStyles,
-      mentionPrefix: '@',
-      supportWhitespace: true,
-      mentionComponent: MentionComponent,
-    });
-    const { MentionSuggestions } = mentionPlugin;
-    (mentionPlugin.decorators || []).push(textLimitDecorator(300));
-    const plugins = [mentionPlugin];
-    return { plugins, MentionSuggestions };
-  }, []);
 
   const [open, setOpen] = useState(false);
   const onOpenChange = useCallback((_open: boolean) => {
@@ -112,7 +88,8 @@ const DraftEditor: React.FC<{
     onPost(plainText, blocks);
   };
   return (
-    <Box
+    <Stack
+      spacing={1}
       sx={{
         'div[role="listbox"]': {
           bgcolor: theme.palette.background.default,
@@ -126,9 +103,7 @@ const DraftEditor: React.FC<{
           },
           zIndex: 10,
         },
-        '.DraftEditor-root': {
-          minHeight: '100px',
-        },
+        width: '100%',
       }}
     >
       <Editor
@@ -154,14 +129,17 @@ const DraftEditor: React.FC<{
         entryComponent={MentionEntry}
       />
       {readOnly === false && (
-        <DraftEditorToolbar
-          maxLength={maxLength}
-          textLength={textLength}
-          editorState={editorState}
-          onPost={onPostText}
-        />
+        <Box>
+          <Divider />
+          <DraftEditorToolbar
+            maxLength={maxLength}
+            textLength={textLength}
+            editorState={editorState}
+            onPost={onPostText}
+          />
+        </Box>
       )}
-    </Box>
+    </Stack>
   );
 };
 

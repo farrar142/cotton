@@ -4,6 +4,7 @@ import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import {
+  Avatar,
   Box,
   Button,
   Dialog,
@@ -40,7 +41,6 @@ const Home = () => {
   const [openLoginWindow] = useLoginWindow();
 
   const handleChange = (event: SyntheticEvent, newValue: string) => {
-    return openLoginWindow();
     if (!user) return openLoginWindow();
     tabValue.set(newValue);
   };
@@ -67,20 +67,49 @@ const Home = () => {
           <TabList
             onChange={handleChange}
             aria-label='lab API tabs example'
-            sx={{ button: { width: '50%' } }}
+            sx={{
+              button: { width: '50%' },
+              borderLeftWidth: '1px',
+              borderRightWidth: '1px',
+              borderBottomWidth: '0px',
+              borderTopWidth: '0px',
+              borderStyle: 'solid',
+              borderColor: theme.palette.divider,
+            }}
           >
             <Tab label='추천' value='1' />
             <Tab label='팔로우 중' value='2' />
           </TabList>
         </Box>
-        <TabPanel value='1'>
+        <TabPanel
+          value='1'
+          sx={{
+            p: 0,
+            borderWidth: '1px',
+            borderColor: theme.palette.divider,
+            borderStyle: 'solid',
+          }}
+        >
           <PostTimeline
             getter={API.Posts.post.getGlobalTimeline}
             type='global'
           />
         </TabPanel>
-        <TabPanel value='2'>
-          <DraftEditor onPost={onPost} />
+        <TabPanel
+          value='2'
+          sx={{
+            p: 0,
+            pt: 2,
+            borderWidth: '1px',
+            borderColor: theme.palette.divider,
+            borderStyle: 'solid',
+          }}
+        >
+          <Box px={2} display='flex' flexDirection='row'>
+            <Avatar sx={{ mr: 1 }} />
+            <DraftEditor onPost={onPost} />
+          </Box>
+          <Divider sx={{ mb: 1 }} />
           <PostTimeline
             getter={API.Posts.post.getFollowingTimeline}
             type='followings'

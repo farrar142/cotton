@@ -1,10 +1,16 @@
-import { createStyles, createTheme, Theme } from '@mui/material';
+import { createStyles, createTheme, Theme, Typography } from '@mui/material';
 import { atom, useRecoilState } from 'recoil';
 
 const isDark = atom({ key: 'darkmode', default: true });
 
 export const useDarkMode = () => useRecoilState(isDark);
-
+const fontFamily = [
+  'Noto Sans KR',
+  'Roboto',
+  'Helvetica',
+  'Arial',
+  'sans-serif',
+].join(',');
 const customTheme = createTheme({
   breakpoints: {
     values: {
@@ -18,6 +24,11 @@ const customTheme = createTheme({
       lg: 1280,
       // extra-large
       xl: 1600,
+    },
+  },
+  typography: {
+    allVariants: {
+      fontFamily,
     },
   },
 });
