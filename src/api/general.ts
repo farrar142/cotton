@@ -61,6 +61,10 @@ export class GenericAPI<
     const endpoint = this.getEndpoint(`/${id}`);
     return client.delete(endpoint);
   };
+  getCount = (params?: Q) => {
+    const endpoint = this.getEndpoint('/count/');
+    return this.client.get<{ count: number }>(endpoint, { params });
+  };
 }
 
 export type CreateGenericApi<

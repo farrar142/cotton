@@ -10,7 +10,14 @@ import {
   IconButton,
   useTheme,
 } from '@mui/material';
-import { CSSProperties, useEffect, useMemo } from 'react';
+import {
+  CSSProperties,
+  MouseEventHandler,
+  ReactNode,
+  useEffect,
+  useMemo,
+} from 'react';
+import { ScrollPreventedBackdrop } from '../utils/ScrollPreventedBackdrop';
 
 const OriginalImageViewer: React.FC<{
   post: Post;
@@ -19,15 +26,6 @@ const OriginalImageViewer: React.FC<{
   const theme = useTheme();
   const image = post.images[index.get];
   const open = Boolean(image);
-
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [open]);
 
   const hasPrev = useMemo(() => {
     if (index.get === 0) return;
@@ -72,11 +70,7 @@ const OriginalImageViewer: React.FC<{
   }, [index.get]);
   if (!open) return <></>;
   return (
-    <Backdrop
-      open={open}
-      onClick={() => index.set(-1)}
-      sx={{ width: '100%', height: '100%' }}
-    >
+    <ScrollPreventedBackdrop open={open} onClick={() => index.set(-1)}>
       <IconButton
         sx={{
           position: 'absolute',
@@ -97,7 +91,7 @@ const OriginalImageViewer: React.FC<{
       </Box>
       {hasPrev}
       {hasNext}
-    </Backdrop>
+    </ScrollPreventedBackdrop>
   );
 };
 

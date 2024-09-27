@@ -89,6 +89,7 @@ export const PostItem: React.FC<{ post: Post }> = ({ post }) => {
   const target = useRef<HTMLElement>();
 
   useEffect(() => {
+    if (!user) return;
     if (!target.current) return;
     const t = target.current;
     if (hasView) return;
@@ -96,7 +97,7 @@ export const PostItem: React.FC<{ post: Post }> = ({ post }) => {
     observer.registerCallback(onView);
     observer.observe(t);
     return () => observer.unobserve(t);
-  }, [hasView]);
+  }, [hasView, user]);
 
   return (
     <Stack>

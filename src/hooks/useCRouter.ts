@@ -18,5 +18,6 @@ export const useRouter = () => {
     reload: router?.reload || (() => {}),
     replace: router?.replace || RoutingFunc,
     asPath: router?.asPath || '',
+    back: router?.back || (() => {}),
   };
 };

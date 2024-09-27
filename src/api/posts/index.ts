@@ -28,6 +28,12 @@ export type Post = PostUpsert & {
 type PostChildUrl = 'reposts' | 'views' | 'favorites' | 'bookmarks';
 
 class PostAPIGenerator extends GenericAPI<Post, PostUpsert> {
+  get getUserTimeline() {
+    return (username: string) =>
+      this.getItemsRequest<Post, {}, Paginated<Post>>(
+        this.getEndpoint(`/timeline/${username}/`)
+      );
+  }
   get getFollowingTimeline() {
     return this.getItemsRequest<Post, {}, Paginated<Post>>(
       this.getEndpoint('/timeline/followings/')
