@@ -49,7 +49,7 @@ const Home = () => {
       .map((line) => line.filter((block) => block.type === 'mention'))
       .flatMap((block) => block)
       .map((block) => ({ mentioned_to: parseInt(block.id) }));
-    API.Posts.post.postItem({ text, blocks, mentions });
+    return API.Posts.post.postItem({ text, blocks, mentions });
   };
 
   return (

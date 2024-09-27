@@ -5,12 +5,19 @@ import {
   Button,
   CircularProgress,
   IconButton,
+  Popover,
   Stack,
   Typography,
+  useTheme,
 } from '@mui/material';
-import { Image } from '@mui/icons-material';
+import {
+  EmojiEmotions,
+  EmojiEmotionsOutlined,
+  Image,
+} from '@mui/icons-material';
 import { EditorState } from 'draft-js';
-import { ChangeEventHandler, createRef, useMemo } from 'react';
+import EmojiPicker from 'emoji-picker-react';
+import { ChangeEventHandler, createRef, useId, useMemo } from 'react';
 import { getBase64 } from '#/utils/images/getBase64';
 import { resizeImage } from '#/utils/images/resizeImage';
 import { ImageType } from '#/api/commons/types';
@@ -21,22 +28,25 @@ const DraftEditorToolbar: React.FC<{
   maxLength: number;
   editorState: EditorState;
   onPost: () => void;
-}> = ({ textLength, maxLength, images, editorState, onPost }) => {
+  onEmojiClick: (emoji: string) => void;
+}> = ({ textLength, maxLength, images, editorState, onEmojiClick, onPost }) => {
+  const theme = useTheme();
   const [user] = useUser();
-  const inputRef = createRef<HTMLInputElement>();
 
+  //Texts
   const isTextOver = useMemo(
     () => maxLength < textLength.get,
     [maxLength, textLength]
   );
 
-  const [share, displayLength] = useMemo(() => {
+  const [share, displayTextLength] = useMemo(() => {
     const remainder = textLength.get % maxLength;
     const share = Math.floor(textLength.get / maxLength);
     if (1 <= share && remainder === 0) return [share, maxLength];
     return [share, remainder];
   }, [textLength.get, maxLength]);
-
+  //Images
+  const inputRef = createRef<HTMLInputElement>();
   const onImageButtonClick = () => {
     if (!inputRef.current) return;
     inputRef.current.click();
@@ -59,12 +69,15 @@ const DraftEditorToolbar: React.FC<{
     );
     typed.then((imgs) => images.set((p) => [...p, ...imgs]));
   };
+  //Emojis
+  const emojiElId = useId();
+  const anchorEl = useValue<HTMLButtonElement | null>(null);
 
   return (
     <Box width='100%' display='flex' justifyContent='space-between'>
-      <Stack direction='row' spacing={1} alignItems='center'>
+      <Stack direction='row' alignItems='center'>
         <IconButton size='small' color='info' onClick={onImageButtonClick}>
-          <Image sx={{ width: 25, height: 25 }} />
+          <Image />
           <input
             ref={inputRef}
             multiple
@@ -74,13 +87,34 @@ const DraftEditorToolbar: React.FC<{
             style={{ display: 'none', visibility: 'hidden' }}
           />
         </IconButton>
+        <IconButton
+          color='info'
+          aria-describedby={emojiElId}
+          onClick={(e) => anchorEl.set(e.currentTarget)}
+        >
+          <EmojiEmotionsOutlined />
+        </IconButton>
+        <Popover
+          open={Boolean(anchorEl.get)}
+          anchorEl={anchorEl.get}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          onClose={() => anchorEl.set(null)}
+        >
+          <EmojiPicker
+            //@ts-ignore
+            theme={theme.palette.mode}
+            onEmojiClick={(e) => {
+              onEmojiClick(e.emoji);
+            }}
+          />
+        </Popover>
       </Stack>
       <Stack direction='row' spacing={1} alignItems='center' m={1}>
         <CircularProgress
           size='25px'
           color={Boolean(share) ? 'error' : 'primary'}
           variant='determinate'
-          value={(displayLength * 100) / maxLength}
+          value={(displayTextLength * 100) / maxLength}
         />
         <Typography
           variant='caption'

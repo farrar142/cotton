@@ -8,7 +8,7 @@ import Editor from '@draft-js-plugins/editor';
 import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData } from '@draft-js-plugins/mention';
 import { Box, Divider, Stack, useTheme } from '@mui/material';
-import { convertFromRaw, convertToRaw, EditorState } from 'draft-js';
+import { convertFromRaw, convertToRaw, EditorState, Modifier } from 'draft-js';
 import mentionsStyles from './MentionsStyles.module.css';
 import DraftEditorToolbar from './Toolbar';
 import { handleTextLength } from './functions';
@@ -55,7 +55,7 @@ const plugins = [mentionPlugin, imagePlugin];
 const DraftEditor: React.FC<{
   maxLength?: number;
   readOnly?: boolean;
-  onPost: (text: string, blocks: Block[][]) => void;
+  onPost: (text: string, blocks: Block[][]) => Promise<any>;
   blocks?: Block[][];
   images?: ImageType[];
 }> = ({
@@ -67,13 +67,14 @@ const DraftEditor: React.FC<{
 }) => {
   const theme = useTheme();
   const editorRef = useRef<Editor>(null);
-  const [editorState, setEditorState] = useState(() =>
+  const getInitialEditorState = () =>
     blocks
       ? EditorState.createWithContent(
           DraftContentParser.blocksToContentState(blocks)
         )
-      : EditorState.createWithContent(emptyContentState)
-  );
+      : EditorState.createWithContent(emptyContentState);
+
+  const [editorState, setEditorState] = useState(getInitialEditorState);
   const [suggestions, setSuggestions] = useState<MentionData[]>([]);
   const images = useValue<ImageType[]>(_images);
   const textLength = useValue(0);
@@ -95,7 +96,23 @@ const DraftEditor: React.FC<{
     const converted = convertToRaw(content);
     const parser = new DraftContentParser(converted);
     const blocks = parser.parseToTextBlocks();
-    onPost(plainText, blocks);
+    onPost(plainText, blocks).then(() => {
+      setEditorState(getInitialEditorState);
+      images.set([]);
+    });
+  };
+
+  const onEmojiClick = (emoji: string) => {
+    const cs = editorState.getCurrentContent();
+    const selection = editorState.getSelection();
+    const newState = Modifier.insertText(cs, selection, emoji);
+    const newEditorState = EditorState.push(
+      editorState,
+      newState,
+      'insert-characters'
+    );
+    setEditorState(newEditorState);
+    handleTextLength(newEditorState, textLength, maxLength);
   };
   return (
     <Stack
@@ -148,6 +165,7 @@ const DraftEditor: React.FC<{
             editorState={editorState}
             onPost={onPostText}
             images={images}
+            onEmojiClick={onEmojiClick}
           />
         </Box>
       )}
