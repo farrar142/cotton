@@ -5,14 +5,8 @@ import { AxiosResponse } from 'axios';
 import { useEffect } from 'react';
 import { atomFamily, useRecoilState } from 'recoil';
 import { PostItem } from './PostItem';
+import { usePostList } from './hooks';
 
-const postListAtom = atomFamily<Post[], string>({
-  key: 'postListAtom',
-  default: (type: string) => [],
-});
-const usePostList = (type: string) => {
-  return useRecoilState(postListAtom(type));
-};
 export const PostTimeline: React.FC<{
   getter: (
     params?: {},

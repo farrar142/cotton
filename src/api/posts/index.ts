@@ -34,6 +34,12 @@ class PostAPIGenerator extends GenericAPI<Post, PostUpsert> {
         this.getEndpoint(`/timeline/${username}/`)
       );
   }
+  get getUserMediaItems() {
+    return (username: string) =>
+      this.getItemsRequest<Post, {}, Paginated<Post>>(
+        this.getEndpoint(`/timeline/${username}/media/`)
+      );
+  }
   get getFavoriteItems() {
     return (username: string) =>
       this.getItemsRequest<Post, {}, Paginated<Post>>(
