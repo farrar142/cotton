@@ -8,7 +8,7 @@ type Registered = {
   registered_at: string;
   is_registered: true;
 };
-export type User = (NotRegistered | Registered) & {
+type UserBase = {
   id: number;
   username: string;
   nickname: string;
@@ -20,3 +20,6 @@ export type User = (NotRegistered | Registered) & {
   followings_count: number;
   followers_count: number;
 };
+
+export type RegisteredUser = Registered & UserBase;
+export type User = (NotRegistered | Registered) & UserBase;

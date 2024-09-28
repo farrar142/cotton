@@ -2,10 +2,11 @@ import { Paginated } from '#/api/general';
 import { Post } from '#/api/posts';
 import { Stack } from '@mui/material';
 import { AxiosResponse } from 'axios';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { atomFamily, useRecoilState } from 'recoil';
 import { PostItem } from './PostItem';
 import { usePostList } from './hooks';
+import { useKeepScrollPosition } from '#/hooks/useKeepScrollPosition';
 
 export const PostTimeline: React.FC<{
   getter: (
@@ -13,7 +14,10 @@ export const PostTimeline: React.FC<{
     options?: { page: number | string }
   ) => Promise<AxiosResponse<Paginated<Post>>>;
   type: string;
-}> = ({ getter, type }) => {
+  keepScrollPosition?: boolean;
+}> = ({ getter, type, keepScrollPosition = true }) => {
+  useKeepScrollPosition(type, keepScrollPosition);
+
   const [items, setItems] = usePostList(type);
   useEffect(() => {
     if (0 < items.length) return;

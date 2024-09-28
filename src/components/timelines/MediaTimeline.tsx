@@ -10,6 +10,7 @@ import { usePostList } from './hooks';
 import { FilterNone } from '@mui/icons-material';
 import { OriginalImageViewer } from './OriginalImageViewer';
 import useValue from '#/hooks/useValue';
+import { useKeepScrollPosition } from '#/hooks/useKeepScrollPosition';
 
 const MergedPostMedia: React.FC<{ item: Post }> = ({ item }) => {
   const index = useValue(-1);
@@ -52,7 +53,9 @@ export const MediaTimeline: React.FC<{
     options?: { page: number | string }
   ) => Promise<AxiosResponse<Paginated<Post>>>;
   type: string;
-}> = ({ getter, type }) => {
+  keepScrollPosition?: boolean;
+}> = ({ getter, type, keepScrollPosition = true }) => {
+  useKeepScrollPosition(type, keepScrollPosition);
   const [items, setItems] = usePostList(type);
 
   useEffect(() => {

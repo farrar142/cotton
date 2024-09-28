@@ -2,6 +2,7 @@ import API from '#/api';
 import { User } from '#/api/users/types';
 import {
   ProfileHeader,
+  ProfileInfo,
   ProfileTab,
 } from '#/components/layouts/pages/ProfilePage';
 import { PostTimeline } from '#/components/timelines';
@@ -14,16 +15,19 @@ const ProfilePage: ExtendedNextPage<{ profile: User; postCount: number }> = ({
   profile,
   postCount,
 }) => {
-  const router = useRouter();
-  const theme = useTheme();
-  const tabValue = useValue(0);
   if (!profile.is_registered) return <></>;
 
   return (
     <Box
-      sx={{ borderWidth: '1px', borderStyle: 'solid', borderColor: 'divider' }}
+      sx={{
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderColor: 'divider',
+        pb: 10,
+      }}
     >
       <ProfileHeader profile={profile} postCount={postCount} />
+      <ProfileInfo profile={profile} />
       <ProfileTab profile={profile} />
     </Box>
   );
