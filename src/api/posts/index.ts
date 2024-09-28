@@ -8,6 +8,7 @@ export type PostUpsert = {
   blocks: Block[][];
   mentions: { mentioned_to: number }[];
   images: ImageType[];
+  parent?: number;
 };
 export type Post = PostUpsert & {
   id: number;
@@ -20,6 +21,7 @@ export type Post = PostUpsert & {
   has_favorite: boolean;
   views_count: number;
   favorites_count: number;
+  replies_count: number;
   mentions: { mentioned_to: User }[];
   relavant_repost?: User;
   latest_date: string;

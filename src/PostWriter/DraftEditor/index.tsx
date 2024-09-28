@@ -70,33 +70,45 @@ const editorAtom = atomFamily<EditorState, string>({
     }
   },
 });
+const imageAtom = atomFamily<ImageType[], string>({
+  key: 'imageAtom',
+  default: (key) => [],
+});
 
-const useEditorState = (blocks?: Block[][], key?: string) => {
-  return useRecoilState(
-    editorAtom(blocks ? JSON.stringify(blocks) : key ? key : 'undefined')
-  );
+const useEditorState = (key?: string) => {
+  return useRecoilState(editorAtom(key ? key : 'undefined'));
 };
-
+const useImage = (key: string) => {
+  const [get, set] = useRecoilState(imageAtom(key));
+  return { get, set, onTextChange: () => {}, onNumberChange: () => {} };
+};
 const DraftEditor: React.FC<
   {
     maxLength?: number;
     blocks?: Block[][];
-    images?: ImageType[];
     additionalWidth?: number;
     editorKey?: string;
+    placeholder?: string;
   } & (ReadOnly | EditOnly)
 > = ({
   maxLength = 300,
   onPost,
   blocks,
   readOnly = false,
-  images: _images = [],
   additionalWidth = 0,
   editorKey, //cache용 같은키의 에디터가 두개있을시 오류발생하니 주의
+  placeholder,
 }) => {
   const theme = useTheme();
+  const key = useMemo(
+    () => (blocks ? JSON.stringify(blocks) : editorKey) || 'undefined',
+    [blocks, editorKey]
+  );
   const editorRef = useRef<Editor>(null);
-  const [editorState, setEditorState] = useEditorState(blocks, editorKey);
+  const [editorState, setEditorState] = useEditorState(key);
+  const [suggestions, setSuggestions] = useState<MentionData[]>([]);
+  const images = useImage(key);
+  const textLength = useValue(0);
   const getInitialEditorState = () =>
     blocks
       ? EditorState.createWithContent(
@@ -125,10 +137,6 @@ const DraftEditor: React.FC<
     const plugins = [mentionPlugin, imagePlugin];
     return { plugins, MentionSuggestions };
   }, []);
-
-  const [suggestions, setSuggestions] = useState<MentionData[]>([]);
-  const images = useValue<ImageType[]>(_images);
-  const textLength = useValue(0);
 
   const [open, setOpen] = useState(false);
   const onOpenChange = useCallback((_open: boolean) => {
@@ -193,7 +201,7 @@ const DraftEditor: React.FC<
           setEditorState(e);
           handleTextLength(e, textLength, maxLength);
         }}
-        placeholder='무슨 일이 일어나고 있나요?'
+        placeholder={placeholder || '무슨 일이 일어나고 있나요?'}
         customStyleMap={styleMap}
         readOnly={readOnly}
       />
