@@ -14,45 +14,13 @@ export const OriginalImageViewer: React.FC<{
   const open = Boolean(image);
 
   const hasPrev = useMemo(() => {
-    if (index.get === 0) return;
-    return (
-      <IconButton
-        onClick={(e) => {
-          e.stopPropagation();
-          index.set((p) => p - 1);
-        }}
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '5%',
-          transform: 'translate(0,-50%)',
-          bgcolor: 'background.default',
-        }}
-      >
-        <ArrowBack />
-      </IconButton>
-    );
+    if (index.get === 0) return false;
+    return true;
   }, [index.get]);
   const hasNext = useMemo(() => {
-    if (post.images.length - 1 <= index.get) return;
+    if (post.images.length - 1 <= index.get) return false;
 
-    return (
-      <IconButton
-        onClick={(e) => {
-          e.stopPropagation();
-          index.set((p) => p + 1);
-        }}
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          right: '5%',
-          transform: 'translate(0,-50%)',
-          bgcolor: 'background.default',
-        }}
-      >
-        <ArrowForward />
-      </IconButton>
-    );
+    return true;
   }, [index.get]);
   if (!open) return <></>;
   return (
@@ -81,8 +49,40 @@ export const OriginalImageViewer: React.FC<{
           style={{ maxWidth: theme.breakpoints.values.md }}
         />
       </Box>
-      {hasPrev}
-      {hasNext}
+      {hasPrev && (
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation();
+            index.set((p) => p - 1);
+          }}
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '5%',
+            transform: 'translate(0,-50%)',
+            bgcolor: 'background.default',
+          }}
+        >
+          <ArrowBack />
+        </IconButton>
+      )}
+      {hasNext && (
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation();
+            index.set((p) => p + 1);
+          }}
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            right: '5%',
+            transform: 'translate(0,-50%)',
+            bgcolor: 'background.default',
+          }}
+        >
+          <ArrowForward />
+        </IconButton>
+      )}
     </ScrollPreventedBackdrop>
   );
 };
