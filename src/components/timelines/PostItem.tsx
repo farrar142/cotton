@@ -171,7 +171,7 @@ const _PostItem: React.FC<{
   const _showParent =
     isLastReplyOfOrigin && parent && parent.user.id !== post.user.id;
   const showRelavantPost =
-    showParent || disableLatestRepost || post.relavant_repost;
+    !showParent && !disableLatestRepost && Boolean(post.relavant_repost);
   return (
     <Stack>
       {_showOrigin ? (

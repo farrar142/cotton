@@ -12,6 +12,14 @@ const fontFamily = [
   'sans-serif',
 ].join(',');
 const customTheme = createTheme({
+  palette: {
+    primary: {
+      main: '#78d400',
+    },
+    info: {
+      main: '#78d400',
+    },
+  },
   breakpoints: {
     values: {
       // extra-small

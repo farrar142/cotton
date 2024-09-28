@@ -22,7 +22,7 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
             ml: 2,
             left: 0,
             position: 'absolute',
-            top: '-110%',
+            top: '-90%',
           }}
         >
           <Box

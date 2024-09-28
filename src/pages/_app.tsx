@@ -51,10 +51,15 @@ export default function RecoilWrapper(props: CustomAppProps) {
 
 function ProviderWrapper(props: CustomAppProps) {
   const [isDark] = useDarkMode();
+  const palette = customTheme.palette;
   const theme = createTheme({
     ...customTheme,
     breakpoints: customTheme.breakpoints,
-    palette: { mode: isDark ? 'dark' : 'light' },
+    palette: {
+      mode: isDark ? 'dark' : 'light',
+      primary: palette.primary,
+      info: palette.info,
+    },
   });
   return (
     <AppCacheProvider>

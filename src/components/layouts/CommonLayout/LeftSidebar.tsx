@@ -122,7 +122,12 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
               deactive={BookmarkBorder}
               isSmall={isSmall}
             />
-            <Box onClick={() => setIsWrite({ open: true })}>
+            <Box
+              onClick={() => setIsWrite({ open: true })}
+              display='flex'
+              alignItems='center'
+              justifyContent='center'
+            >
               {isSmall ? (
                 <IconButton color='info'>
                   <Create />
