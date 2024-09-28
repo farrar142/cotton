@@ -1,9 +1,11 @@
 import NextLink from '#/components/NextLink';
 import { useRouter } from '#/hooks/useCRouter';
+import { usePostWrite } from '#/hooks/usePostWrite';
 import useUser from '#/hooks/useUser';
 import {
   Bookmark,
   BookmarkBorder,
+  Create,
   Home,
   HomeOutlined,
   Login,
@@ -74,6 +76,7 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
   const [user] = useUser();
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down('md'));
+  const [isWrite, setIsWrite] = usePostWrite();
   return (
     <Box
       height='100%'
@@ -119,6 +122,17 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
               deactive={BookmarkBorder}
               isSmall={isSmall}
             />
+            <Box onClick={() => setIsWrite({ open: true })}>
+              {isSmall ? (
+                <IconButton color='info'>
+                  <Create />
+                </IconButton>
+              ) : (
+                <Button variant='contained' color='info' fullWidth>
+                  게시하기
+                </Button>
+              )}
+            </Box>
           </React.Fragment>
         )}
       </Stack>

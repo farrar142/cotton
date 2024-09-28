@@ -1,18 +1,12 @@
 import useValue from '#/hooks/useValue';
-import {
-  Box,
-  Button,
-  IconButton,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
 
+import { useLoginWindow } from '#/hooks/useLoginWindow';
+import useUser from '#/hooks/useUser';
 import * as React from 'react';
 import SigninComponent from '../pages/SigninComponent';
-import useUser from '#/hooks/useUser';
+import { ElevatedPostWriter } from './ElevatedPostWriter';
 import LeftSidebar from './LeftSidebar';
-import { useLoginWindow } from '#/hooks/useLoginWindow';
-import { Login } from '@mui/icons-material';
 
 const CommonLayout: React.FC<{
   children?: React.ReactNode;
@@ -66,6 +60,7 @@ const CommonLayout: React.FC<{
           오른쪽사이드바
         </Box>
       </Box>
+      <ElevatedPostWriter />
     </Box>
   );
 };

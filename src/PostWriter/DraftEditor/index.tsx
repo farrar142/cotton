@@ -1,4 +1,10 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import API from '#/api';
 import useValue from '#/hooks/useValue';
@@ -22,6 +28,7 @@ import 'draft-js/dist/Draft.css';
 import ImageEditor from './ImageEditor';
 import { ImageType } from '#/api/commons/types';
 import { glassmorphism } from '#/styles';
+import { atom, atomFamily, useRecoilState } from 'recoil';
 
 const emptyContentState = convertFromRaw({
   entityMap: {},
@@ -50,12 +57,33 @@ type EditOnly = {
   ) => Promise<any>;
 };
 
+const editorAtom = atomFamily<EditorState, string>({
+  key: 'editorAtom',
+  default: (key: string) => {
+    try {
+      const parsed = JSON.parse(key);
+      return EditorState.createWithContent(
+        DraftContentParser.blocksToContentState(parsed)
+      );
+    } catch {
+      return EditorState.createWithContent(emptyContentState);
+    }
+  },
+});
+
+const useEditorState = (blocks?: Block[][], key?: string) => {
+  return useRecoilState(
+    editorAtom(blocks ? JSON.stringify(blocks) : key ? key : 'undefined')
+  );
+};
+
 const DraftEditor: React.FC<
   {
     maxLength?: number;
     blocks?: Block[][];
     images?: ImageType[];
     additionalWidth?: number;
+    editorKey?: string;
   } & (ReadOnly | EditOnly)
 > = ({
   maxLength = 300,
@@ -64,9 +92,11 @@ const DraftEditor: React.FC<
   readOnly = false,
   images: _images = [],
   additionalWidth = 0,
+  editorKey, //cache용 같은키의 에디터가 두개있을시 오류발생하니 주의
 }) => {
   const theme = useTheme();
   const editorRef = useRef<Editor>(null);
+  const [editorState, setEditorState] = useEditorState(blocks, editorKey);
   const getInitialEditorState = () =>
     blocks
       ? EditorState.createWithContent(
@@ -74,7 +104,7 @@ const DraftEditor: React.FC<
         )
       : EditorState.createWithContent(emptyContentState);
 
-  const [editorState, setEditorState] = useState(getInitialEditorState);
+  // const [editorState, setEditorState] = useState(getInitialEditorState);
 
   //mentions
   const { plugins, MentionSuggestions } = useMemo(() => {
@@ -148,11 +178,12 @@ const DraftEditor: React.FC<
           div: {
             cursor: 'pointer',
           },
-          zIndex: 10,
+          zIndex: 1000,
           ...glassmorphism(theme),
         },
         width: `calc(100% + ${additionalWidth}px);`,
       }}
+      onClick={(e) => e.stopPropagation()}
     >
       <Editor
         ref={editorRef}
