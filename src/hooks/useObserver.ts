@@ -1,17 +1,20 @@
 import { useRef } from 'react';
 
 export const useObserver = () => {
-  const callback = useRef(() => {});
+  const onIntersection = useRef(() => {});
+  const onNotIntersection = useRef(() => {});
   const observer = useRef(
     new IntersectionObserver(
       (entries, observer) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            callback.current();
+            onIntersection.current();
+          } else {
+            onNotIntersection.current();
           }
         });
       },
-      { threshold: 1 }
+      { threshold: 1, rootMargin: '500px' }
     )
   );
 
@@ -22,7 +25,15 @@ export const useObserver = () => {
     observer.current.unobserve(element);
   };
   const registerCallback = (cb: () => void) => {
-    callback.current = cb;
+    onIntersection.current = cb;
   };
-  return { observe, unobserve, registerCallback };
+  const registerNotIntersectionCallback = (cb: () => void) => {
+    onNotIntersection.current = cb;
+  };
+  return {
+    observe,
+    unobserve,
+    onIntersection: registerCallback,
+    onNotIntersection: registerNotIntersectionCallback,
+  };
 };
