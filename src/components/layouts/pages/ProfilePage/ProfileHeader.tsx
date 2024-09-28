@@ -1,20 +1,15 @@
-import API from '#/api';
-import { RegisteredUser, User } from '#/api/users/types';
-import { PostTimeline } from '#/components/timelines';
+import { RegisteredUser } from '#/api/users/types';
 import { useRouter } from '#/hooks/useCRouter';
 import { glassmorphism } from '#/styles';
-import { ArrowBack, CalendarMonth } from '@mui/icons-material';
+import { ArrowBack } from '@mui/icons-material';
 import {
-  Avatar,
   Box,
-  Button,
   IconButton,
   Stack,
   Tooltip,
   Typography,
   useTheme,
 } from '@mui/material';
-import moment from 'moment';
 
 export const ProfileHeader: React.FC<{
   profile: RegisteredUser;

@@ -81,7 +81,12 @@ const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
             type={articleKey}
           />
         </TabPanel>
-        <TabPanel value={replyKey}>답글</TabPanel>
+        <TabPanel value={replyKey}>
+          <PostTimeline
+            getter={API.Posts.post.getUserRepliesItems(profile.username)}
+            type={replyKey}
+          />
+        </TabPanel>
         <TabPanel value={mediaKey}>
           <MediaTimeline
             getter={API.Posts.post.getUserMediaItems(profile.username)}
