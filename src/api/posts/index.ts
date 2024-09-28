@@ -34,6 +34,12 @@ class PostAPIGenerator extends GenericAPI<Post, PostUpsert> {
         this.getEndpoint(`/timeline/${username}/`)
       );
   }
+  get getFavoriteItems() {
+    return (username: string) =>
+      this.getItemsRequest<Post, {}, Paginated<Post>>(
+        this.getEndpoint(`/timeline/${username}/favorites/`)
+      );
+  }
   get getFollowingTimeline() {
     return this.getItemsRequest<Post, {}, Paginated<Post>>(
       this.getEndpoint('/timeline/followings/')
@@ -42,6 +48,11 @@ class PostAPIGenerator extends GenericAPI<Post, PostUpsert> {
   get getGlobalTimeline() {
     return this.getItemsRequest<Post, {}, Paginated<Post>>(
       this.getEndpoint('/timeline/global/')
+    );
+  }
+  get getBookmarkItems() {
+    return this.getItemsRequest<Post, {}, Paginated<Post>>(
+      this.getEndpoint('/bookmarks')
     );
   }
   getChildRelatedItem = (childUrl: PostChildUrl) => {
