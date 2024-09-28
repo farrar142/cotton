@@ -27,11 +27,46 @@ import {
   useTheme,
 } from '@mui/material';
 import { useEffect, useRef } from 'react';
-import { atomFamily, useRecoilState } from 'recoil';
+import {
+  atomFamily,
+  DefaultValue,
+  selectorFamily,
+  useRecoilState,
+  useSetRecoilState,
+} from 'recoil';
 import { ImageViewer } from './ImageViewer';
 import { useObserver } from '#/hooks/useObserver';
 import { usePostWrite } from '#/hooks/usePostWrite';
 import { IntersectingOnly } from '../utils/IntersectingOnly';
+import useValue from '#/hooks/useValue';
+
+const postItemAtom = atomFamily<Post | null, number | undefined>({
+  key: 'postItemAtom',
+  default: (id) => null,
+});
+
+const postItemSelector = selectorFamily<Post | null, number | undefined>({
+  key: 'postItemSelector',
+  get:
+    (key) =>
+    ({ get }) => {
+      if (!key) return null;
+      const value = get(postItemAtom(key));
+      if (value) return value;
+      return API.Posts.post.getItem(key).then((r) => r.data);
+    },
+  set:
+    (key) =>
+    ({ set }, newValue) => {
+      if (!newValue) return;
+      if (newValue instanceof DefaultValue) return;
+      set(postItemAtom(key), newValue);
+    },
+});
+
+const usePostItem = (id: number | undefined) =>
+  useRecoilState(postItemSelector(id));
+const useSetPostItem = (id: number) => useSetRecoilState(postItemSelector(id));
 
 type PickBoolean<T> = {
   [K in keyof T]: T[K] extends boolean ? K : never;
@@ -46,18 +81,22 @@ const useOverrideAtom = (field: string) => {
   return useRecoilState(boolOverridedAtom(field));
 };
 
-export const PostItem: React.FC<{
+const _PostItem: React.FC<{
   post: Post;
   disableAction?: boolean;
   disableLatestRepost?: boolean;
   disableImages?: boolean;
   disableDivider?: boolean;
+  showParent?: boolean;
+  showChildLine?: boolean;
 }> = ({
   post,
   disableAction = false,
   disableLatestRepost = false,
   disableImages = false,
   disableDivider = false,
+  showParent = false,
+  showChildLine = false,
 }) => {
   const theme = useTheme();
   const [user, setUser] = useUser();
@@ -118,170 +157,218 @@ export const PostItem: React.FC<{
     return () => observer.unobserve(t);
   }, [hasView, user]);
 
+  //부모 기능
+  const registPostItem = useSetPostItem(post.id);
+  const [origin] = usePostItem(showParent ? post.origin : undefined);
+  const [parent] = usePostItem(showParent ? post.parent : undefined);
+
+  useEffect(() => {
+    registPostItem(post);
+  }, [post.id]);
+
+  const isLastReplyOfOrigin = showParent && post.reply_row_number_desc === 1;
+  const _showOrigin = isLastReplyOfOrigin && origin;
+  const _showParent =
+    isLastReplyOfOrigin && parent && parent.user.id !== post.user.id;
+  const showRelavantPost =
+    showParent || disableLatestRepost || post.relavant_repost;
   return (
-    <IntersectingOnly sx={{ minHeight: '50px' }}>
-      <Stack>
-        {disableLatestRepost ||
-          (post.relavant_repost && (
-            <Stack direction='row' spacing={1} pl={4.5}>
-              <Typography
-                display='flex'
-                alignItems='center'
-                variant='caption'
-                color='textSecondary'
-              >
-                <Cloud fontSize='small' />
-              </Typography>
-              <Typography
-                display='flex'
-                alignItems='center'
-                variant='caption'
-                color='textSecondary'
-              >
-                {post.relavant_repost.nickname} 님이 높이 띄움
-              </Typography>
-            </Stack>
-          ))}
+    <Stack>
+      {_showOrigin ? (
+        <_PostItem
+          post={origin}
+          disableDivider
+          disableLatestRepost
+          showChildLine
+        />
+      ) : (
+        <></>
+      )}
+      {_showParent ? (
+        <PostItem
+          post={parent}
+          disableDivider
+          disableLatestRepost
+          showChildLine
+        />
+      ) : (
+        <></>
+      )}
+      {showRelavantPost ? (
+        <Stack direction='row' spacing={1} pl={4.5}>
+          <Typography
+            display='flex'
+            alignItems='center'
+            variant='caption'
+            color='textSecondary'
+          >
+            <Cloud fontSize='small' />
+          </Typography>
+          <Typography
+            display='flex'
+            alignItems='center'
+            variant='caption'
+            color='textSecondary'
+          >
+            {post.relavant_repost?.nickname} 님이 높이 띄움
+          </Typography>
+        </Stack>
+      ) : (
+        <></>
+      )}
+      <Box ref={target} display='flex' flexDirection='row' width='100%' px={2}>
         <Box
-          ref={target}
+          mt={1.5}
+          mr={1}
           display='flex'
-          flexDirection='row'
-          width='100%'
-          px={2}
+          flexDirection='column'
+          alignItems='center'
         >
-          <Box mt={1.5} mr={1}>
-            <Avatar />
-          </Box>
-          <Stack flex={1} width='100%'>
-            <Stack direction='row' spacing={1} alignItems='center'>
-              <Typography fontWeight='bold' variant='h6'>
-                {post.user.nickname}
-              </Typography>
-              <Typography
-                variant='caption'
-                sx={(theme) => ({ color: theme.palette.text.secondary })}
-              >
-                @{post.user.username}
-              </Typography>
-              <Typography>·</Typography>
-              <Typography
-                variant='caption'
-                sx={(theme) => ({ color: theme.palette.text.secondary })}
-              >
-                {formatRelativeTime(post.created_at)}
-              </Typography>
-            </Stack>
-            <DraftEditor readOnly={true} blocks={post.blocks} />
-            {disableImages || <ImageViewer post={post} />}
-            {disableAction || (
-              <Grid2
-                container
-                width='100%'
-                sx={{
-                  color: theme.palette.text.disabled,
-                }}
-              >
-                <Grid2 size={2}>
-                  <Stack direction='row' alignItems='center'>
-                    <Tooltip title='reply'>
-                      <IconButton
-                        color='inherit'
-                        onClick={() => setIsWrite({ open: true, parent: post })}
-                      >
-                        <ModeCommentOutlined />
-                      </IconButton>
-                    </Tooltip>
-                    <Typography variant='caption'>
-                      {post.replies_count}
-                    </Typography>
-                  </Stack>
-                </Grid2>
-                <Grid2 size={2}>
-                  <Tooltip title='cottoning'>
-                    {hasRepost ? (
-                      <IconButton
-                        onClick={onRepost(false)}
-                        disabled={!Boolean(user)}
-                        color='info'
-                      >
-                        <Cloud />
-                      </IconButton>
-                    ) : (
-                      <IconButton
-                        onClick={onRepost(true)}
-                        disabled={!Boolean(user)}
-                        color='inherit'
-                      >
-                        <CloudOutlined />
-                      </IconButton>
-                    )}
-                  </Tooltip>
-                </Grid2>
-                <Grid2 size={2}>
-                  <Stack direction='row' alignItems='center'>
-                    <Tooltip title='favorite'>
-                      {hasFavorite ? (
-                        <IconButton
-                          onClick={onFavorite(false)}
-                          disabled={!Boolean(user)}
-                          color='error'
-                        >
-                          <Favorite />
-                        </IconButton>
-                      ) : (
-                        <IconButton
-                          onClick={onFavorite(true)}
-                          disabled={!Boolean(user)}
-                          color='inherit'
-                        >
-                          <FavoriteBorderOutlined />
-                        </IconButton>
-                      )}
-                    </Tooltip>
-                    <Typography variant='caption'>
-                      {post.favorites_count}
-                    </Typography>
-                  </Stack>
-                </Grid2>
-                <Grid2 size={2}>
-                  <Tooltip title='bookmark'>
-                    {hasBookmark ? (
-                      <IconButton
-                        onClick={onBookmark(false)}
-                        disabled={!Boolean(user)}
-                        color='warning'
-                      >
-                        <Bookmark />
-                      </IconButton>
-                    ) : (
-                      <IconButton
-                        onClick={onBookmark(true)}
-                        disabled={!Boolean(user)}
-                        color='inherit'
-                      >
-                        <BookmarkBorderOutlined />
-                      </IconButton>
-                    )}
-                  </Tooltip>
-                </Grid2>
-                <Grid2 size={3}>
-                  <Stack direction='row' alignItems='center'>
-                    <Tooltip title='views'>
-                      <IconButton color='inherit'>
-                        <BarChartOutlined />
-                      </IconButton>
-                    </Tooltip>
-                    <Typography variant='caption'>
-                      {post.views_count}
-                    </Typography>
-                  </Stack>
-                </Grid2>
-              </Grid2>
-            )}
-          </Stack>
+          <Avatar />
+          {showChildLine && (
+            <Box
+              flex={1}
+              height='100%'
+              mt={1}
+              sx={{
+                borderWidth: 1,
+                borderStyle: 'solid',
+                borderColor: theme.palette.text.disabled,
+              }}
+            />
+          )}
         </Box>
-        {disableDivider || <Divider />}
-      </Stack>
-    </IntersectingOnly>
+        <Stack flex={1} width='100%'>
+          <Stack direction='row' spacing={1} alignItems='center'>
+            <Typography fontWeight='bold' variant='h6'>
+              {post.user.nickname}
+            </Typography>
+            <Typography
+              variant='caption'
+              sx={(theme) => ({ color: theme.palette.text.secondary })}
+            >
+              @{post.user.username}
+            </Typography>
+            <Typography>·</Typography>
+            <Typography
+              variant='caption'
+              sx={(theme) => ({ color: theme.palette.text.secondary })}
+            >
+              {formatRelativeTime(post.created_at)}
+            </Typography>
+          </Stack>
+          <DraftEditor readOnly={true} blocks={post.blocks} />
+          {disableImages ? <></> : <ImageViewer post={post} />}
+          {disableAction ? (
+            <></>
+          ) : (
+            <Grid2
+              container
+              width='100%'
+              sx={{
+                color: theme.palette.text.disabled,
+              }}
+            >
+              <Grid2 size={2}>
+                <Stack direction='row' alignItems='center'>
+                  <Tooltip title='reply'>
+                    <IconButton
+                      color='inherit'
+                      onClick={() => setIsWrite({ open: true, parent: post })}
+                    >
+                      <ModeCommentOutlined />
+                    </IconButton>
+                  </Tooltip>
+                  <Typography variant='caption'>
+                    {post.replies_count}
+                  </Typography>
+                </Stack>
+              </Grid2>
+              <Grid2 size={2}>
+                <Tooltip title='cottoning'>
+                  {hasRepost ? (
+                    <IconButton
+                      onClick={onRepost(false)}
+                      disabled={!Boolean(user)}
+                      color='info'
+                    >
+                      <Cloud />
+                    </IconButton>
+                  ) : (
+                    <IconButton
+                      onClick={onRepost(true)}
+                      disabled={!Boolean(user)}
+                      color='inherit'
+                    >
+                      <CloudOutlined />
+                    </IconButton>
+                  )}
+                </Tooltip>
+              </Grid2>
+              <Grid2 size={2}>
+                <Stack direction='row' alignItems='center'>
+                  <Tooltip title='favorite'>
+                    {hasFavorite ? (
+                      <IconButton
+                        onClick={onFavorite(false)}
+                        disabled={!Boolean(user)}
+                        color='error'
+                      >
+                        <Favorite />
+                      </IconButton>
+                    ) : (
+                      <IconButton
+                        onClick={onFavorite(true)}
+                        disabled={!Boolean(user)}
+                        color='inherit'
+                      >
+                        <FavoriteBorderOutlined />
+                      </IconButton>
+                    )}
+                  </Tooltip>
+                  <Typography variant='caption'>
+                    {post.favorites_count}
+                  </Typography>
+                </Stack>
+              </Grid2>
+              <Grid2 size={2}>
+                <Tooltip title='bookmark'>
+                  {hasBookmark ? (
+                    <IconButton
+                      onClick={onBookmark(false)}
+                      disabled={!Boolean(user)}
+                      color='warning'
+                    >
+                      <Bookmark />
+                    </IconButton>
+                  ) : (
+                    <IconButton
+                      onClick={onBookmark(true)}
+                      disabled={!Boolean(user)}
+                      color='inherit'
+                    >
+                      <BookmarkBorderOutlined />
+                    </IconButton>
+                  )}
+                </Tooltip>
+              </Grid2>
+              <Grid2 size={3}>
+                <Stack direction='row' alignItems='center'>
+                  <Tooltip title='views'>
+                    <IconButton color='inherit'>
+                      <BarChartOutlined />
+                    </IconButton>
+                  </Tooltip>
+                  <Typography variant='caption'>{post.views_count}</Typography>
+                </Stack>
+              </Grid2>
+            </Grid2>
+          )}
+        </Stack>
+      </Box>
+      {disableDivider ? <></> : <Divider />}
+    </Stack>
   );
 };
+
+export const PostItem = IntersectingOnly(_PostItem);

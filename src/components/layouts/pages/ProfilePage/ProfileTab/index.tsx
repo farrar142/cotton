@@ -16,7 +16,7 @@ const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
   const mediaKey = `timeline/${profile.username}/media`;
   const favoriteKey = `timeline/${profile.username}/favorite`;
   const theme = useTheme();
-  const tabValue = useValue(articleKey);
+  const tabValue = useValue(replyKey);
   const [_, setScroll] = useKeyScrollPosition();
   return (
     <Box
@@ -85,6 +85,7 @@ const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
           <PostTimeline
             getter={API.Posts.post.getUserRepliesItems(profile.username)}
             type={replyKey}
+            showParent
           />
         </TabPanel>
         <TabPanel value={mediaKey}>

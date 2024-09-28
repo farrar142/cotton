@@ -9,11 +9,13 @@ export type PostUpsert = {
   mentions: { mentioned_to: number }[];
   images: ImageType[];
   parent?: number;
+  origin?: number;
 };
 export type Post = PostUpsert & {
   id: number;
   created_at: string;
   user: User;
+  depth: number;
 
   has_view: boolean;
   has_bookmark: boolean;
@@ -22,9 +24,9 @@ export type Post = PostUpsert & {
   views_count: number;
   favorites_count: number;
   replies_count: number;
-  mentions: { mentioned_to: User }[];
   relavant_repost?: User;
   latest_date: string;
+  reply_row_number_desc: number;
 };
 
 type PostChildUrl = 'reposts' | 'views' | 'favorites' | 'bookmarks';

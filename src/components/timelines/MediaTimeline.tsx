@@ -11,6 +11,7 @@ import { FilterNone } from '@mui/icons-material';
 import { OriginalImageViewer } from './OriginalImageViewer';
 import useValue from '#/hooks/useValue';
 import { useKeepScrollPosition } from '#/hooks/useKeepScrollPosition';
+import { IntersectingOnly } from '../utils/IntersectingOnly';
 
 const MergedPostMedia: React.FC<{ item: Post }> = ({ item }) => {
   const index = useValue(-1);
@@ -47,7 +48,7 @@ const MergedPostMedia: React.FC<{ item: Post }> = ({ item }) => {
   );
 };
 
-export const MediaTimeline: React.FC<{
+const _MediaTimeline: React.FC<{
   getter: (
     params?: {},
     options?: { page: number | string }
@@ -79,3 +80,4 @@ export const MediaTimeline: React.FC<{
     </Box>
   );
 };
+export const MediaTimeline = IntersectingOnly(_MediaTimeline);

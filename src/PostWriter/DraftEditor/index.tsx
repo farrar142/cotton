@@ -10,7 +10,7 @@ import API from '#/api';
 import useValue from '#/hooks/useValue';
 import { Block } from '#/utils/textEditor/blockTypes';
 import { DraftContentParser } from '#/utils/textEditor/draftParser';
-import Editor from '@draft-js-plugins/editor';
+// import Editor from '@draft-js-plugins/editor';
 import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData } from '@draft-js-plugins/mention';
 import { Box, Divider, Stack, useTheme } from '@mui/material';
@@ -29,6 +29,13 @@ import ImageEditor from './ImageEditor';
 import { ImageType } from '#/api/commons/types';
 import { glassmorphism } from '#/styles';
 import { atom, atomFamily, useRecoilState } from 'recoil';
+import dynamic from 'next/dynamic';
+
+const Editor = dynamic(
+  //@ts-ignore
+  () => import('@draft-js-plugins/editor').then((d) => d.default),
+  { ssr: false }
+);
 
 const emptyContentState = convertFromRaw({
   entityMap: {},
@@ -104,7 +111,7 @@ const DraftEditor: React.FC<
     () => (blocks ? JSON.stringify(blocks) : editorKey) || 'undefined',
     [blocks, editorKey]
   );
-  const editorRef = useRef<Editor>(null);
+  // const editorRef = useRef<typeof Editor>(null);
   const [editorState, setEditorState] = useEditorState(key);
   const [suggestions, setSuggestions] = useState<MentionData[]>([]);
   const images = useImage(key);
@@ -193,8 +200,9 @@ const DraftEditor: React.FC<
       }}
       onClick={(e) => e.stopPropagation()}
     >
+      {/** tslint:disable */}
       <Editor
-        ref={editorRef}
+        // ref={editorRef}
         editorState={editorState}
         plugins={plugins}
         onChange={(e) => {

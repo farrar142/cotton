@@ -15,7 +15,8 @@ export const PostTimeline: React.FC<{
   ) => Promise<AxiosResponse<Paginated<Post>>>;
   type: string;
   keepScrollPosition?: boolean;
-}> = ({ getter, type, keepScrollPosition = true }) => {
+  showParent?: boolean;
+}> = ({ getter, type, keepScrollPosition = true, showParent = false }) => {
   useKeepScrollPosition(type, keepScrollPosition);
 
   const [items, setItems] = usePostList(type);
@@ -29,7 +30,7 @@ export const PostTimeline: React.FC<{
   return (
     <Stack spacing={1}>
       {items.map((post) => (
-        <PostItem key={post.id} post={post} />
+        <PostItem key={post.id} post={post} showParent={showParent} />
       ))}
     </Stack>
   );

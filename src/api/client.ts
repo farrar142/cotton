@@ -70,8 +70,6 @@ export class AxiosWrapper {
   onResponseFailed = async (
     error: AxiosError<{ code: string; detail: string; messages: any[] }>
   ) => {
-    console.log('error');
-    console.log(error);
     if (error.response?.data?.code === 'user_not_found')
       return this.userNotFound(error);
     if (error.response?.data?.code === 'invalid_token')
@@ -82,7 +80,6 @@ export class AxiosWrapper {
     ) {
       return this.tokenNotValid(error);
     }
-    console.log('return error');
     throw error;
   };
 

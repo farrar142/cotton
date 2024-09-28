@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 export const useObserver = () => {
   const onIntersection = useRef(() => {});
@@ -30,6 +30,10 @@ export const useObserver = () => {
   const registerNotIntersectionCallback = (cb: () => void) => {
     onNotIntersection.current = cb;
   };
+
+  useEffect(() => {
+    return () => observer.current.disconnect();
+  }, []);
   return {
     observe,
     unobserve,

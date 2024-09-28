@@ -64,7 +64,7 @@ const NavBarItem: React.FC<{
             <Deactive fontSize='large' />
           )}
         </IconButton>
-        {isSmall || <Typography>{verbose}</Typography>}
+        {!isSmall ? <Typography>{verbose}</Typography> : <></>}
       </Stack>
     </NextLink>
   );

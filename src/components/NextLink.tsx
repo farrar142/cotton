@@ -1,7 +1,7 @@
 import { LinkProps as MLinkProps, Link as MLink, styled } from '@mui/material';
 import Link, { LinkProps } from 'next/link';
 import { formatUrl } from 'next/dist/shared/lib/router/utils/format-url';
-import { useMemo } from 'react';
+import { forwardRef, useMemo } from 'react';
 
 const CustomLink = styled(MLink)(() => ({
   // display: 'inline-flex',
@@ -16,17 +16,24 @@ const CustomLink = styled(MLink)(() => ({
   verticalAlign: 'center',
 }));
 
-const NextLink = ({
-  ...props
-}: Omit<MLinkProps, 'href'> & Pick<LinkProps, 'href'>): JSX.Element => {
-  const href = useMemo(() => {
-    const href = props.href;
-    if (href === undefined) return '/';
-    if (typeof href === 'string') return href;
-    return formatUrl(href);
-  }, [props.href]);
+const NextLink = forwardRef(
+  (
+    { children, ...props }: Omit<MLinkProps, 'href'> & Pick<LinkProps, 'href'>,
+    ref
+  ): JSX.Element => {
+    const href = useMemo(() => {
+      const href = props.href;
+      if (href === undefined) return '/';
+      if (typeof href === 'string') return href;
+      return formatUrl(href);
+    }, [props.href]);
 
-  return <CustomLink component={Link} {...props} href={href} />;
-};
+    return (
+      <CustomLink component={Link} {...props} href={href}>
+        {children}
+      </CustomLink>
+    );
+  }
+);
 
 export default NextLink;

@@ -18,7 +18,14 @@ export const ElevatedPostWriter = () => {
       .flatMap((block) => block)
       .map((block) => ({ mentioned_to: parseInt(block.id) }));
     return API.Posts.post
-      .postItem({ text, blocks, mentions, images, parent: isWrite.parent?.id })
+      .postItem({
+        text,
+        blocks,
+        mentions,
+        images,
+        parent: isWrite.parent?.id,
+        origin: isWrite.parent?.origin || isWrite.parent?.id,
+      })
       .then(onClose)
       .then(({ data }) => {
         return data;
