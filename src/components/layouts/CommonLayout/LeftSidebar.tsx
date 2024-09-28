@@ -122,14 +122,14 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
           </React.Fragment>
         )}
       </Stack>
-      <Box bottom={0} right={0} mb={3}>
+      <Box bottom={0} right={0} mb={3} onClick={openLoginWindow}>
         {user === undefined &&
           (isSmall ? (
             <IconButton>
               <Login />
             </IconButton>
           ) : (
-            <Button variant='contained' fullWidth onClick={openLoginWindow}>
+            <Button variant='contained' fullWidth>
               로그인
             </Button>
           ))}
