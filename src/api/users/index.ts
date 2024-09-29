@@ -1,7 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
 import { client } from '../client';
 import { Paginated } from '../general';
-import { User } from './types';
+import { User, UserUpsert } from './types';
 
 type StringMap<Keys extends string[]> = Record<Keys[number], string>;
 
@@ -27,4 +27,7 @@ export const Users = {
   me: () => client.get<User>('/users/me/'),
   users: (queries?: { search?: string }) =>
     client.get<Paginated<User>>('/users/', { params: queries }),
+  patchItem: (id: number, params: Partial<UserUpsert>) => {
+    return client.patch<User>(`/users/${id}/`, params);
+  },
 };

@@ -1,6 +1,6 @@
 import API from '#/api';
 import { Post } from '#/api/posts';
-import useUser from '#/hooks/useUser';
+import useUser, { useUserProfile } from '#/hooks/useUser';
 import DraftEditor from '#/PostWriter/DraftEditor';
 import { formatRelativeTime } from '#/utils/formats/formatRelativeTime';
 import {
@@ -100,7 +100,7 @@ const _PostItem: React.FC<{
   showChildLine = false,
 }) => {
   const theme = useTheme();
-  const [user, setUser] = useUser();
+  const [profile, user] = useUserProfile(post.user);
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [isWrite, setIsWrite] = usePostWrite();
@@ -171,7 +171,7 @@ const _PostItem: React.FC<{
   const isLastReplyOfOrigin = showParent && post.reply_row_number_desc === 1;
   const _showOrigin = isLastReplyOfOrigin && origin;
   const _showParent =
-    isLastReplyOfOrigin && parent && parent.user.id !== post.user.id;
+    isLastReplyOfOrigin && parent && parent.user.id !== profile.id;
   const showRelavantPost =
     !showParent && !disableLatestRepost && Boolean(post.relavant_repost);
   return (
@@ -232,7 +232,7 @@ const _PostItem: React.FC<{
           flexDirection='column'
           alignItems='center'
         >
-          <Avatar />
+          <Avatar src={profile?.profile_image?.url} />
           {showChildLine && (
             <Box
               flex={1}
@@ -249,13 +249,13 @@ const _PostItem: React.FC<{
         <Stack flex={1} width='100%'>
           <Stack direction='row' spacing={1} alignItems='center'>
             <Typography fontWeight='bold' variant='h6'>
-              {post.user.nickname}
+              {profile.nickname}
             </Typography>
             <Typography
               variant='caption'
               sx={(theme) => ({ color: theme.palette.text.secondary })}
             >
-              @{post.user.username}
+              @{profile.username}
             </Typography>
             <Typography>·</Typography>
             <Typography

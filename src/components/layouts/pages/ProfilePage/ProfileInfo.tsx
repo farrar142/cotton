@@ -1,13 +1,16 @@
 import API from '#/api';
 import { ImageType } from '#/api/commons/types';
-import { RegisteredUser, User } from '#/api/users/types';
+import { RegisteredUser } from '#/api/users/types';
 import TextInput from '#/components/inputs/TextInput';
 import { ScrollPreventedBackdrop } from '#/components/utils/ScrollPreventedBackdrop';
-import { useNestedState } from '#/hooks/useNestedState';
-import useUser from '#/hooks/useUser';
+import useUser, { useUserProfile } from '#/hooks/useUser';
 import useValue, { UseValue } from '#/hooks/useValue';
 import { glassmorphism } from '#/styles';
-import { getBase64 } from '#/utils/images/getBase64';
+import {
+  getBase64,
+  getImageSize,
+  resizeImageWithMinimum,
+} from '#/utils/images/getBase64';
 import { AddAPhoto, CalendarMonth, Close } from '@mui/icons-material';
 import {
   Avatar,
@@ -20,8 +23,7 @@ import {
   useTheme,
 } from '@mui/material';
 import moment from 'moment';
-import { ChangeEventHandler, createRef, useRef } from 'react';
-import { atomFamily, DefaultValue, selectorFamily } from 'recoil';
+import { ChangeEventHandler, createRef, useEffect, useRef } from 'react';
 
 const HiddenInput = styled('input')({
   display: 'none',
@@ -30,22 +32,36 @@ const HiddenInput = styled('input')({
 
 const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
   const [user, setUser] = useUser();
+  console.log(user);
   const theme = useTheme();
-  const profileRef = createRef<HTMLInputElement>();
-  const headerRef = createRef<HTMLInputElement>();
+  const isUploading = useValue(false);
   if (!user) return <></>;
   //텍스트 값
   const nickname = useValue(user.nickname);
   const bio = useValue(user.bio);
   //이미지 값
+  const profileRef = createRef<HTMLInputElement>();
+  const headerRef = createRef<HTMLInputElement>();
+
   const headerImage = useValue(user.header_image);
   const profileImage = useValue(user.profile_image);
+
+  const newHeaderImage = useValue<ImageType | undefined>(undefined);
+  const newProfileImage = useValue<ImageType | undefined>(undefined);
 
   const currentSetter = useRef(headerImage);
   const ratio = useValue(1);
   const editImage = useValue<ImageType | undefined>(undefined);
+  const size = useValue({ width: 100, height: 100 });
 
-  const closeEditor = () => open.set(false);
+  const dragStart = useRef(false);
+  const prevPos = useRef({ x: 0, y: 0 });
+  const translate = useValue({ x: 0, y: 0 });
+
+  const closeEditor = () => {
+    open.set(false);
+    editImage.set(undefined);
+  };
 
   const onImageChange =
     (
@@ -55,15 +71,45 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
     (e) => {
       const file = [...(e.target.files || [])][0];
       if (!file) return;
-      getBase64(file)
-        .then((url) => {
-          currentSetter.current = state;
-          editImage.set({ id: -1, url });
-          ratio.set(aspectRatio);
-        })
-        .finally(() => (e.target.value = ''));
+      getBase64(file).then((url) => state.set({ id: -1, url }));
+      // const fileUrl = URL.createObjectURL(file);
+      // getImageSize(fileUrl)
+      //   .then(({ url, ...imgSize }) => {
+      //     currentSetter.current = state;
+      //     size.set(imgSize);
+      //     editImage.set({ id: -1, url });
+      //     ratio.set(aspectRatio);
+      //   })
+      //   .finally(() => (e.target.value = ''));
     };
 
+  const onPost = () => {
+    const params = {
+      nickname: nickname.get,
+      bio: bio.get,
+      profile_image: newProfileImage.get,
+      header_image: newHeaderImage.get,
+    };
+    console.log(params);
+    const filtered = Object.entries(params).filter(
+      ([key, value]) => value !== undefined
+    );
+    const merged = Object.fromEntries(filtered);
+    isUploading.set(true);
+    API.Users.patchItem(user.id, merged)
+      .then((r) => r.data)
+      .then(setUser)
+      .then(() => {
+        if (newProfileImage.get) profileImage.set(newProfileImage.get);
+        if (newHeaderImage.get) headerImage.set(newHeaderImage.get);
+        newProfileImage.set(undefined);
+        headerImage.set(undefined);
+      })
+      .finally(() => {
+        isUploading.set(false);
+        open.set(false);
+      });
+  };
   return (
     <ScrollPreventedBackdrop open={open.get} onClick={closeEditor}>
       <Box width='100%' height='100%' display='flex'>
@@ -76,6 +122,7 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
           p={1}
           borderRadius={5}
           onMouseDown={(e) => e.stopPropagation()}
+          onMouseUp={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
         >
           {/**프로필 에디터 */}
@@ -83,18 +130,6 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
             <></>
           ) : (
             <Stack spacing={1}>
-              <HiddenInput
-                type='file'
-                accept='image/png, image/gif, image/jpeg'
-                ref={profileRef}
-                onChange={onImageChange(profileImage, 1)}
-              />
-              <HiddenInput
-                type='file'
-                accept='image/png, image/gif, image/jpeg'
-                ref={headerRef}
-                onChange={onImageChange(headerImage, 3)}
-              />
               <Stack direction='row' alignItems='center'>
                 <IconButton onClick={closeEditor}>
                   <Close />
@@ -102,12 +137,19 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
                 <Box flex={1}>
                   <Typography>프로필 수정</Typography>
                 </Box>
-                <Button>저장</Button>
+                <Button
+                  variant='contained'
+                  sx={{ borderRadius: 5 }}
+                  disabled={isUploading.get}
+                  onClick={onPost}
+                >
+                  저장
+                </Button>
               </Stack>
               {/**헤더 이미지 */}
               <Box position='relative' sx={{ width: '100%', aspectRatio: 3 }}>
                 <img
-                  src={headerImage.get?.url}
+                  src={newHeaderImage.get?.url || headerImage.get?.url}
                   alt=''
                   style={{ width: '100%', aspectRatio: 3, objectFit: 'cover' }}
                 />
@@ -161,7 +203,7 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
                   >
                     <Avatar
                       sx={{ width: '95%', height: '95%' }}
-                      src={profileImage.get?.url}
+                      src={newProfileImage.get?.url || profileImage.get?.url}
                     />
                     <Box
                       position='absolute'
@@ -193,10 +235,24 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
                 size='small'
                 value={bio.get}
                 onChange={bio.onTextChange}
+                multiline
+                minRows={3}
+              />
+              <HiddenInput
+                type='file'
+                accept='image/png, image/gif, image/jpeg'
+                ref={profileRef}
+                onChange={onImageChange(newProfileImage, 1)}
+              />
+              <HiddenInput
+                type='file'
+                accept='image/png, image/gif, image/jpeg'
+                ref={headerRef}
+                onChange={onImageChange(newHeaderImage, 3)}
               />
             </Stack>
           )}
-          {/**미디어 에디터 */}
+          {/**미디어 에디터 완성안됨*/}
           {editImage.get ? (
             <Stack spacing={1}>
               <Stack direction='row' alignItems='center'>
@@ -209,10 +265,95 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
                 <Button>저장</Button>
               </Stack>
               <Box
-                sx={{ width: '100%', aspectRatio: 1, p: 3, overflow: 'hidden' }}
+                p={3}
+                onMouseDown={(e) => {
+                  dragStart.current = true;
+                  prevPos.current = {
+                    x: e.pageX,
+                    y: e.pageY,
+                  };
+                }}
+                onMouseUp={() => {
+                  dragStart.current = false;
+                }}
+                onMouseLeave={() => {
+                  dragStart.current = false;
+                }}
+                onMouseMove={(e) => {
+                  if (!dragStart.current) return;
+                  const newPos = {
+                    x: prevPos.current.x - e.pageX,
+                    y: prevPos.current.y - e.pageY,
+                  };
+                  translate.set((p) => ({
+                    x: p.x - newPos.x,
+                    y: p.y - newPos.y,
+                  }));
+                  console.log(newPos);
+                  prevPos.current = {
+                    x: e.pageX,
+                    y: e.pageY,
+                  };
+                }}
               >
-                <img src={editImage.get.url} alt='' />
-                <Box border='1px solid red' width='100%' height='100%'></Box>
+                <Box
+                  display='flex'
+                  justifyContent='center'
+                  alignItems='center'
+                  width='100%'
+                  overflow='hidden'
+                  sx={{ aspectRatio: 1 }}
+                >
+                  <Box
+                    className='rectangle'
+                    position='relative'
+                    width='100%'
+                    sx={{ aspectRatio: size.get.width / size.get.height }}
+                    display='flex'
+                    alignItems='center'
+                    justifyContent='center'
+                  >
+                    <Box
+                      position='absolute'
+                      sx={{
+                        transform: `translate3d(${translate.get.x}px, ${
+                          translate.get.y
+                        }px, ${0}px)`,
+                      }}
+                      zIndex={0}
+                    >
+                      <img
+                        src={editImage.get.url}
+                        draggable={false}
+                        width='100%'
+                        height='100%'
+                        alt=''
+                      />
+                    </Box>
+                    <Box
+                      className='square'
+                      width='100%'
+                      height='100%'
+                      maxWidth='100%'
+                      maxHeight='100%'
+                      display='flex'
+                      justifyContent='center'
+                    >
+                      <Box
+                        top={-2}
+                        position='relative'
+                        height='calc(100%)'
+                        boxShadow='rgba(18, 21, 23, 0.7) 0px 0px 0px 9999px'
+                        sx={{
+                          aspectRatio: 1,
+                          borderColor: theme.palette.info.main,
+                          borderWidth: 4,
+                          borderStyle: 'solid',
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
               </Box>
             </Stack>
           ) : (
@@ -224,17 +365,25 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
   );
 };
 
-const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
+const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
+  profile: _profile,
+}) => {
+  const [profile, user] = useUserProfile(_profile);
   const profileEditorOpen = useValue(false);
+  if (!profile.is_registered) return <></>;
   return (
     <Box>
-      <ProfileEditor open={profileEditorOpen} />
+      {user ? <ProfileEditor open={profileEditorOpen} /> : <></>}
       {/**헤더 칸 */}
-      <img
-        src='https://pbs.twimg.com/media/GYeKYhxbwAAMFX0?format=png&name=360x360'
-        alt=''
-        style={{ width: '100%', aspectRatio: 3, objectFit: 'cover' }}
-      />
+      {profile.header_image ? (
+        <img
+          src={profile.header_image.large || profile.header_image.url}
+          alt=''
+          style={{ width: '100%', aspectRatio: 3, objectFit: 'cover' }}
+        />
+      ) : (
+        <Box sx={{ width: '100%', aspectRatio: 3, bgcolor: 'text.disabled' }} />
+      )}
       {/**프로필 이미지 칸 */}
       <Box display='flex' flexDirection='row' position='relative' pb={3}>
         <Box
@@ -259,7 +408,10 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
               justifyContent: 'center',
             }}
           >
-            <Avatar sx={{ width: '95%', height: '95%' }} />
+            <Avatar
+              sx={{ width: '95%', height: '95%' }}
+              src={profile.profile_image?.medium || profile.profile_image?.url}
+            />
           </Box>
         </Box>
         <Box flex={1} />
@@ -277,7 +429,7 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
       {/**프로필 정보 칸 */}
       <Stack px={2}>
         <Typography variant='h5' fontWeight='bold'>
-          {profile.username}
+          {profile.nickname}
         </Typography>
         <Typography variant='caption' color='textDisabled'>
           @{profile.username}

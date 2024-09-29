@@ -1,5 +1,6 @@
 import { RegisteredUser } from '#/api/users/types';
 import { useRouter } from '#/hooks/useCRouter';
+import { useUserProfile } from '#/hooks/useUser';
 import { glassmorphism } from '#/styles';
 import { ArrowBack } from '@mui/icons-material';
 import {
@@ -14,7 +15,8 @@ import {
 export const ProfileHeader: React.FC<{
   profile: RegisteredUser;
   postCount: number;
-}> = ({ profile, postCount }) => {
+}> = ({ profile: _profile, postCount }) => {
+  const [profile] = useUserProfile(_profile);
   const router = useRouter();
   const theme = useTheme();
   return (

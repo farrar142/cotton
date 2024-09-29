@@ -8,13 +8,15 @@ type Registered = {
   registered_at: string;
   is_registered: true;
 };
-type UserBase = {
-  id: number;
-  username: string;
-  nickname: string;
+export type UserUpsert = {
   bio: string;
+  nickname: string;
   profile_image?: ImageType;
   header_image?: ImageType;
+};
+type UserBase = UserUpsert & {
+  id: number;
+  username: string;
   email: string;
   is_staff: boolean;
 

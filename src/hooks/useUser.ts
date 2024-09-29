@@ -47,9 +47,9 @@ export const useUserProfile = (profile: User) => {
     //동기화
     setUser(me);
   }, [me, user]);
-  const returnUser = user?.id === profile.id ? user : profile;
+  const returnUser = (user?.id === profile.id ? user : profile) || profile;
 
-  return [returnUser];
+  return [returnUser, me] as const;
 };
 
 const useUser = (user?: User) => {
