@@ -92,7 +92,7 @@ export const ElevatedPostWriter = () => {
               <Typography></Typography>
             </Stack>
           )}
-          <Box width='100%' px={1} pt={1}>
+          <Box width='100%' px={1} pt={1} minWidth='300px'>
             <DraftEditor
               maxLength={300}
               onPost={onPost}

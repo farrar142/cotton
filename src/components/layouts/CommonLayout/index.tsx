@@ -91,7 +91,6 @@ const CommonLayout: React.FC<{
             display='flex'
             justifyContent='space-around'
             alignItems='center'
-            // sx={glassmorphism(theme)}
           >
             <IconButton onClick={handleLoginBackdrop}>
               <Avatar />

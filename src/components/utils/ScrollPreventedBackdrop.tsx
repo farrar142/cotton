@@ -28,6 +28,7 @@ export const ScrollPreventedBackdrop: React.FC<{
           zIndex={10}
           overflow='scroll'
           className='hide-scrollbar'
+          onClick={onClick}
         >
           {children}
         </Box>

@@ -32,6 +32,7 @@ const ProfilePage: ExtendedNextPage<{ profile: User; postCount: number }> = ({
     </Box>
   );
 };
+
 ProfilePage.getInitialProps = getInitialPropsWrapper(async ({ query }) => {
   return new Promise((res, rej) => {
     const username = `${query.username}`;

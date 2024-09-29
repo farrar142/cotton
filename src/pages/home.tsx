@@ -30,12 +30,14 @@ import { PostTimeline } from '#/components/timelines';
 import useUser from '#/hooks/useUser';
 import { useLoginWindow } from '#/hooks/useLoginWindow';
 import { ImageType } from '#/api/commons/types';
+import useMediaSize from '#/hooks/useMediaSize';
 // import PostWriter from '#/PostWriter';
 // const DraftEditor = dynamic(() => import('#/PostWriter/DraftEditor'), {
 //   ssr: true,
 // });
 
 const Home = () => {
+  const { isMd } = useMediaSize();
   const theme = useTheme();
   const [user] = useUser();
   const tabValue = useValue('1');
@@ -107,7 +109,7 @@ const Home = () => {
             pt: 2,
           }}
         >
-          <Box px={2} display='flex' flexDirection='row'>
+          <Box px={isMd ? 2 : 1} display='flex' flexDirection='row'>
             <Avatar sx={{ mr: 1 }} />
             <DraftEditor onPost={onPost} additionalWidth={-48} />
           </Box>
