@@ -28,11 +28,12 @@ const DraftEditorToolbar: React.FC<{
   textLength: UseValue<number>;
   maxLength: number;
   editorState: EditorState;
-  onPost: () => void;
+  onPost: () => Promise<any>;
   onEmojiClick: (emoji: string) => void;
 }> = ({ textLength, maxLength, images, editorState, onEmojiClick, onPost }) => {
   const theme = useTheme();
   const [user] = useUser();
+  const onPosting = useValue(false);
 
   //Texts
   const isTextOver = useMemo(
@@ -46,12 +47,19 @@ const DraftEditorToolbar: React.FC<{
     if (1 <= share && remainder === 0) return [share, maxLength];
     return [share, remainder];
   }, [textLength.get, maxLength]);
+
   //Images
   const inputRef = createRef<HTMLInputElement>();
   const onImageButtonClick = () => {
     if (!inputRef.current) return;
     inputRef.current.click();
   };
+
+  const onPostButtonClick = () => {
+    onPosting.set(true);
+    onPost().finally(() => onPosting.set(false));
+  };
+
   const onInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     e.preventDefault();
     const availableImageLength = 4 - images.get.length;
@@ -141,10 +149,15 @@ const DraftEditorToolbar: React.FC<{
         <Button
           variant='contained'
           sx={{ borderRadius: 10 }}
-          onClick={onPost}
-          disabled={isTextOver || !Boolean(user) || textLength.get === 0}
+          onClick={onPostButtonClick}
+          disabled={
+            onPosting.get ||
+            isTextOver ||
+            !Boolean(user) ||
+            textLength.get === 0
+          }
         >
-          게시
+          {onPosting.get ? <CircularProgress size={25} /> : '게시'}
         </Button>
       </Stack>
     </Box>

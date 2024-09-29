@@ -16,7 +16,7 @@ const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
   const mediaKey = `timeline/${profile.username}/media`;
   const favoriteKey = `timeline/${profile.username}/favorite`;
   const theme = useTheme();
-  const tabValue = useValue(replyKey);
+  const tabValue = useValue(articleKey);
   const [_, setScroll] = useKeyScrollPosition();
   return (
     <Box
