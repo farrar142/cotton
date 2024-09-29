@@ -108,7 +108,11 @@ const CommonLayout: React.FC<{
         ) : (
           <></>
         )}
-        <Box position='relative' maxWidth={isSmall ? '100vw' : undefined}>
+        <Box
+          position='relative'
+          maxWidth={isSmall ? '100vw' : undefined}
+          sx={{ '>*': { pb: 10 } }}
+        >
           {children}
         </Box>
       </Box>

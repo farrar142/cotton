@@ -54,7 +54,13 @@ const Home = () => {
   };
 
   return (
-    <Box>
+    <Box
+      sx={{
+        borderWidth: '1px',
+        borderColor: theme.palette.divider,
+        borderStyle: 'solid',
+      }}
+    >
       <TabContext value={user ? tabValue.get : '1'}>
         <Box
           sx={{
@@ -71,8 +77,8 @@ const Home = () => {
             aria-label='lab API tabs example'
             sx={{
               button: { width: '50%' },
-              borderLeftWidth: '1px',
-              borderRightWidth: '1px',
+              borderLeftWidth: '0px',
+              borderRightWidth: '0px',
               borderBottomWidth: '0px',
               borderTopWidth: '0px',
               borderStyle: 'solid',
@@ -87,9 +93,6 @@ const Home = () => {
           value='1'
           sx={{
             p: 0,
-            borderWidth: '1px',
-            borderColor: theme.palette.divider,
-            borderStyle: 'solid',
           }}
         >
           <PostTimeline
@@ -102,9 +105,6 @@ const Home = () => {
           sx={{
             p: 0,
             pt: 2,
-            borderWidth: '1px',
-            borderColor: theme.palette.divider,
-            borderStyle: 'solid',
           }}
         >
           <Box px={2} display='flex' flexDirection='row'>
