@@ -1,4 +1,4 @@
-import { ChangeEventHandler } from 'react';
+import { ChangeEventHandler, Dispatch, SetStateAction } from 'react';
 import useValue, { UseValue } from './useValue';
 
 const isFunc = <T>(
@@ -7,8 +7,13 @@ const isFunc = <T>(
   return typeof setter === 'function';
 };
 
+type NestedInputState<T> = {
+  get: T;
+  set: Dispatch<SetStateAction<T>>;
+};
+
 export const useNestedState = <T extends object, K extends keyof T>(
-  state: UseValue<T>,
+  state: NestedInputState<T>,
   key: K
 ): UseValue<T[K]> => {
   const { get, set } = state;

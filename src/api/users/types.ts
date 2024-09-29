@@ -1,4 +1,4 @@
-import { Image } from '@syncfusion/ej2-react-richtexteditor';
+import { ImageType } from '../commons/types';
 
 type NotRegistered = {
   registerd_at?: undefined;
@@ -13,7 +13,8 @@ type UserBase = {
   username: string;
   nickname: string;
   bio: string;
-  profile_image: Image;
+  profile_image?: ImageType;
+  header_image?: ImageType;
   email: string;
   is_staff: boolean;
 
