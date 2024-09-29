@@ -1,5 +1,5 @@
-import { Backdrop, Box } from '@mui/material';
-import { ReactNode, MouseEventHandler, useEffect } from 'react';
+import { Backdrop, Box, Dialog, DialogContent } from '@mui/material';
+import { ReactNode, MouseEventHandler, useEffect, Fragment } from 'react';
 
 export const ScrollPreventedBackdrop: React.FC<{
   children: ReactNode;
@@ -16,19 +16,24 @@ export const ScrollPreventedBackdrop: React.FC<{
   }, [open]);
 
   return (
-    <Backdrop
-      open={open}
-      onClick={onClick}
-      sx={{
-        width: '100%',
-        height: '100%',
-        zIndex: 15,
-        position: 'fixed',
-        top: 0,
-        left: 0,
-      }}
-    >
-      {children}
-    </Backdrop>
+    <Fragment>
+      <Backdrop open={open} onClick={onClick} />
+      {open ? (
+        <Box
+          width='100%'
+          maxHeight='100%'
+          minHeight='100%'
+          height='100vh'
+          position='fixed'
+          zIndex={10}
+          overflow='scroll'
+          className='hide-scrollbar'
+        >
+          {children}
+        </Box>
+      ) : (
+        <></>
+      )}
+    </Fragment>
   );
 };

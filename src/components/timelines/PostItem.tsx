@@ -24,6 +24,7 @@ import {
   styled,
   Tooltip,
   Typography,
+  useMediaQuery,
   useTheme,
 } from '@mui/material';
 import { useEffect, useRef } from 'react';
@@ -100,6 +101,7 @@ const _PostItem: React.FC<{
 }) => {
   const theme = useTheme();
   const [user, setUser] = useUser();
+  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [isWrite, setIsWrite] = usePostWrite();
   const [favorite, setFavorite] = useOverrideAtom('favorite');
@@ -216,7 +218,13 @@ const _PostItem: React.FC<{
       ) : (
         <></>
       )}
-      <Box ref={target} display='flex' flexDirection='row' width='100%' px={2}>
+      <Box
+        ref={target}
+        display='flex'
+        flexDirection='row'
+        width='100%'
+        px={isSmall ? 1 : 2}
+      >
         <Box
           mt={1.5}
           mr={1}
@@ -262,12 +270,14 @@ const _PostItem: React.FC<{
           {disableAction ? (
             <></>
           ) : (
-            <Grid2
-              container
+            <Box
               width='100%'
+              display='flex'
+              justifyContent='space-between'
               sx={{
                 color: theme.palette.text.disabled,
               }}
+              pr={3}
             >
               <Grid2 size={2}>
                 <Stack direction='row' alignItems='center'>
@@ -362,7 +372,7 @@ const _PostItem: React.FC<{
                   <Typography variant='caption'>{post.views_count}</Typography>
                 </Stack>
               </Grid2>
-            </Grid2>
+            </Box>
           )}
         </Stack>
       </Box>
@@ -371,4 +381,4 @@ const _PostItem: React.FC<{
   );
 };
 
-export const PostItem = IntersectingOnly(_PostItem);
+export const PostItem = _PostItem;

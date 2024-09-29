@@ -1,5 +1,11 @@
 import useValue from '#/hooks/useValue';
-import { Box, useMediaQuery, useTheme } from '@mui/material';
+import {
+  Avatar,
+  Box,
+  IconButton,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 
 import { useLoginWindow } from '#/hooks/useLoginWindow';
 import useUser from '#/hooks/useUser';
@@ -7,6 +13,10 @@ import * as React from 'react';
 import SigninComponent from '../pages/SigninComponent';
 import { ElevatedPostWriter } from './ElevatedPostWriter';
 import LeftSidebar from './LeftSidebar';
+import { glassmorphism } from '#/styles';
+import { Cloud, Settings } from '@mui/icons-material';
+import NextLink from '#/components/NextLink';
+import paths from '#/paths';
 
 const CommonLayout: React.FC<{
   children?: React.ReactNode;
@@ -16,7 +26,8 @@ const CommonLayout: React.FC<{
   const theme = useTheme();
   const [user] = useUser();
   const loginBackDrop = useValue(false);
-  const media = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMd = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
   const handleLoginBackdrop = () => {
     loginBackDrop.set((p) => !p);
   };
@@ -35,16 +46,34 @@ const CommonLayout: React.FC<{
       }}
     >
       <Box flex={1}>
-        <Box position='sticky' height='100vh' minWidth={80} top={0} left='100%'>
+        <Box
+          sx={
+            isSmall
+              ? {
+                  position: 'fixed',
+                  bottom: 0,
+                  zIndex: 5,
+                  width: '100vw',
+                  ...glassmorphism(theme),
+                }
+              : {
+                  position: 'sticky',
+                  height: '100vh',
+                  minWidth: 80,
+                  top: 0,
+                  left: '100%',
+                }
+          }
+        >
           <Box
-            width='100%'
             display='flex'
             flexDirection='column'
             alignItems='flex-end'
             justifyContent='space-between'
             height='100%'
-            pt={1}
-            pr={2}
+            pt={isSmall ? undefined : 1}
+            py={isSmall ? 0.5 : undefined}
+            pr={isSmall ? undefined : 2}
           >
             <LeftSidebar openLoginWindow={handleLoginBackdrop} />
           </Box>
@@ -54,8 +83,36 @@ const CommonLayout: React.FC<{
           onClose={handleLoginBackdrop}
         />
       </Box>
-      <Box position='relative'>{children}</Box>
-      <Box flex={1} minWidth={80} display={media ? 'none' : 'block'}>
+      <Box position='relative'>
+        {isSmall ? (
+          <Box
+            top={0}
+            width='100%'
+            display='flex'
+            justifyContent='space-around'
+            alignItems='center'
+            // sx={glassmorphism(theme)}
+          >
+            <IconButton onClick={handleLoginBackdrop}>
+              <Avatar />
+            </IconButton>
+            <NextLink href={paths.home}>
+              <IconButton size='large'>
+                <Cloud fontSize='large' />
+              </IconButton>
+            </NextLink>
+            <IconButton>
+              <Settings />
+            </IconButton>
+          </Box>
+        ) : (
+          <></>
+        )}
+        <Box position='relative' maxWidth={isSmall ? '100vw' : undefined}>
+          {children}
+        </Box>
+      </Box>
+      <Box flex={1} minWidth={80} display={isMd ? 'none' : 'block'}>
         <Box position='sticky' top={0}>
           오른쪽사이드바
         </Box>

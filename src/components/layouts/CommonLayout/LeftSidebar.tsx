@@ -33,8 +33,8 @@ const NavBarItem: React.FC<{
   verbose: string;
   active: SvgIconComponent;
   deactive: SvgIconComponent;
-  isSmall: boolean;
-}> = ({ url, active, deactive, verbose, isSmall }) => {
+  isMd: boolean;
+}> = ({ url, active, deactive, verbose, isMd }) => {
   const theme = useTheme();
   const router = useRouter();
   const isCurrentUrl = useMemo(() => {
@@ -54,7 +54,7 @@ const NavBarItem: React.FC<{
     >
       <Stack
         direction='row'
-        width={isSmall ? undefined : '100%'}
+        width={isMd ? undefined : '100%'}
         alignItems='center'
       >
         <IconButton size='small' color='inherit'>
@@ -64,7 +64,7 @@ const NavBarItem: React.FC<{
             <Deactive fontSize='large' />
           )}
         </IconButton>
-        {!isSmall ? <Typography>{verbose}</Typography> : <></>}
+        {!isMd ? <Typography>{verbose}</Typography> : <></>}
       </Stack>
     </NextLink>
   );
@@ -75,36 +75,46 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
 }) => {
   const [user] = useUser();
   const theme = useTheme();
-  const isSmall = useMediaQuery(theme.breakpoints.down('md'));
+  const isMd = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
   const [isWrite, setIsWrite] = usePostWrite();
   return (
     <Box
-      height='100%'
+      position='relative'
+      height={isMd ? '100%' : undefined}
+      width={isSmall ? '100%' : undefined}
       display='flex'
-      flexDirection='column'
-      justifyContent='space-between'
+      flexDirection={isSmall ? 'row' : 'column'}
+      justifyContent={isSmall ? undefined : 'space-between'}
     >
-      <Stack spacing={2}>
+      <Stack
+        spacing={2}
+        flex={isSmall ? 1 : undefined}
+        direction={isSmall ? 'row' : 'column'}
+        height={isMd ? '100%' : undefined}
+        width={isSmall ? undefined : '100%'}
+        justifyContent={isSmall ? 'space-evenly' : undefined}
+      >
         <NavBarItem
           url='/home'
           verbose='Home'
           active={Home}
           deactive={HomeOutlined}
-          isSmall={isSmall}
+          isMd={isMd}
         />
         <NavBarItem
           url='/search'
           verbose='Search'
           active={SavedSearch}
           deactive={SearchOutlined}
-          isSmall={isSmall}
+          isMd={isMd}
         />
         <NavBarItem
           url='/notification'
           verbose='Notification'
           active={Notifications}
           deactive={NotificationsOutlined}
-          isSmall={isSmall}
+          isMd={isMd}
         />
         {user && (
           <React.Fragment>
@@ -113,14 +123,14 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
               verbose='Profile'
               active={Person}
               deactive={PersonOutlineOutlined}
-              isSmall={isSmall}
+              isMd={isMd}
             />
             <NavBarItem
               url={`/bookmark`}
               verbose='Bookmark'
               active={Bookmark}
               deactive={BookmarkBorder}
-              isSmall={isSmall}
+              isMd={isMd}
             />
             <Box
               onClick={() => setIsWrite({ open: true })}
@@ -128,7 +138,7 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
               alignItems='center'
               justifyContent='center'
             >
-              {isSmall ? (
+              {isMd ? (
                 <IconButton color='info'>
                   <Create />
                 </IconButton>
@@ -141,18 +151,27 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
           </React.Fragment>
         )}
       </Stack>
-      <Box bottom={0} right={0} mb={3} onClick={openLoginWindow}>
-        {user === undefined &&
-          (isSmall ? (
-            <IconButton>
-              <Login />
-            </IconButton>
-          ) : (
-            <Button variant='contained' fullWidth>
-              로그인
-            </Button>
-          ))}
-      </Box>
+      {isSmall ? (
+        <></>
+      ) : (
+        <Box
+          bottom={0}
+          right={0}
+          mb={isSmall ? undefined : 3}
+          onClick={openLoginWindow}
+        >
+          {user === undefined &&
+            (isMd ? (
+              <IconButton>
+                <Login />
+              </IconButton>
+            ) : (
+              <Button variant='contained' fullWidth>
+                로그인
+              </Button>
+            ))}
+        </Box>
+      )}
     </Box>
   );
 };

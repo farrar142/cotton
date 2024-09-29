@@ -7,7 +7,14 @@ import DraftEditor from '#/PostWriter/DraftEditor';
 import { MentionEntry } from '#/PostWriter/DraftEditor/mention';
 import { Block } from '#/utils/textEditor/blockTypes';
 import { Close } from '@mui/icons-material';
-import { Box, Divider, IconButton, Stack, Typography } from '@mui/material';
+import {
+  Backdrop,
+  Box,
+  Divider,
+  IconButton,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { MouseEvent } from 'react';
 
 export const ElevatedPostWriter = () => {
@@ -39,21 +46,17 @@ export const ElevatedPostWriter = () => {
   return (
     <ScrollPreventedBackdrop open={isWrite.open}>
       <Box
+        onMouseDown={() => setIsWrite({ open: false, parent: undefined })}
         width='100%'
         height='100%'
         display='flex'
-        justifyContent='center'
-        alignItems='center'
-        position='absolute'
-        zIndex={20}
-        onMouseDown={() => setIsWrite({ open: false, parent: undefined })}
       >
         <Box
           bgcolor='background.default'
           onMouseDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
           maxWidth={(theme) => theme.breakpoints.values.xs * 1.5}
-          width='100%'
+          m='auto'
           borderRadius={5}
           p={1}
         >
