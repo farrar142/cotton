@@ -14,9 +14,11 @@ import SigninComponent from '../pages/SigninComponent';
 import { ElevatedPostWriter } from './ElevatedPostWriter';
 import LeftSidebar from './LeftSidebar';
 import { glassmorphism } from '#/styles';
-import { Cloud, Settings } from '@mui/icons-material';
+import { Cloud, ExitToApp, Replay, Settings } from '@mui/icons-material';
 import NextLink from '#/components/NextLink';
 import paths from '#/paths';
+import useMediaSize from '#/hooks/useMediaSize';
+import { useRouter } from '#/hooks/useCRouter';
 
 const CommonLayout: React.FC<{
   children?: React.ReactNode;
@@ -24,10 +26,8 @@ const CommonLayout: React.FC<{
 }> = ({ children }) => {
   const [_, setOpenLoginWindow] = useLoginWindow();
   const theme = useTheme();
-  const [user] = useUser();
   const loginBackDrop = useValue(false);
-  const isMd = useMediaQuery(theme.breakpoints.down('md'));
-  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
+  const { isMd, isSmall } = useMediaSize();
   const handleLoginBackdrop = () => {
     loginBackDrop.set((p) => !p);
   };
@@ -47,7 +47,7 @@ const CommonLayout: React.FC<{
     >
       <Box flex={1}>
         <Box
-          sx={
+          sx={[
             isSmall
               ? {
                   position: 'fixed',
@@ -62,8 +62,9 @@ const CommonLayout: React.FC<{
                   minWidth: 80,
                   top: 0,
                   left: '100%',
-                }
-          }
+                },
+            isMd ? {} : { pr: 2 },
+          ]}
         >
           <Box
             display='flex'
@@ -80,33 +81,14 @@ const CommonLayout: React.FC<{
         </Box>
         <SigninComponent
           open={loginBackDrop.get}
-          onClose={handleLoginBackdrop}
+          onClose={() => loginBackDrop.set(false)}
         />
       </Box>
       <Box position='relative'>
-        {isSmall ? (
-          <Box
-            top={0}
-            width='100%'
-            display='flex'
-            justifyContent='space-around'
-            alignItems='center'
-          >
-            <IconButton onClick={handleLoginBackdrop}>
-              <Avatar />
-            </IconButton>
-            <NextLink href={paths.home}>
-              <IconButton size='large'>
-                <Cloud fontSize='large' />
-              </IconButton>
-            </NextLink>
-            <IconButton>
-              <Settings />
-            </IconButton>
-          </Box>
-        ) : (
-          <></>
-        )}
+        <SmallSizeHeader
+          handleLoginBackdrop={handleLoginBackdrop}
+          isSmall={isSmall}
+        />
         <Box
           position='relative'
           maxWidth={isSmall ? '100vw' : undefined}
@@ -121,6 +103,48 @@ const CommonLayout: React.FC<{
         </Box>
       </Box>
       <ElevatedPostWriter />
+    </Box>
+  );
+};
+
+const SmallSizeHeader: React.FC<{
+  handleLoginBackdrop: () => void;
+  isSmall: boolean;
+}> = ({ handleLoginBackdrop, isSmall }) => {
+  const [user, _, signout] = useUser();
+  const router = useRouter();
+  if (!isSmall) return <></>;
+  return (
+    <Box
+      top={0}
+      width='100%'
+      display='flex'
+      justifyContent='space-around'
+      alignItems='center'
+    >
+      <IconButton
+        onClick={
+          user
+            ? () => router.push(paths.mypage(user.username))
+            : handleLoginBackdrop
+        }
+      >
+        <Avatar src={user?.profile_image?.small} />
+      </IconButton>
+      <NextLink href={paths.home}>
+        <IconButton size='large'>
+          <Cloud fontSize='large' />
+        </IconButton>
+      </NextLink>
+      {user ? (
+        <IconButton onClick={signout} color='warning'>
+          <ExitToApp />
+        </IconButton>
+      ) : (
+        <IconButton onClick={router.reload}>
+          <Replay />
+        </IconButton>
+      )}
     </Box>
   );
 };

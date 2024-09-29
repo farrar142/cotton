@@ -174,6 +174,7 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
                     onClick={() => {
                       headerImage.set(undefined);
                     }}
+                    disabled={!Boolean(newHeaderImage.get)}
                   >
                     <Close />
                   </IconButton>

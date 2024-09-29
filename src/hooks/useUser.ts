@@ -9,6 +9,7 @@ import {
   useRecoilState,
   useRecoilValue,
 } from 'recoil';
+import { useRouter } from './useCRouter';
 
 const userAtom = atomFamily<User | null, number | undefined>({
   key: 'userAtom',
@@ -53,12 +54,18 @@ export const useUserProfile = (profile: User) => {
 };
 
 const useUser = (user?: User) => {
+  const router = useRouter();
   const [_user, setUser] = useRecoilState(userAtom(undefined));
   useEffect(() => {
     if (!user) return;
     setUser(user);
   }, [user]);
-  return [_user, setUser] as const;
+  const signout = () => {
+    API.client.instance.deleteTokens();
+    setUser(null);
+    router.reload();
+  };
+  return [_user, setUser, signout] as const;
 };
 
 export default useUser;

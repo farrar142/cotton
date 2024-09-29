@@ -32,7 +32,7 @@ const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
             display: 'flex',
             position: 'sticky',
             top: 65,
-            zIndex: 10,
+            zIndex: 3,
             ...glassmorphism(theme),
           }}
           onChange={(e, v) => tabValue.set(v)}

@@ -6,6 +6,7 @@ import {
   Bookmark,
   BookmarkBorder,
   Create,
+  ExitToApp,
   Home,
   HomeOutlined,
   Login,
@@ -22,6 +23,7 @@ import {
   Button,
   IconButton,
   Stack,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
@@ -73,7 +75,7 @@ const NavBarItem: React.FC<{
 const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
   openLoginWindow,
 }) => {
-  const [user] = useUser();
+  const [user, _, signout] = useUser();
   const theme = useTheme();
   const isMd = useMediaQuery(theme.breakpoints.down('md'));
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
@@ -81,7 +83,7 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
   return (
     <Box
       position='relative'
-      height={isMd ? '100%' : undefined}
+      height={isSmall ? undefined : '100%'}
       width={isSmall ? '100%' : undefined}
       display='flex'
       flexDirection={isSmall ? 'row' : 'column'}
@@ -136,7 +138,7 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
               onClick={() => setIsWrite({ open: true })}
               display='flex'
               alignItems='center'
-              justifyContent='center'
+              justifyContent={isMd ? 'center' : undefined}
             >
               {isMd ? (
                 <IconButton color='info'>
@@ -154,23 +156,34 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
       {isSmall ? (
         <></>
       ) : (
-        <Box
-          bottom={0}
-          right={0}
-          mb={isSmall ? undefined : 3}
-          onClick={openLoginWindow}
-        >
-          {user === undefined &&
-            (isMd ? (
-              <IconButton>
-                <Login />
+        <Tooltip title='Logout'>
+          <Box bottom={0} right={0} mb={isSmall ? undefined : 3}>
+            {!Boolean(user) ? (
+              isMd ? (
+                <IconButton onClick={openLoginWindow}>
+                  <Login />
+                </IconButton>
+              ) : (
+                <Button variant='contained' fullWidth onClick={openLoginWindow}>
+                  Login
+                </Button>
+              )
+            ) : isMd ? (
+              <IconButton onClick={signout} color='warning'>
+                <ExitToApp />
               </IconButton>
             ) : (
-              <Button variant='contained' fullWidth>
-                로그인
+              <Button
+                variant='contained'
+                color='inherit'
+                fullWidth
+                onClick={signout}
+              >
+                Logout
               </Button>
-            ))}
-        </Box>
+            )}
+          </Box>
+        </Tooltip>
       )}
     </Box>
   );

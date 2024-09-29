@@ -18,11 +18,13 @@ import * as React from 'react';
 import TextInput, { ErrorTypeMap } from '#/components/inputs/TextInput';
 import { client } from '#/api/client';
 import useUser from '#/hooks/useUser';
+import { useRouter } from '#/hooks/useCRouter';
 
 const SigninComponent: React.FC<{ onClose: () => void; open?: boolean }> = ({
   open = true,
   onClose,
 }) => {
+  const router = useRouter();
   const [user, setUser] = useUser();
   const tabValue = useValue('1');
   const email = useValue('');
@@ -40,6 +42,7 @@ const SigninComponent: React.FC<{ onClose: () => void; open?: boolean }> = ({
       .then(tokens.set)
       .then(API.Users.me)
       .then(({ data }) => {
+        router.reload();
         setUser(data);
         if (!data.is_registered) tabValue.set('3');
         else onClose();
