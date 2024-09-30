@@ -13,7 +13,7 @@ import { DraftContentParser } from '#/utils/textEditor/draftParser';
 // import Editor from '@draft-js-plugins/editor';
 import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData } from '@draft-js-plugins/mention';
-import { Box, Divider, Stack, useTheme } from '@mui/material';
+import { Box, Collapse, Divider, Stack, useTheme } from '@mui/material';
 import { convertFromRaw, convertToRaw, EditorState, Modifier } from 'draft-js';
 import mentionsStyles from './MentionsStyles.module.css';
 import DraftEditorToolbar from './Toolbar';
@@ -51,17 +51,19 @@ const emptyContentState = convertFromRaw({
   ],
 });
 
+export type DraftOnPost = (
+  text: string,
+  blocks: Block[][],
+  images: ImageType[]
+) => Promise<any>;
+
 type ReadOnly = {
   readOnly: true;
   onPost?: undefined;
 };
 type EditOnly = {
   readOnly?: undefined;
-  onPost: (
-    text: string,
-    blocks: Block[][],
-    images: ImageType[]
-  ) => Promise<any>;
+  onPost: DraftOnPost;
 };
 
 const editorAtom = atomFamily<EditorState, string>({
@@ -96,12 +98,14 @@ const DraftEditor: React.FC<
     additionalWidth?: number;
     editorKey?: string;
     placeholder?: string;
+    showToolbar?: boolean;
   } & (ReadOnly | EditOnly)
 > = ({
   maxLength = 300,
   onPost,
   blocks,
   readOnly = false,
+  showToolbar = true,
   additionalWidth = 0,
   editorKey, //cache용 같은키의 에디터가 두개있을시 오류발생하니 주의
   placeholder,
@@ -226,7 +230,7 @@ const DraftEditor: React.FC<
         entryComponent={MentionEntry}
       />
       <ImageEditor images={images} />
-      {readOnly === false && (
+      <Collapse in={readOnly === false && showToolbar}>
         <DraftEditorToolbar
           maxLength={maxLength}
           textLength={textLength}
@@ -235,7 +239,7 @@ const DraftEditor: React.FC<
           images={images}
           onEmojiClick={onEmojiClick}
         />
-      )}
+      </Collapse>
     </Stack>
   );
 };
