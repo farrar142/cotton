@@ -1,36 +1,18 @@
 import useValue from '#/hooks/useValue';
-import { ArrowBack, Close } from '@mui/icons-material';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
-import {
-  Avatar,
-  Box,
-  Button,
-  Dialog,
-  Divider,
-  Fade,
-  IconButton,
-  Paper,
-  Stack,
-  Tab,
-  TextField,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
+import { Avatar, Box, Divider, Tab, useTheme } from '@mui/material';
 
 import DraftEditor from '#/PostWriter/DraftEditor';
 import API from '#/api';
-import CommonLayout from '#/components/layouts/CommonLayout';
-import { Block } from '#/utils/textEditor/blockTypes';
-import { SyntheticEvent, useEffect, useRef } from 'react';
-import { Post } from '#/api/posts';
-import { PostTimeline } from '#/components/timelines';
-import useUser from '#/hooks/useUser';
-import { useLoginWindow } from '#/hooks/useLoginWindow';
 import { ImageType } from '#/api/commons/types';
+import { PostTimeline } from '#/components/timelines';
+import { useLoginWindow } from '#/hooks/useLoginWindow';
 import useMediaSize from '#/hooks/useMediaSize';
+import useUser from '#/hooks/useUser';
+import { Block } from '#/utils/textEditor/blockTypes';
+import { SyntheticEvent } from 'react';
 // import PostWriter from '#/PostWriter';
 // const DraftEditor = dynamic(() => import('#/PostWriter/DraftEditor'), {
 //   ssr: true,
@@ -56,13 +38,7 @@ const Home = () => {
   };
 
   return (
-    <Box
-      sx={{
-        borderWidth: '1px',
-        borderColor: theme.palette.divider,
-        borderStyle: 'solid',
-      }}
-    >
+    <Box sx={{}}>
       <TabContext value={user ? tabValue.get : '1'}>
         <Box
           sx={{

@@ -10,6 +10,7 @@ import getInitialPropsWrapper from '#/functions/getInitialPropsWrapper';
 import { useRouter } from '#/hooks/useCRouter';
 import useValue from '#/hooks/useValue';
 import { Box, useTheme } from '@mui/material';
+import React from 'react';
 
 const ProfilePage: ExtendedNextPage<{ profile: User; postCount: number }> = ({
   profile,
@@ -20,9 +21,6 @@ const ProfilePage: ExtendedNextPage<{ profile: User; postCount: number }> = ({
   return (
     <Box
       sx={{
-        borderWidth: '1px',
-        borderStyle: 'solid',
-        borderColor: 'divider',
         pb: 10,
       }}
     >

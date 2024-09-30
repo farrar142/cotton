@@ -16,21 +16,36 @@ export const PostTimeline: React.FC<{
   type: string;
   keepScrollPosition?: boolean;
   showParent?: boolean;
-}> = ({ getter, type, keepScrollPosition = true, showParent = false }) => {
+  disableLatestRepost?: boolean;
+  params?: {};
+}> = ({
+  getter,
+  type,
+  keepScrollPosition = true,
+  showParent = false,
+  disableLatestRepost = false,
+  params = {},
+}) => {
   useKeepScrollPosition(type, keepScrollPosition);
 
   const [items, setItems] = usePostList(type);
   useEffect(() => {
     if (0 < items.length) return;
-    getter()
+    getter(params)
       .then(({ data }) => data.results)
       .then(setItems);
-  }, []);
+    return () => setItems([]);
+  }, [type]);
 
   return (
     <Stack spacing={1}>
       {items.map((post) => (
-        <PostItem key={post.id} post={post} showParent={showParent} />
+        <PostItem
+          key={post.id}
+          post={post}
+          showParent={showParent}
+          disableLatestRepost={disableLatestRepost}
+        />
       ))}
     </Stack>
   );

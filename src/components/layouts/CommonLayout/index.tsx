@@ -92,7 +92,12 @@ const CommonLayout: React.FC<{
         <Box
           position='relative'
           maxWidth={isSmall ? '100vw' : undefined}
-          sx={{ '>*': { pb: 10 } }}
+          sx={{
+            '>*': { pb: 10 },
+            borderWidth: '1px',
+            borderColor: theme.palette.divider,
+            borderStyle: 'solid',
+          }}
         >
           {children}
         </Box>
