@@ -25,8 +25,10 @@ export const Auth = {
 
 export const Users = {
   me: () => client.get<User>('/users/me/'),
-  users: (queries?: { search?: string }) =>
-    client.get<Paginated<User>>('/users/', { params: queries }),
+  users: (queries?: { search?: string }, params?: { cursor?: string }) =>
+    client.get<Paginated<User>>('/users/', {
+      params: { ...queries, ...params },
+    }),
   patchItem: (id: number, params: Partial<UserUpsert>) => {
     return client.patch<User>(`/users/${id}/`, params);
   },

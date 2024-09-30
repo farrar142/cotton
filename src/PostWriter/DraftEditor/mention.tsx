@@ -1,4 +1,5 @@
 import { User } from '#/api/users/types';
+import { SimpleProfileItem } from '#/components/SimpleProfileComponent';
 import { MentionPluginTheme, MentionData } from '@draft-js-plugins/mention';
 import { SubMentionComponentProps } from '@draft-js-plugins/mention/lib/Mention';
 import { Box, Typography, useTheme } from '@mui/material';
@@ -37,26 +38,10 @@ export const MentionEntry: React.FC<EntryComponentProps> = (props) => {
       onMouseUp={onMouseUp}
       onMouseEnter={onMouseEnter}
       onClick={onMouseDown}
-      bgcolor='transparent'
-      //   className={theme?.mentionSuggestions}
-      sx={{
-        bgcolor: isFocused ? 'var(--mention-selected)' : 'inherit',
-        // borderColor: _theme.palette.info.light,
-        // borderWidth: '1px',
-        // borderStyle: 'solid',
-        pb: 0.5,
-      }}
+      sx={{ minWidth: '300px', width: '100%' }}
     >
-      <Typography
-        component='span'
-        data-type='mention'
-        data-username={mention.username}
-        data-id={mention.id}
-        className='mention'
-        sx={{ color: 'primary.main' }}
-      >
-        @{mention.username}
-      </Typography>
+      {/**@ts-ignore */}
+      <SimpleProfileItem profile={mention} />
     </Box>
   );
 };

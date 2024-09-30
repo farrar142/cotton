@@ -22,6 +22,10 @@ type UserBase = UserUpsert & {
 
   followings_count: number;
   followers_count: number;
+
+  is_following_to: boolean;
+  if_followed_by: boolean;
+  is_mutual_follow: boolean;
 };
 
 export type RegisteredUser = Registered & UserBase;

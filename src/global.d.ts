@@ -17,9 +17,3 @@ declare global {
     getLayout?: React.FC<{ children?: ReactNode }>;
   };
 }
-
-declare module '@draft-js-plugins/mention' {
-  interface MentionData extends User {
-    name: string;
-  }
-}

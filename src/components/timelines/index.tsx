@@ -63,6 +63,7 @@ const useTimelinePagination = ({
 
   useEffect(() => {
     if (pages.length !== 0) return;
+    console.log('call?', key);
     //데이터가 없을 시 생길때까지 계속 패치
     const interval = setInterval(
       () =>
@@ -81,7 +82,7 @@ const useTimelinePagination = ({
       }
     });
     return () => clearInterval(interval);
-  }, [key]);
+  }, [key.get]);
 
   const getNextPage = () => {
     const lastPage = pages[pages.length - 1];
