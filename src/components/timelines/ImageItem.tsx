@@ -1,6 +1,8 @@
 import { ImageType } from '#/api/commons/types';
-import { Box } from '@mui/material';
+import { Box, styled } from '@mui/material';
 import { CSSProperties } from 'react';
+
+const ClickableImage = styled('img')({ cursor: 'pointer' });
 
 export const ImageItem: React.FC<{
   image: ImageType;
@@ -38,8 +40,13 @@ export const ImageItem: React.FC<{
           },
         };
   return (
-    <Box key={image.id} onClick={onClick} width={width} height={height}>
-      <img src={image.large || image.url} alt='' {...imgProps} />
+    <Box key={image.id} width={width} height={height}>
+      <ClickableImage
+        onClick={onClick}
+        src={image.large || image.url}
+        alt=''
+        {...imgProps}
+      />
     </Box>
   );
 };

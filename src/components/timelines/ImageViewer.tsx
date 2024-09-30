@@ -4,6 +4,7 @@ import { Box } from '@mui/material';
 import { useMemo } from 'react';
 import { ImageItem } from './ImageItem';
 import { OriginalImageViewer } from './OriginalImageViewer';
+import React from 'react';
 
 export const ImageViewer: React.FC<{ post: Post }> = ({ post }) => {
   const images = post.images;
