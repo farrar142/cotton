@@ -205,7 +205,9 @@ const DraftEditor: React.FC<
         },
         width: `calc(100% + ${additionalWidth}px);`,
       }}
-      onClick={(e) => e.stopPropagation()}
+      onClick={(e) => {
+        !readOnly && e.stopPropagation();
+      }}
     >
       {/** tslint:disable */}
       <Editor

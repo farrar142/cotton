@@ -41,6 +41,7 @@ import React from 'react';
 import { useRouter } from '#/hooks/useCRouter';
 import paths from '#/paths';
 import { SuspendHOC } from '../SuspendHOC';
+import NextLink from '../NextLink';
 
 const postItemAtom = atomFamily<Post | null, number | undefined>({
   key: 'postItemAtom',
@@ -56,12 +57,10 @@ const relatedPostItemSelector = selectorFamily<Post | null, number | undefined>(
         if (!key) return null;
         const value = get(postItemAtom(key));
         if (value) return value;
-        console.log('here');
         return API.Posts.post
           .getItem(key)
           .then((r) => {
             const d = r.data;
-            console.log(d);
             return d;
           })
           .catch(() => {
@@ -228,6 +227,15 @@ const _PostItem: React.FC<{
     isLastReplyOfOrigin && parent && parent.user.id !== profile.id;
   const showRelavantPost =
     !showParent && !disableLatestRepost && Boolean(post.relavant_repost);
+
+  const showMoreReplies =
+    showParent &&
+    _showOrigin &&
+    !_showParent &&
+    post.depth - origin?.depth >= 2;
+
+  const smallPading = isSmall ? 1 : 2;
+
   return (
     <Stack
       onClick={() => {
@@ -255,8 +263,15 @@ const _PostItem: React.FC<{
       ) : (
         <></>
       )}
+      {showMoreReplies && (
+        <NextLink href={paths.postDetail(parent?.id || post.id)}>
+          <Typography pl={smallPading + 6} color='primary'>
+            더 많은 답글 보기
+          </Typography>
+        </NextLink>
+      )}
       {showRelavantPost ? (
-        <Stack direction='row' spacing={1} pl={4.5}>
+        <Stack direction='row' spacing={1} pl={smallPading + 2.5}>
           <Typography
             display='flex'
             alignItems='center'
@@ -282,7 +297,7 @@ const _PostItem: React.FC<{
         display='flex'
         flexDirection='row'
         width='100%'
-        px={isSmall ? 1 : 2}
+        px={smallPading}
       >
         <Box
           mt={1.5}
@@ -326,6 +341,28 @@ const _PostItem: React.FC<{
               {formatRelativeTime(post.created_at)}
             </Typography>
           </Stack>
+          {!_showParent && parent ? (
+            <Stack direction='row' spacing={1}>
+              <Typography
+                display='flex'
+                alignItems='center'
+                variant='caption'
+                color='primary'
+              >
+                @{parent.user.nickname}
+              </Typography>
+              <Typography
+                display='flex'
+                alignItems='center'
+                variant='caption'
+                color='textSecondary'
+              >
+                님에게 보내는 답글
+              </Typography>
+            </Stack>
+          ) : (
+            <></>
+          )}
           <DraftEditor readOnly={true} blocks={post.blocks} />
           {disableImages ? <></> : <ImageViewer post={post} />}
           {disableAction ? (
@@ -443,4 +480,4 @@ const _PostItem: React.FC<{
   );
 };
 
-export const PostItem = SuspendHOC(_PostItem);
+export const PostItem = _PostItem;

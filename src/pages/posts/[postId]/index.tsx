@@ -1,6 +1,7 @@
 import API from '#/api';
 import { Post } from '#/api/posts';
 import TextInput from '#/components/inputs/TextInput';
+import { PostTimeline } from '#/components/timelines';
 import { PostItem, useCurrentPostItem } from '#/components/timelines/PostItem';
 import getInitialPropsWrapper from '#/functions/getInitialPropsWrapper';
 import { usePostWriteService } from '#/hooks/posts/usePostWriteService';
@@ -12,13 +13,14 @@ import { ArrowBack } from '@mui/icons-material';
 import {
   Avatar,
   Box,
+  CircularProgress,
   Collapse,
   Divider,
   IconButton,
   Stack,
   Typography,
 } from '@mui/material';
-import React from 'react';
+import React, { Suspense } from 'react';
 
 const PostDetailPage: ExtendedNextPage<{ post: Post }> = ({ post: _post }) => {
   const router = useRouter();
@@ -56,7 +58,7 @@ const PostDetailPage: ExtendedNextPage<{ post: Post }> = ({ post: _post }) => {
         </IconButton>
         <Typography variant='h5'>Post</Typography>
       </Stack>
-      <PostItem post={post} routingToDetail={false} />
+      <PostItem post={post} routingToDetail={false} showChildLine showParent />
       {user ? (
         <>
           <Stack px={2} spacing={1}>
@@ -92,6 +94,11 @@ const PostDetailPage: ExtendedNextPage<{ post: Post }> = ({ post: _post }) => {
       ) : (
         <></>
       )}
+      <PostTimeline
+        getter={API.Posts.post.getReplies(post.id)}
+        type={`${post.id}/replies`}
+        disableLatestRepost
+      />
     </Stack>
   );
 };

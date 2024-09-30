@@ -8,7 +8,8 @@ import { glassmorphism } from '#/styles';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
-import { Box, Divider, Tab, useTheme } from '@mui/material';
+import { Box, CircularProgress, Divider, Tab, useTheme } from '@mui/material';
+import { Suspense } from 'react';
 
 const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
   const articleKey = `timeline/${profile.username}`;
@@ -82,11 +83,13 @@ const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
           />
         </TabPanel>
         <TabPanel value={replyKey}>
-          <PostTimeline
-            getter={API.Posts.post.getUserRepliesItems(profile.username)}
-            type={replyKey}
-            showParent
-          />
+          <Suspense fallback={<CircularProgress />}>
+            <PostTimeline
+              getter={API.Posts.post.getUserRepliesItems(profile.username)}
+              type={replyKey}
+              showParent
+            />
+          </Suspense>
         </TabPanel>
         <TabPanel value={mediaKey}>
           <MediaTimeline

@@ -23,6 +23,7 @@ import {
   useTheme,
 } from '@mui/material';
 import moment from 'moment';
+import React from 'react';
 import { ChangeEventHandler, createRef, useEffect, useRef } from 'react';
 
 const HiddenInput = styled('input')({
@@ -32,7 +33,6 @@ const HiddenInput = styled('input')({
 
 const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
   const [user, setUser] = useUser();
-  console.log(user);
   const theme = useTheme();
   const isUploading = useValue(false);
   if (!user) return <></>;

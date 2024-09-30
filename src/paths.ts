@@ -1,6 +1,6 @@
 const paths = {
   home: '/',
-  mypage: (username: string) => `/${username}`,
+  mypage: (username: string) => `/profiles/${username}`,
   postDetail: (id: number) => `/posts/${id}`,
 };
 

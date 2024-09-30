@@ -63,9 +63,24 @@ const useTimelinePagination = ({
 
   useEffect(() => {
     if (pages.length !== 0) return;
+    //데이터가 없을 시 생길때까지 계속 패치
+    const interval = setInterval(
+      () =>
+        func(params).then((r) => {
+          if (r.data.results.length !== 0) {
+            setPages((p) => [...p, r]);
+            return clearInterval(interval);
+          }
+        }),
+      5000
+    );
     func(params).then((r) => {
-      setPages((p) => [...p, r]);
+      if (r.data.results.length !== 0) {
+        setPages((p) => [...p, r]);
+        return clearInterval(interval);
+      }
     });
+    return () => clearInterval(interval);
   }, [key]);
 
   const getNextPage = () => {
@@ -92,7 +107,10 @@ const useTimelinePagination = ({
   const getPrevPage = async () => {
     console.log('get prev');
     if (!newPages[0]) {
-      if (!pages[0]) return;
+      if (!pages[0]) {
+        getNextPage();
+        return;
+      }
       return patchPrevByLastPage(pages[0]);
     } else {
       return patchPrevByLastPage(newPages[0]);

@@ -87,6 +87,10 @@ class PostAPIGenerator extends GenericAPI<Post, PostUpsert> {
     const endpoint = this.getEndpoint(`/${post.id}/${childUrl}/`);
     return this.client.delete<{ is_success: boolean }>(endpoint);
   };
+  getReplies = (postId: number) => {
+    const endpoint = this.getEndpoint(`/${postId}/replies/`);
+    return this.getItemsRequest<Post, {}, TimeLinePaginated<Post>>(endpoint);
+  };
 }
 
 export const Posts = {

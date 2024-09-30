@@ -2,6 +2,7 @@ import NextLink from '#/components/NextLink';
 import { useRouter } from '#/hooks/useCRouter';
 import { usePostWrite } from '#/hooks/usePostWrite';
 import useUser from '#/hooks/useUser';
+import paths from '#/paths';
 import {
   Bookmark,
   BookmarkBorder,
@@ -75,6 +76,7 @@ const NavBarItem: React.FC<{
 const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
   openLoginWindow,
 }) => {
+  const router = useRouter();
   const [user, _, signout] = useUser();
   const theme = useTheme();
   const isMd = useMediaQuery(theme.breakpoints.down('md'));
@@ -121,7 +123,7 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
         {user && (
           <React.Fragment>
             <NavBarItem
-              url={`/${user.username}`}
+              url={paths.mypage(user.username)}
               verbose='Profile'
               active={Person}
               deactive={PersonOutlineOutlined}
