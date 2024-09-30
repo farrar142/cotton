@@ -3,7 +3,11 @@ import { client } from './client';
 export type PaginationBase<T> = {
   results: T[];
 };
-
+export type TimeLinePaginated<T> = PaginationBase<T> & {
+  current_offset: string | number;
+  next_offset: string | number;
+  offset_field: [keyof T][number];
+};
 export type Paginated<T> = PaginationBase<T> & {
   next?: string;
   prev?: string;
@@ -29,7 +33,7 @@ export class GenericAPI<
     return url;
   }
   getItemsRequest<T, Q2, Pagination2 = PaginationBase<T>>(endpoint: string) {
-    return (params?: Q2, options?: { page: number | string }) => {
+    return (params?: Q2, options?: {}) => {
       return client.get<
         Pagination2 extends PaginationBase<T> ? Pagination2 : T[]
       >(endpoint, {
@@ -41,7 +45,7 @@ export class GenericAPI<
     const endpoint = this.getEndpoint(`/${id}`);
     return client.get<M>(endpoint);
   };
-  getItems = (params?: Q, options?: { page: number | string }) => {
+  getItems = (params?: Q, options?: { cursor?: string }) => {
     const endpoint = this.getEndpoint('/');
     return this.getItemsRequest<M, Q, Pagination>(endpoint)(params, options);
   };

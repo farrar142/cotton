@@ -1,6 +1,6 @@
 import { Block } from '#/utils/textEditor/blockTypes';
 import { ImageType } from '../commons/types';
-import { GenericAPI, Paginated } from '../general';
+import { GenericAPI, Paginated, TimeLinePaginated } from '../general';
 import { User } from '../users/types';
 
 export type PostUpsert = {
@@ -34,40 +34,40 @@ type PostChildUrl = 'reposts' | 'views' | 'favorites' | 'bookmarks';
 class PostAPIGenerator extends GenericAPI<Post, PostUpsert> {
   get getUserTimeline() {
     return (username: string) =>
-      this.getItemsRequest<Post, {}, Paginated<Post>>(
+      this.getItemsRequest<Post, {}, TimeLinePaginated<Post>>(
         this.getEndpoint(`/timeline/${username}/`)
       );
   }
   get getUserMediaItems() {
     return (username: string) =>
-      this.getItemsRequest<Post, {}, Paginated<Post>>(
+      this.getItemsRequest<Post, {}, TimeLinePaginated<Post>>(
         this.getEndpoint(`/timeline/${username}/media/`)
       );
   }
   get getUserRepliesItems() {
     return (username: string) =>
-      this.getItemsRequest<Post, {}, Paginated<Post>>(
+      this.getItemsRequest<Post, {}, TimeLinePaginated<Post>>(
         this.getEndpoint(`/timeline/${username}/replies/`)
       );
   }
   get getFavoriteItems() {
     return (username: string) =>
-      this.getItemsRequest<Post, {}, Paginated<Post>>(
+      this.getItemsRequest<Post, {}, TimeLinePaginated<Post>>(
         this.getEndpoint(`/timeline/${username}/favorites/`)
       );
   }
   get getFollowingTimeline() {
-    return this.getItemsRequest<Post, {}, Paginated<Post>>(
+    return this.getItemsRequest<Post, {}, TimeLinePaginated<Post>>(
       this.getEndpoint('/timeline/followings/')
     );
   }
   get getGlobalTimeline() {
-    return this.getItemsRequest<Post, {}, Paginated<Post>>(
+    return this.getItemsRequest<Post, {}, TimeLinePaginated<Post>>(
       this.getEndpoint('/timeline/global/')
     );
   }
   get getBookmarkItems() {
-    return this.getItemsRequest<Post, {}, Paginated<Post>>(
+    return this.getItemsRequest<Post, {}, TimeLinePaginated<Post>>(
       this.getEndpoint('/bookmarks')
     );
   }

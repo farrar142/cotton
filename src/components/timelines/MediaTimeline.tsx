@@ -1,17 +1,14 @@
-import { ImageType } from '#/api/commons/types';
 import { Paginated } from '#/api/general';
+import { Post } from '#/api/posts';
+import { useKeepScrollPosition } from '#/hooks/useKeepScrollPosition';
+import useValue from '#/hooks/useValue';
+import { FilterNone } from '@mui/icons-material';
 import { Box, Grid2, useMediaQuery, useTheme } from '@mui/material';
 import { AxiosResponse } from 'axios';
-import { useEffect, useMemo } from 'react';
-import { atomFamily, useRecoilState } from 'recoil';
-import { ImageItem } from './ImageItem';
-import { Post } from '#/api/posts';
-import { usePostList } from './hooks';
-import { FilterNone } from '@mui/icons-material';
-import { OriginalImageViewer } from './OriginalImageViewer';
-import useValue from '#/hooks/useValue';
-import { useKeepScrollPosition } from '#/hooks/useKeepScrollPosition';
+import React, { useEffect, useMemo } from 'react';
 import { IntersectingOnly } from '../utils/IntersectingOnly';
+import { usePostList } from './hooks';
+import { OriginalImageViewer } from './OriginalImageViewer';
 
 const MergedPostMedia: React.FC<{ item: Post }> = ({ item }) => {
   const index = useValue(-1);

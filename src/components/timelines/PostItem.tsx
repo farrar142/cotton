@@ -316,6 +316,7 @@ const _PostItem: React.FC<{
                 color: theme.palette.text.disabled,
               }}
               pr={3}
+              onClick={(e) => e.stopPropagation()}
             >
               <Grid2 size={2}>
                 <Stack direction='row' alignItems='center'>
