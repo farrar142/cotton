@@ -14,16 +14,30 @@ import useUser from '#/hooks/useUser';
 import { Block } from '#/utils/textEditor/blockTypes';
 import { SyntheticEvent } from 'react';
 import { usePostWriteService } from '#/hooks/posts/usePostWriteService';
+import { atom, useRecoilState } from 'recoil';
+import { recoilPersist } from 'recoil-persist';
+
+const { persistAtom } = recoilPersist();
 // import PostWriter from '#/PostWriter';
 // const DraftEditor = dynamic(() => import('#/PostWriter/DraftEditor'), {
 //   ssr: true,
 // });
+const homeTabAtom = atom({
+  key: 'homeTabAtom',
+  default: '1',
+  effects_UNSTABLE: [persistAtom],
+});
+
+const useHomeTabAtom = () => {
+  const [get, set] = useRecoilState(homeTabAtom);
+  return { get, set };
+};
 
 const Home = () => {
   const { isMd } = useMediaSize();
   const theme = useTheme();
   const [user] = useUser();
-  const tabValue = useValue('1');
+  const tabValue = useHomeTabAtom();
   const [openLoginWindow] = useLoginWindow();
   const postWriteService = usePostWriteService();
 
