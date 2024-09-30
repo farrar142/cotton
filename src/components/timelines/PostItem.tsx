@@ -383,6 +383,7 @@ const _PostItem: React.FC<{
                   <Tooltip title='reply'>
                     <IconButton
                       color='inherit'
+                      disabled={!Boolean(user)}
                       onClick={() => setIsWrite({ open: true, parent: post })}
                     >
                       <ModeCommentOutlined />
@@ -394,25 +395,30 @@ const _PostItem: React.FC<{
                 </Stack>
               </Grid2>
               <Grid2 size={2}>
-                <Tooltip title='cottoning'>
-                  {hasRepost ? (
-                    <IconButton
-                      onClick={onRepost(false)}
-                      disabled={!Boolean(user)}
-                      color='info'
-                    >
-                      <Cloud />
-                    </IconButton>
-                  ) : (
-                    <IconButton
-                      onClick={onRepost(true)}
-                      disabled={!Boolean(user)}
-                      color='inherit'
-                    >
-                      <CloudOutlined />
-                    </IconButton>
-                  )}
-                </Tooltip>
+                <Stack direction='row' alignItems='center'>
+                  <Tooltip title='cottoning'>
+                    {hasRepost ? (
+                      <IconButton
+                        onClick={onRepost(false)}
+                        disabled={!Boolean(user)}
+                        color='info'
+                      >
+                        <Cloud />
+                      </IconButton>
+                    ) : (
+                      <IconButton
+                        onClick={onRepost(true)}
+                        disabled={!Boolean(user)}
+                        color='inherit'
+                      >
+                        <CloudOutlined />
+                      </IconButton>
+                    )}
+                  </Tooltip>
+                  <Typography variant='caption'>
+                    {post.reposts_count}
+                  </Typography>
+                </Stack>
               </Grid2>
               <Grid2 size={2}>
                 <Stack direction='row' alignItems='center'>

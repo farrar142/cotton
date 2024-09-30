@@ -24,6 +24,7 @@ export type Post = PostUpsert & {
   views_count: number;
   favorites_count: number;
   replies_count: number;
+  reposts_count: number;
   relavant_repost?: User;
   latest_date: string;
   reply_row_number_desc: number;
