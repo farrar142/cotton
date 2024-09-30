@@ -1,10 +1,11 @@
 import API from '#/api';
 import { Post } from '#/api/posts';
-import useUser, { useUserProfile } from '#/hooks/useUser';
+import { useObserver } from '#/hooks/useObserver';
+import { usePostWrite } from '#/hooks/usePostWrite';
+import { useUserProfile } from '#/hooks/useUser';
 import DraftEditor from '#/PostWriter/DraftEditor';
 import { formatRelativeTime } from '#/utils/formats/formatRelativeTime';
 import {
-  BarChart,
   BarChartOutlined,
   Bookmark,
   BookmarkBorderOutlined,
@@ -21,7 +22,6 @@ import {
   Grid2,
   IconButton,
   Stack,
-  styled,
   Tooltip,
   Typography,
   useMediaQuery,
@@ -36,38 +36,66 @@ import {
   useSetRecoilState,
 } from 'recoil';
 import { ImageViewer } from './ImageViewer';
-import { useObserver } from '#/hooks/useObserver';
-import { usePostWrite } from '#/hooks/usePostWrite';
-import { IntersectingOnly } from '../utils/IntersectingOnly';
-import useValue from '#/hooks/useValue';
+import React from 'react';
+import { useRouter } from '#/hooks/useCRouter';
+import paths from '#/paths';
 
 const postItemAtom = atomFamily<Post | null, number | undefined>({
   key: 'postItemAtom',
   default: (id) => null,
 });
 
-const postItemSelector = selectorFamily<Post | null, number | undefined>({
-  key: 'postItemSelector',
+const relatedPostItemSelector = selectorFamily<Post | null, number | undefined>(
+  {
+    key: 'postItemSelector',
+    get:
+      (key) =>
+      ({ get }) => {
+        if (!key) return null;
+        const value = get(postItemAtom(key));
+        if (value) return value;
+        return API.Posts.post.getItem(key).then((r) => r.data);
+      },
+    set:
+      (key) =>
+      ({ set }, newValue) => {
+        if (!newValue) return;
+        if (newValue instanceof DefaultValue) return;
+        set(postItemAtom(key), newValue);
+      },
+  }
+);
+
+const useRelatedPostItem = (id: number | undefined) =>
+  useRecoilState(relatedPostItemSelector(id));
+const useSetRelatedPostItem = (id: number) =>
+  useSetRecoilState(relatedPostItemSelector(id));
+
+const currentPostItemSelector = selectorFamily<Post | null, number>({
+  key: 'currentPostItemSelector',
   get:
     (key) =>
     ({ get }) => {
-      if (!key) return null;
-      const value = get(postItemAtom(key));
-      if (value) return value;
-      return API.Posts.post.getItem(key).then((r) => r.data);
+      return get(postItemAtom(key));
     },
   set:
     (key) =>
     ({ set }, newValue) => {
-      if (!newValue) return;
       if (newValue instanceof DefaultValue) return;
       set(postItemAtom(key), newValue);
     },
 });
 
-const usePostItem = (id: number | undefined) =>
-  useRecoilState(postItemSelector(id));
-const useSetPostItem = (id: number) => useSetRecoilState(postItemSelector(id));
+const useCurrentPostItem = (post: Post) => {
+  const [currentPost, setCurrentPost] = useRecoilState(
+    currentPostItemSelector(post.id)
+  );
+  useEffect(() => {
+    if (currentPost) return;
+    setCurrentPost(post);
+  }, [post]);
+  return [currentPost || post, setCurrentPost] as const;
+};
 
 type PickBoolean<T> = {
   [K in keyof T]: T[K] extends boolean ? K : never;
@@ -90,16 +118,20 @@ const _PostItem: React.FC<{
   disableDivider?: boolean;
   showParent?: boolean;
   showChildLine?: boolean;
+  routingToDetail?: boolean;
 }> = ({
-  post,
+  post: _post,
   disableAction = false,
   disableLatestRepost = false,
   disableImages = false,
   disableDivider = false,
   showParent = false,
   showChildLine = false,
+  routingToDetail = true,
 }) => {
+  const router = useRouter();
   const theme = useTheme();
+  const [post] = useCurrentPostItem(_post);
   const [profile, user] = useUserProfile(post.user);
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -161,9 +193,9 @@ const _PostItem: React.FC<{
   }, [hasView, user]);
 
   //부모 기능
-  const registPostItem = useSetPostItem(post.id);
-  const [origin] = usePostItem(showParent ? post.origin : undefined);
-  const [parent] = usePostItem(showParent ? post.parent : undefined);
+  const registPostItem = useSetRelatedPostItem(post.id);
+  const [origin] = useRelatedPostItem(showParent ? post.origin : undefined);
+  const [parent] = useRelatedPostItem(showParent ? post.parent : undefined);
 
   useEffect(() => {
     registPostItem(post);
@@ -176,7 +208,12 @@ const _PostItem: React.FC<{
   const showRelavantPost =
     !showParent && !disableLatestRepost && Boolean(post.relavant_repost);
   return (
-    <Stack>
+    <Stack
+      onClick={() => {
+        if (routingToDetail) router.push(paths.postDetail(post.id));
+      }}
+      sx={[routingToDetail ? { cursor: 'pointer' } : {}]}
+    >
       {_showOrigin ? (
         <_PostItem
           post={origin}
