@@ -21,27 +21,39 @@ const getInitialPropsWrapper = <P extends {}>(
 ) => {
   return async (
     context: NextPageContext
-  ): Promise<Awaited<P> & ExtendedParams> => {
-    const client = API.client.instance;
-    client.setContext(context);
-    const { access, refresh } = nookies.get(context);
-    const user = access || refresh ? await getUser() : undefined;
-    const tokens =
-      client.tempTokens || access ? { access, refresh } : undefined;
-    const { pre = [], post = [] } = middleware;
-    const preMiddlewarerChecks = pre.map((fc) => fc({ user, tokens }));
-    if (preMiddlewarerChecks.some((p) => Boolean(p))) {
-      //@ts-ignore
-      return preMiddlewarerChecks.filter((p) => p !== false)[0];
-    }
-    const result = await func(context, { user, tokens });
-    const postMiddlewareCheck = post.map((fc) => fc({ user, tokens }));
-    if (postMiddlewareCheck.some((p) => Boolean(p))) {
-      //@ts-ignore
-      return postMiddlewareCheck.filter((p) => p !== false)[0];
-    }
-    return { ...result, user, tokens };
-  };
+  ): Promise<Awaited<P> & ExtendedParams> =>
+    new Promise(async (res, rej) => {
+      const client = API.client.instance;
+      client.setContext(context);
+      const { access, refresh } = nookies.get(context);
+      const user = access || refresh ? await getUser() : undefined;
+      const tokens =
+        client.tempTokens || access ? { access, refresh } : undefined;
+      const { pre = [], post = [] } = middleware;
+      const preMiddlewarerChecks = pre.map((fc) => fc({ user, tokens }));
+      if (preMiddlewarerChecks.some((p) => Boolean(p))) {
+        //@ts-ignore
+        return res(preMiddlewarerChecks.filter((p) => p !== false)[0]);
+      }
+      try {
+        const result = await func(context, { user, tokens });
+        const postMiddlewareCheck = post.map((fc) => fc({ user, tokens }));
+        if (postMiddlewareCheck.some((p) => Boolean(p))) {
+          //@ts-ignore
+          return res(postMiddlewareCheck.filter((p) => p !== false)[0]);
+        }
+        return res({ ...result, user, tokens });
+      } catch (e) {
+        //@ts-ignore
+        if (e.error) {
+          //@ts-ignore
+          return res(e);
+        } else {
+          //@ts-ignore
+          return res({ error: true, statusCode: 500 });
+        }
+      }
+    });
 };
 
 export const getAdminInitialPropsWrapper = <P extends {}>(
