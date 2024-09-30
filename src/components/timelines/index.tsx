@@ -2,7 +2,13 @@ import { Paginated, TimeLinePaginated } from '#/api/general';
 import { Post } from '#/api/posts';
 import { Box, Button, Divider, Stack } from '@mui/material';
 import { AxiosResponse } from 'axios';
-import { useEffect, useMemo, useRef } from 'react';
+import {
+  MutableRefObject,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+} from 'react';
 import { atomFamily, useRecoilState } from 'recoil';
 import { PostItem } from './PostItem';
 import { usePostList } from './hooks';
@@ -24,15 +30,22 @@ const useApiResponse = (key: string) => useRecoilState(apiResponseAtom(key));
 const useTimelinePagination = ({
   func,
   apiKey,
+  params = {},
 }: {
   func: (
     params?: {},
     options?: { offset?: string | number; direction?: 'next' | 'prev' }
   ) => Promise<AxiosResponse<TimeLinePaginated<Post>>>;
   apiKey: string;
+  params?: {};
 }) => {
-  const [pages, setPages] = useApiResponse(apiKey);
-  const [newPages, setNewPages] = useApiResponse(`new:${apiKey}`);
+  const createKey = () =>
+    `${apiKey}:${Object.entries(params)
+      .flatMap((r) => r.join('='))
+      .join(':')}`;
+  const key = useValue(createKey());
+  const [pages, setPages] = useApiResponse(key.get);
+  const [newPages, setNewPages] = useApiResponse(`new:${key.get}`);
 
   const filterDuplicate = (items: Post[]) => {
     const seenIds = new Set<number>();
@@ -44,36 +57,45 @@ const useTimelinePagination = ({
   };
 
   useEffect(() => {
-    func().then((r) => {
+    const timeout = setTimeout(() => key.set(createKey()), 500);
+    return () => clearTimeout(timeout);
+  }, [apiKey, params]);
+
+  useEffect(() => {
+    if (pages.length !== 0) return;
+    func(params).then((r) => {
       setPages((p) => [...p, r]);
     });
-  }, []);
+  }, [key]);
 
   const getNextPage = () => {
     const lastPage = pages[pages.length - 1];
     if (!lastPage) return;
     if (!lastPage.data.next_offset) return;
     const next_offset = lastPage.data.next_offset;
-    func({}, { offset: next_offset }).then((r) => setPages((p) => [...p, r]));
+    func(params, { offset: next_offset }).then((r) =>
+      setPages((p) => [...p, r])
+    );
   };
 
   const patchPrevByLastPage = (page: AxiosResponse<TimeLinePaginated<any>>) => {
     if (!page.data.current_offset) return;
-    func({}, { offset: page.data.current_offset, direction: 'prev' }).then(
-      (r) => {
-        if (r.data.results.length === 0) return;
-        setNewPages((p) => [r, ...p]);
-      }
-    );
+    return func(params, {
+      offset: page.data.current_offset,
+      direction: 'prev',
+    }).then((r) => {
+      if (r.data.results.length === 0) return;
+      setNewPages((p) => [r, ...p]);
+    });
   };
 
-  const getPrevPage = () => {
+  const getPrevPage = async () => {
     console.log('get prev');
     if (!newPages[0]) {
       if (!pages[0]) return;
-      patchPrevByLastPage(pages[0]);
+      return patchPrevByLastPage(pages[0]);
     } else {
-      patchPrevByLastPage(newPages[0]);
+      return patchPrevByLastPage(newPages[0]);
     }
   };
 
@@ -118,6 +140,7 @@ export const PostTimeline: React.FC<{
   showParent?: boolean;
   disableLatestRepost?: boolean;
   params?: {};
+  fetchNew?: MutableRefObject<() => void>;
 }> = ({
   getter,
   type,
@@ -125,6 +148,7 @@ export const PostTimeline: React.FC<{
   showParent = false,
   disableLatestRepost = false,
   params = {},
+  fetchNew,
 }) => {
   useKeepScrollPosition(type, keepScrollPosition);
 
@@ -133,10 +157,13 @@ export const PostTimeline: React.FC<{
     getNextPage,
     newData,
     mergeDatas,
+    getPrevPage,
   } = useTimelinePagination({
     func: getter,
     apiKey: type,
+    params,
   });
+
   const observer = useObserver();
   const nextCallblock = useRef<HTMLDivElement>();
   useEffect(() => {
@@ -147,6 +174,26 @@ export const PostTimeline: React.FC<{
     0;
     return () => observer.unobserve(block);
   }, [items]);
+
+  //이전글 강제로 가져오는 기능
+  const fetch = useValue(false);
+  useImperativeHandle(
+    fetchNew,
+    () => () => {
+      getPrevPage().then(() => fetch.set(true));
+    },
+    [getPrevPage, mergeDatas]
+  );
+
+  useEffect(() => {
+    if (!fetch.get) return;
+    const timeout = setTimeout(() => {
+      mergeDatas();
+      fetch.set(false);
+    }, 100);
+    return () => clearTimeout(timeout);
+  }, [fetch.get, mergeDatas]);
+
   return (
     <Stack spacing={1}>
       {1 <= newData.length && (

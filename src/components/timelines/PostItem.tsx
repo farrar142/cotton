@@ -131,7 +131,7 @@ const _PostItem: React.FC<{
 }) => {
   const router = useRouter();
   const theme = useTheme();
-  const [post] = useCurrentPostItem(_post);
+  const [post, setPost] = useCurrentPostItem(_post);
   const [profile, user] = useUserProfile(post.user);
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -159,21 +159,30 @@ const _PostItem: React.FC<{
 
   const getCaller = (bool: boolean) =>
     bool ? API.Posts.post.postChildItem : API.Posts.post.deleteChildItem;
-
+  const refetchPost = () => {
+    setTimeout(
+      () =>
+        API.Posts.post
+          .getItem(post.id)
+          .then((r) => r.data)
+          .then(setPost),
+      100
+    );
+  };
   const onRepost = (bool: boolean) => () => {
-    getCaller(bool)(post, 'reposts');
+    getCaller(bool)(post, 'reposts').then(refetchPost);
     setRepost((p) => new Map(p.entries()).set(post.id, bool));
   };
   const onBookmark = (bool: boolean) => () => {
-    getCaller(bool)(post, 'bookmarks');
+    getCaller(bool)(post, 'bookmarks').then(refetchPost);
     setBookmark((p) => new Map(p.entries()).set(post.id, bool));
   };
   const onFavorite = (bool: boolean) => () => {
-    getCaller(bool)(post, 'favorites');
+    getCaller(bool)(post, 'favorites').then(refetchPost);
     setFavorite((p) => new Map(p.entries()).set(post.id, bool));
   };
   const onView = () => {
-    getCaller(true)(post, 'views');
+    getCaller(true)(post, 'views').then(refetchPost);
     setView((p) => new Map(p.entries()).set(post.id, true));
   };
 

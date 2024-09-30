@@ -22,6 +22,7 @@ export const ImageViewer: React.FC<{ post: Post }> = ({ post }) => {
       flexDirection='row'
       width='100%'
       sx={{ aspectRatio, borderRadius: 15 }}
+      onClick={(e) => e.stopPropagation()}
     >
       {images.length === 1 && (
         <Box sx={{ width: '100%', height: '100%', maxHeight: 400 }}>

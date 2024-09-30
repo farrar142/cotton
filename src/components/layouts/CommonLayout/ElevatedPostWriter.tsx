@@ -3,6 +3,7 @@ import { ImageType } from '#/api/commons/types';
 import { PostItem } from '#/components/timelines/PostItem';
 import { ScrollPreventedBackdrop } from '#/components/utils/ScrollPreventedBackdrop';
 import { usePostWriteService } from '#/hooks/posts/usePostWriteService';
+import { useRouter } from '#/hooks/useCRouter';
 import { usePostWrite } from '#/hooks/usePostWrite';
 import DraftEditor from '#/PostWriter/DraftEditor';
 import { MentionEntry } from '#/PostWriter/DraftEditor/mention';
@@ -19,6 +20,7 @@ import {
 import { MouseEvent } from 'react';
 
 export const ElevatedPostWriter = () => {
+  const router = useRouter();
   const [isWrite, setIsWrite] = usePostWrite();
   const postWriteService = usePostWriteService();
   const onPost = (text: string, blocks: Block[][], images: ImageType[]) => {
@@ -26,6 +28,7 @@ export const ElevatedPostWriter = () => {
       .onPost(text, blocks, images, isWrite.parent)
       .then(onClose)
       .then(({ data }) => {
+        router.reload();
         return data;
       });
   };

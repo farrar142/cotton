@@ -4,7 +4,7 @@ import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import { Avatar, Box, Divider, Tab, useTheme } from '@mui/material';
 
-import DraftEditor from '#/PostWriter/DraftEditor';
+import DraftEditor, { DraftOnPost } from '#/PostWriter/DraftEditor';
 import API from '#/api';
 import { ImageType } from '#/api/commons/types';
 import { PostTimeline } from '#/components/timelines';
@@ -12,7 +12,7 @@ import { useLoginWindow } from '#/hooks/useLoginWindow';
 import useMediaSize from '#/hooks/useMediaSize';
 import useUser from '#/hooks/useUser';
 import { Block } from '#/utils/textEditor/blockTypes';
-import { SyntheticEvent } from 'react';
+import { SyntheticEvent, useRef } from 'react';
 import { usePostWriteService } from '#/hooks/posts/usePostWriteService';
 import { atom, useRecoilState } from 'recoil';
 import { recoilPersist } from 'recoil-persist';
@@ -44,6 +44,14 @@ const Home = () => {
   const handleChange = (event: SyntheticEvent, newValue: string) => {
     if (!user) return openLoginWindow();
     tabValue.set(newValue);
+  };
+
+  const fetchNew = useRef(() => {});
+
+  const onPost: DraftOnPost = (text, blocks, images) => {
+    return postWriteService
+      .onPost(text, blocks, images)
+      .then(() => fetchNew.current());
   };
 
   return (
@@ -96,15 +104,13 @@ const Home = () => {
         >
           <Box px={isMd ? 2 : 1} display='flex' flexDirection='row'>
             <Avatar sx={{ mr: 1 }} />
-            <DraftEditor
-              onPost={postWriteService.onPost}
-              additionalWidth={-48}
-            />
+            <DraftEditor onPost={onPost} additionalWidth={-48} />
           </Box>
           <Divider sx={{ mb: 1 }} />
           <PostTimeline
             getter={API.Posts.post.getFollowingTimeline}
             type='followings'
+            fetchNew={fetchNew}
           />
         </TabPanel>
       </TabContext>
