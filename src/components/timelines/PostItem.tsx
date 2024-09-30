@@ -18,6 +18,7 @@ import {
 import {
   Avatar,
   Box,
+  CircularProgress,
   Divider,
   Grid2,
   IconButton,
@@ -27,7 +28,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import { useEffect, useRef } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import {
   atomFamily,
   DefaultValue,
@@ -39,6 +40,7 @@ import { ImageViewer } from './ImageViewer';
 import React from 'react';
 import { useRouter } from '#/hooks/useCRouter';
 import paths from '#/paths';
+import { SuspendHOC } from '../SuspendHOC';
 
 const postItemAtom = atomFamily<Post | null, number | undefined>({
   key: 'postItemAtom',
@@ -54,7 +56,18 @@ const relatedPostItemSelector = selectorFamily<Post | null, number | undefined>(
         if (!key) return null;
         const value = get(postItemAtom(key));
         if (value) return value;
-        return API.Posts.post.getItem(key).then((r) => r.data);
+        console.log('here');
+        return API.Posts.post
+          .getItem(key)
+          .then((r) => {
+            const d = r.data;
+            console.log(d);
+            return d;
+          })
+          .catch(() => {
+            console.log('error');
+            return null;
+          });
       },
     set:
       (key) =>
@@ -140,7 +153,6 @@ const _PostItem: React.FC<{
   const [bookmark, setBookmark] = useOverrideAtom('bookmark');
   const [repost, setRepost] = useOverrideAtom('repost');
   const [view, setView] = useOverrideAtom('view');
-
   // 부가기능
   const isChecked = (
     field: PickBoolean<Post>,
@@ -280,7 +292,7 @@ const _PostItem: React.FC<{
           alignItems='center'
         >
           <Avatar src={profile?.profile_image?.url} />
-          {showChildLine && (
+          {showChildLine ? (
             <Box
               flex={1}
               height='100%'
@@ -291,6 +303,8 @@ const _PostItem: React.FC<{
                 borderColor: theme.palette.text.disabled,
               }}
             />
+          ) : (
+            <></>
           )}
         </Box>
         <Stack flex={1} width='100%'>
@@ -429,4 +443,4 @@ const _PostItem: React.FC<{
   );
 };
 
-export const PostItem = _PostItem;
+export const PostItem = SuspendHOC(_PostItem);

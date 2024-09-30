@@ -12,7 +12,7 @@ const BookmarkPage: ExtendedNextPage<{ user: User }> = ({ user }) => {
   if (!user) return;
   const userKey = `timeline/${user?.username}/bookmarks/search?${search.get}`;
   return (
-    <Stack pt={3} spacing={2}>
+    <Stack spacing={2}>
       <Box
         width='100%'
         px={2}
