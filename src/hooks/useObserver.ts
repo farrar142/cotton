@@ -3,9 +3,9 @@ import { useEffect, useRef } from 'react';
 export const useObserver = () => {
   const onIntersection = useRef(() => {});
   const onNotIntersection = useRef(() => {});
-  const observer = useRef<IntersectionObserver>();
-  useEffect(() => {
-    observer.current = new IntersectionObserver(
+  const createObserver = () => {
+    if (typeof window === 'undefined') return;
+    return new IntersectionObserver(
       (entries, observer) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -17,7 +17,8 @@ export const useObserver = () => {
       },
       { threshold: 1, rootMargin: '500px' }
     );
-  }, []);
+  };
+  const observer = useRef<IntersectionObserver | undefined>(createObserver());
 
   const observe = (element: HTMLElement) => {
     observer.current?.observe(element);
