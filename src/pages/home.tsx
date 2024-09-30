@@ -13,6 +13,7 @@ import useMediaSize from '#/hooks/useMediaSize';
 import useUser from '#/hooks/useUser';
 import { Block } from '#/utils/textEditor/blockTypes';
 import { SyntheticEvent } from 'react';
+import { usePostWriteService } from '#/hooks/posts/usePostWriteService';
 // import PostWriter from '#/PostWriter';
 // const DraftEditor = dynamic(() => import('#/PostWriter/DraftEditor'), {
 //   ssr: true,
@@ -24,17 +25,11 @@ const Home = () => {
   const [user] = useUser();
   const tabValue = useValue('1');
   const [openLoginWindow] = useLoginWindow();
+  const postWriteService = usePostWriteService();
 
   const handleChange = (event: SyntheticEvent, newValue: string) => {
     if (!user) return openLoginWindow();
     tabValue.set(newValue);
-  };
-  const onPost = (text: string, blocks: Block[][], images: ImageType[]) => {
-    const mentions = blocks
-      .map((line) => line.filter((block) => block.type === 'mention'))
-      .flatMap((block) => block)
-      .map((block) => ({ mentioned_to: parseInt(block.id) }));
-    return API.Posts.post.postItem({ text, blocks, mentions, images });
   };
 
   return (
@@ -87,7 +82,10 @@ const Home = () => {
         >
           <Box px={isMd ? 2 : 1} display='flex' flexDirection='row'>
             <Avatar sx={{ mr: 1 }} />
-            <DraftEditor onPost={onPost} additionalWidth={-48} />
+            <DraftEditor
+              onPost={postWriteService.onPost}
+              additionalWidth={-48}
+            />
           </Box>
           <Divider sx={{ mb: 1 }} />
           <PostTimeline

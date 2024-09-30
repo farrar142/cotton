@@ -30,6 +30,7 @@ import { ImageType } from '#/api/commons/types';
 import { glassmorphism } from '#/styles';
 import { atom, atomFamily, useRecoilState } from 'recoil';
 import dynamic from 'next/dynamic';
+import { Post } from '#/api/posts';
 
 const Editor = dynamic(
   //@ts-ignore
@@ -54,7 +55,8 @@ const emptyContentState = convertFromRaw({
 export type DraftOnPost = (
   text: string,
   blocks: Block[][],
-  images: ImageType[]
+  images: ImageType[],
+  parent?: Post
 ) => Promise<any>;
 
 type ReadOnly = {

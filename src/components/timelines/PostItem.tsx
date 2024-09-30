@@ -86,7 +86,7 @@ const currentPostItemSelector = selectorFamily<Post | null, number>({
     },
 });
 
-const useCurrentPostItem = (post: Post) => {
+export const useCurrentPostItem = (post: Post) => {
   const [currentPost, setCurrentPost] = useRecoilState(
     currentPostItemSelector(post.id)
   );

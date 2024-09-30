@@ -2,6 +2,7 @@ import API from '#/api';
 import { ImageType } from '#/api/commons/types';
 import { PostItem } from '#/components/timelines/PostItem';
 import { ScrollPreventedBackdrop } from '#/components/utils/ScrollPreventedBackdrop';
+import { usePostWriteService } from '#/hooks/posts/usePostWriteService';
 import { usePostWrite } from '#/hooks/usePostWrite';
 import DraftEditor from '#/PostWriter/DraftEditor';
 import { MentionEntry } from '#/PostWriter/DraftEditor/mention';
@@ -19,20 +20,10 @@ import { MouseEvent } from 'react';
 
 export const ElevatedPostWriter = () => {
   const [isWrite, setIsWrite] = usePostWrite();
+  const postWriteService = usePostWriteService();
   const onPost = (text: string, blocks: Block[][], images: ImageType[]) => {
-    const mentions = blocks
-      .map((line) => line.filter((block) => block.type === 'mention'))
-      .flatMap((block) => block)
-      .map((block) => ({ mentioned_to: parseInt(block.id) }));
-    return API.Posts.post
-      .postItem({
-        text,
-        blocks,
-        mentions,
-        images,
-        parent: isWrite.parent?.id,
-        origin: isWrite.parent?.origin || isWrite.parent?.id,
-      })
+    return postWriteService
+      .onPost(text, blocks, images, isWrite.parent)
       .then(onClose)
       .then(({ data }) => {
         return data;
