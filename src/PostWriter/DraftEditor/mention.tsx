@@ -64,12 +64,13 @@ export const MentionEntry: React.FC<EntryComponentProps> = (props) => {
 export const MentionComponent: React.FC<SubMentionComponentProps> = (e) => {
   //@ts-ignore
   const key = e.children[0].key;
+  const theme = useTheme();
   return (
     <span
       className={e.className}
       spellCheck={false}
       data-testid='mentionText'
-      style={{ cursor: 'pointer' }}
+      style={{ cursor: 'pointer', color: theme.palette.primary.main }}
       onClick={() => {
         console.log(e.mention);
       }}
