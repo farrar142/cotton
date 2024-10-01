@@ -23,7 +23,7 @@ const customTheme = createTheme({
   breakpoints: {
     values: {
       // extra-small
-      xs: 320,
+      xs: 350,
       // small
       sm: 640,
       // medium

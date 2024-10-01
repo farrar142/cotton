@@ -28,7 +28,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import { Suspense, useEffect, useRef } from 'react';
+import { MouseEventHandler, Suspense, useEffect, useRef } from 'react';
 import {
   atomFamily,
   DefaultValue,
@@ -236,13 +236,13 @@ const _PostItem: React.FC<{
 
   const smallPading = isSmall ? 1 : 2;
 
+  const route: MouseEventHandler = (e) => {
+    e.stopPropagation();
+    if (routingToDetail) router.push(paths.postDetail(post.id));
+  };
+
   return (
-    <Stack
-      onClick={() => {
-        if (routingToDetail) router.push(paths.postDetail(post.id));
-      }}
-      sx={[routingToDetail ? { cursor: 'pointer' } : {}]}
-    >
+    <Stack onClick={route} sx={[routingToDetail ? { cursor: 'pointer' } : {}]}>
       {_showOrigin ? (
         <_PostItem
           post={origin}
@@ -305,7 +305,6 @@ const _PostItem: React.FC<{
         flexDirection='row'
         width='100%'
         px={smallPading}
-        onClick={(e) => e.stopPropagation()}
       >
         <Box
           mt={1.5}
@@ -314,11 +313,15 @@ const _PostItem: React.FC<{
           flexDirection='column'
           alignItems='center'
         >
-          <NextLink href={paths.mypage(profile.username)}>
+          <NextLink
+            href={paths.mypage(profile.username)}
+            onClick={(e) => e.stopPropagation()}
+          >
             <Avatar src={profile.profile_image?.url} />
           </NextLink>
           {showChildLine ? (
             <Box
+              onClick={route}
               flex={1}
               height='100%'
               mt={1}
@@ -332,8 +335,11 @@ const _PostItem: React.FC<{
             <></>
           )}
         </Box>
-        <Stack flex={1} width='100%'>
-          <NextLink href={paths.mypage(profile.username)}>
+        <Stack flex={1} width='100%' onClick={route}>
+          <NextLink
+            onClick={(e) => e.stopPropagation()}
+            href={paths.mypage(profile.username)}
+          >
             <Stack direction='row' spacing={1} alignItems='center'>
               <Typography
                 fontWeight='bold'

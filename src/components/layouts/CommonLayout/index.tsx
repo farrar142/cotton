@@ -1,24 +1,18 @@
 import useValue from '#/hooks/useValue';
-import {
-  Avatar,
-  Box,
-  IconButton,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
+import { Avatar, Box, IconButton, styled, useTheme } from '@mui/material';
 
+import NextLink from '#/components/NextLink';
+import { useRouter } from '#/hooks/useCRouter';
 import { useLoginWindow } from '#/hooks/useLoginWindow';
+import useMediaSize from '#/hooks/useMediaSize';
 import useUser from '#/hooks/useUser';
-import * as React from 'react';
+import paths from '#/paths';
+import { glassmorphism } from '#/styles';
+import { Cloud, ExitToApp, Replay } from '@mui/icons-material';
+import React, { useEffect, useMemo } from 'react';
 import SigninComponent from '../pages/SigninComponent';
 import { ElevatedPostWriter } from './ElevatedPostWriter';
 import LeftSidebar from './LeftSidebar';
-import { glassmorphism } from '#/styles';
-import { Cloud, ExitToApp, Replay, Settings } from '@mui/icons-material';
-import NextLink from '#/components/NextLink';
-import paths from '#/paths';
-import useMediaSize from '#/hooks/useMediaSize';
-import { useRouter } from '#/hooks/useCRouter';
 
 const CommonLayout: React.FC<{
   children?: React.ReactNode;
@@ -31,21 +25,28 @@ const CommonLayout: React.FC<{
   const handleLoginBackdrop = () => {
     loginBackDrop.set((p) => !p);
   };
-  React.useEffect(() => {
+  useEffect(() => {
     setOpenLoginWindow(() => () => handleLoginBackdrop());
   }, []);
+
+  const SideFlexBox = useMemo(
+    () => styled(Box)({ flex: 1, minWidth: isMd ? 80 : 120 }),
+    [isMd]
+  );
 
   return (
     <Box
       display='flex'
       sx={{
         '>div:nth-of-type(2)': {
-          maxWidth: theme.breakpoints.values.sm,
+          maxWidth: isMd
+            ? theme.breakpoints.values.md
+            : theme.breakpoints.values.sm,
           width: '100%',
         },
       }}
     >
-      <Box flex={1}>
+      <SideFlexBox>
         <Box
           sx={[
             isSmall
@@ -83,7 +84,7 @@ const CommonLayout: React.FC<{
           open={loginBackDrop.get}
           onClose={() => loginBackDrop.set(false)}
         />
-      </Box>
+      </SideFlexBox>
       <Box position='relative'>
         <SmallSizeHeader
           handleLoginBackdrop={handleLoginBackdrop}
@@ -103,11 +104,11 @@ const CommonLayout: React.FC<{
           {children}
         </Box>
       </Box>
-      <Box flex={1} minWidth={80} display={isMd ? 'none' : 'block'}>
+      <SideFlexBox display={isMd ? 'none' : 'block'}>
         <Box position='sticky' top={0}>
           오른쪽사이드바
         </Box>
-      </Box>
+      </SideFlexBox>
       <ElevatedPostWriter />
     </Box>
   );
