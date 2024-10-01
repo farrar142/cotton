@@ -2,20 +2,46 @@ import API from '#/api';
 import { User } from '#/api/users/types';
 import CommonLayout from '#/components/layouts/CommonLayout';
 import { CommonTab } from '#/components/layouts/CommonTab';
+import { SimpleProfileItem } from '#/components/SimpleProfileComponent';
 import getInitialPropsWrapper from '#/functions/getInitialPropsWrapper';
+import { useCursorPagination } from '#/hooks/paginations/useCursorPagination';
 import { useRouter } from '#/hooks/useCRouter';
-import useValue from '#/hooks/useValue';
+import { useObserver } from '#/hooks/useObserver';
 import paths from '#/paths';
-import { Box } from '@mui/material';
-import React from 'react';
+import { Box, Stack } from '@mui/material';
+import React, { useEffect, useRef } from 'react';
 
-const FollowingsPage: ExtendedNextPage<{ profile: User }> = () => {
-  return <>aaaa</>;
+const FollowingsPage: ExtendedNextPage<{ profile: User }> = ({ profile }) => {
+  const { data, fetchNext } = useCursorPagination({
+    getter: API.Relations.getFollowings(profile.id),
+    apiKey: `followings:${profile.username}`,
+  });
+  const observer = useObserver();
+  const fetchNextBlock = useRef<HTMLElement>();
+  useEffect(() => {
+    const block = fetchNextBlock.current;
+    if (!block) return;
+    observer.observe(block);
+    observer.onIntersection(fetchNext);
+    return () => observer.unobserve(block);
+  }, [data]);
+
+  return (
+    <Stack spacing={1}>
+      {data.map((profile) => (
+        <SimpleProfileItem
+          profile={profile}
+          key={profile.id}
+          onClick={() => {}}
+        />
+      ))}
+      <Box ref={fetchNextBlock} />
+    </Stack>
+  );
 };
 
 FollowingsPage.getLayout = ({ children, props }) => {
   const router = useRouter();
-  console.log(props);
   return (
     <CommonLayout>
       <Box>
@@ -39,6 +65,7 @@ FollowingsPage.getLayout = ({ children, props }) => {
             },
           ]}
           panels={[<>{children}</>, <></>]}
+          pannelProps={{ sx: { p: 0 } }}
         />
       </Box>
     </CommonLayout>

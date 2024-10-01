@@ -2,7 +2,7 @@ import useValue from '#/hooks/useValue';
 import { glassmorphism } from '#/styles';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
-import TabPanel from '@mui/lab/TabPanel';
+import TabPanel, { TabPanelProps } from '@mui/lab/TabPanel';
 import { Tab } from '@mui/material';
 import { MouseEventHandler, ReactNode, useMemo } from 'react';
 
@@ -21,7 +21,8 @@ export const CommonTab: React.FC<{
   labels: (string | TabProp)[];
   top?: number;
   defaultTabIndex?: number;
-}> = ({ panels, labels, top, defaultTabIndex = 0 }) => {
+  pannelProps?: Partial<TabPanelProps>;
+}> = ({ panels, labels, top, defaultTabIndex = 0, pannelProps = {} }) => {
   const normalized = useMemo(() => labels.map(normalizeTabProps), [labels]);
   const tabValue = useValue(normalized[defaultTabIndex].value);
   const keypanels = (() => {
@@ -57,7 +58,7 @@ export const CommonTab: React.FC<{
         ))}
       </TabList>
       {keypanels.map(({ label, children }) => (
-        <TabPanel value={label.value} key={label.value}>
+        <TabPanel {...pannelProps} value={label.value} key={label.value}>
           {children}
         </TabPanel>
       ))}

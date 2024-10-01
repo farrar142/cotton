@@ -373,7 +373,8 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
 const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
   profile: _profile,
 }) => {
-  const [profile, user, { isMyProfile, setProfile }] = useUserProfile(_profile);
+  const [profile, user, { isMyProfile, setProfile, setMyProfile }] =
+    useUserProfile(_profile);
   const profileEditorOpen = useValue(false);
   const { isSmall } = useMediaSize();
   const { done, wrapper } = usePromiseState();
@@ -385,6 +386,9 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
         return API.Relations.followUser(profile.id);
       }
     })().then(({ data }) => {
+      API.Users.me()
+        .then((r) => r.data)
+        .then(setMyProfile);
       return API.Relations.getUserByUsername(profile.username)
         .then((r) => r.data)
         .then(setProfile);
@@ -453,7 +457,7 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
               disabled={done.get === false}
               onClick={wrapper(followUser)}
             >
-              {profile.is_following_to ? '팔로우 해제' : '팔로우'}
+              {profile.is_following_to ? '언팔로우' : '팔로우'}
             </Button>
           )}
         </Box>

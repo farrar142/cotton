@@ -31,12 +31,12 @@ const objectToStringKey = (obj: object) =>
 
 export const useCursorPagination = <T extends { id: number }>({
   getter,
-  params,
+  params = {},
   apiKey,
 }: {
   getter: Getter<T>;
   apiKey: string;
-  params: {};
+  params?: {};
 }) => {
   const key = useValue(`${apiKey}:${objectToStringKey(params)}`);
   const [pages, setPages] = useCursorPaginationData<

@@ -33,7 +33,7 @@ const userSelector = selectorFamily<User | null, number>({
 });
 
 export const useUserProfile = (profile: User) => {
-  const [me, setme] = useRecoilState(userAtom(undefined));
+  const [me, setMe] = useRecoilState(userAtom(undefined));
   const [user, setUser] = useRecoilState(userSelector(profile.id));
 
   useEffect(() => {
@@ -51,7 +51,11 @@ export const useUserProfile = (profile: User) => {
   const returnUser = (user?.id === profile.id ? user : profile) || profile;
 
   const isMe = profile.id === me?.id;
-  return [returnUser, me, { isMyProfile: isMe, setProfile: setUser }] as const;
+  return [
+    returnUser,
+    me,
+    { isMyProfile: isMe, setProfile: setUser, setMyProfile: setMe },
+  ] as const;
 };
 
 const useUser = (user?: User) => {
