@@ -85,7 +85,7 @@ const DraftEditorToolbar: React.FC<{
   return (
     <Box width='100%' display='flex' justifyContent='space-between'>
       <Stack direction='row' alignItems='center'>
-        <IconButton size='small' color='info' onClick={onImageButtonClick}>
+        <IconButton size='small' color='primary' onClick={onImageButtonClick}>
           <Image />
           <input
             ref={inputRef}
@@ -97,7 +97,7 @@ const DraftEditorToolbar: React.FC<{
           />
         </IconButton>
         <IconButton
-          color='info'
+          color='primary'
           aria-describedby={emojiElId}
           onClick={(e) => anchorEl.set(e.currentTarget)}
         >
