@@ -22,10 +22,12 @@ export type Post = PostUpsert & {
   has_bookmark: boolean;
   has_repost: boolean;
   has_favorite: boolean;
+  has_quote: boolean;
   views_count: number;
   favorites_count: number;
   replies_count: number;
   reposts_count: number;
+  quotes_count: number;
   relavant_repost?: User;
   latest_date: string;
   reply_row_number_desc: number;

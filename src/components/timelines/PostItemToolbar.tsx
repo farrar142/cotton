@@ -41,6 +41,7 @@ export const PostItemToolbar: React.FC<{
   const [favorite, setFavorite] = useOverrideAtom('favorite');
   const [bookmark, setBookmark] = useOverrideAtom('bookmark');
   const [repost, setRepost] = useOverrideAtom('repost');
+  const [quote, setQuote] = useOverrideAtom('quote');
 
   const isChecked = (
     field: PickBoolean<Post>,
@@ -55,6 +56,7 @@ export const PostItemToolbar: React.FC<{
   const hasRepost = isChecked('has_repost', repost);
   const hasBookmark = isChecked('has_bookmark', bookmark);
   const hasFavorite = isChecked('has_favorite', favorite);
+  const hasQuote = isChecked('has_quote', quote);
   const getCaller = (bool: boolean) =>
     bool ? API.Posts.post.postChildItem : API.Posts.post.deleteChildItem;
   const refetchPost = () => {
@@ -116,10 +118,10 @@ export const PostItemToolbar: React.FC<{
       <Grid2 size={2}>
         <Stack direction='row' alignItems='center'>
           <Tooltip title='cottoning'>
-            {hasRepost ? (
+            {hasRepost || hasQuote ? (
               <IconButton
                 onClick={onRepost(false)}
-                disabled={!Boolean(user)}
+                disabled={!Boolean(user) || hasQuote}
                 color='info'
               >
                 <Cloud />
@@ -134,7 +136,9 @@ export const PostItemToolbar: React.FC<{
               </IconButton>
             )}
           </Tooltip>
-          <Typography variant='caption'>{post.reposts_count}</Typography>
+          <Typography variant='caption'>
+            {post.reposts_count + post.quotes_count}
+          </Typography>
         </Stack>
         <Menu
           anchorEl={repostAnchor.get}

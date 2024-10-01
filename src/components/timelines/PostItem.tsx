@@ -44,6 +44,7 @@ import { SuspendHOC } from '../SuspendHOC';
 import NextLink from '../NextLink';
 import { PickBoolean, useOverrideAtom } from './postActionAtoms';
 import { PostItemToolbar } from './PostItemToolbar';
+import { ClientOnlyHOC } from '../ClientOnlyHOC';
 
 const postItemAtom = atomFamily<Post | null, number | undefined>({
   key: 'postItemAtom',
@@ -383,4 +384,4 @@ const _PostItem: React.FC<{
   );
 };
 
-export const PostItem = _PostItem;
+export const PostItem = ClientOnlyHOC(_PostItem);
