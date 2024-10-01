@@ -30,7 +30,6 @@ const BookmarkPage: ExtendedNextPage<{ user: User }> = ({ user }) => {
             @{user.nickname}
           </Typography>
           <TextInput
-            label='Search Bookmark'
             placeholder='Search Bookmark'
             value={search.get}
             onChange={search.onTextChange}

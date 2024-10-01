@@ -95,6 +95,7 @@ const SearchPage: ExtendedNextPage = () => {
               onChange={search.onTextChange}
               size='small'
               fullWidth
+              placeholder='Search'
               slotProps={{
                 input: {
                   startAdornment: (
@@ -144,7 +145,7 @@ const SearchPage: ExtendedNextPage = () => {
             p: 0,
           }}
         >
-          <UserSearchComponent search={search.get} />
+          {search.get && <UserSearchComponent search={search.get} />}
         </TabPanel>
       </TabContext>
     </Box>
