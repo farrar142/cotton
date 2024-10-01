@@ -119,7 +119,10 @@ const Home = () => {
           }}
         >
           <Box px={isMd ? 2 : 1} display='flex' flexDirection='row'>
-            <Avatar sx={{ mr: 1 }} />
+            <Avatar
+              sx={{ mr: 1 }}
+              src={user?.profile_image?.small || user?.profile_image?.url}
+            />
             <DraftEditor onPost={onPost} additionalWidth={-48} />
           </Box>
           <Divider sx={{ mb: 1 }} />
