@@ -97,7 +97,7 @@ const SearchPage: ExtendedNextPage = () => {
             position: 'sticky',
             top: 0,
             backdropFilter: 'blur(5px)',
-            zIndex: 2,
+            zIndex: 5,
           }}
         >
           <Box px={2} pt={2}>

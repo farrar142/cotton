@@ -22,7 +22,7 @@ export const CommonTab: React.FC<{
   top?: number;
   defaultTabIndex?: number;
   pannelProps?: Partial<TabPanelProps>;
-}> = ({ panels, labels, top, defaultTabIndex = 0, pannelProps = {} }) => {
+}> = ({ panels, labels, top = 0, defaultTabIndex = 0, pannelProps = {} }) => {
   const normalized = useMemo(() => labels.map(normalizeTabProps), [labels]);
   const tabValue = useValue(normalized[defaultTabIndex].value);
   const keypanels = (() => {
@@ -32,7 +32,6 @@ export const CommonTab: React.FC<{
     }
     return keypanels;
   })();
-  console.log('refresh');
   return (
     <TabContext value={tabValue.get}>
       <TabList
@@ -40,7 +39,7 @@ export const CommonTab: React.FC<{
           display: 'flex',
           position: 'sticky',
           top,
-          zIndex: 3,
+          zIndex: 5,
           ...glassmorphism(theme),
         })}
         onChange={(e, value) => {
