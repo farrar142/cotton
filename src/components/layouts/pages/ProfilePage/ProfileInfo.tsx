@@ -2,11 +2,13 @@ import API from '#/api';
 import { ImageType } from '#/api/commons/types';
 import { RegisteredUser } from '#/api/users/types';
 import TextInput from '#/components/inputs/TextInput';
+import NextLink from '#/components/NextLink';
 import { ScrollPreventedBackdrop } from '#/components/utils/ScrollPreventedBackdrop';
 import useMediaSize from '#/hooks/useMediaSize';
 import { usePromiseState } from '#/hooks/usePromiseState';
 import useUser, { useUserProfile } from '#/hooks/useUser';
 import useValue, { UseValue } from '#/hooks/useValue';
+import paths from '#/paths';
 import { glassmorphism } from '#/styles';
 import {
   getBase64,
@@ -476,30 +478,42 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
           </Typography>
         </Stack>
         <Stack direction='row' spacing={2}>
-          <Stack direction='row' alignItems='center' spacing={1}>
-            <Typography variant='subtitle2' fontWeight={700}>
-              {profile.followings_count}
-            </Typography>
-            <Typography
-              variant='subtitle2'
-              fontWeight={100}
-              color='textDisabled'
-            >
-              팔로우 중
-            </Typography>
-          </Stack>
-          <Stack direction='row' alignItems='center' spacing={1}>
-            <Typography variant='subtitle2' fontWeight={700}>
-              {profile.followers_count}
-            </Typography>
-            <Typography
-              variant='subtitle2'
-              fontWeight={100}
-              color='textDisabled'
-            >
-              팔로워
-            </Typography>
-          </Stack>
+          <NextLink href={paths.userfollowings(profile.username)}>
+            <Stack direction='row' alignItems='center' spacing={1}>
+              <Typography
+                variant='subtitle2'
+                fontWeight={700}
+                color='textPrimary'
+              >
+                {profile.followings_count}
+              </Typography>
+              <Typography
+                variant='subtitle2'
+                fontWeight={100}
+                color='textDisabled'
+              >
+                팔로우 중
+              </Typography>
+            </Stack>
+          </NextLink>
+          <NextLink href={paths.userfollowers(profile.username)}>
+            <Stack direction='row' alignItems='center' spacing={1}>
+              <Typography
+                variant='subtitle2'
+                fontWeight={700}
+                color='textPrimary'
+              >
+                {profile.followers_count}
+              </Typography>
+              <Typography
+                variant='subtitle2'
+                fontWeight={100}
+                color='textDisabled'
+              >
+                팔로워
+              </Typography>
+            </Stack>
+          </NextLink>
         </Stack>
       </Stack>
     </Box>

@@ -1,6 +1,7 @@
 import { TimeLinePaginated } from '#/api/general';
 import { Post } from '#/api/posts';
 import useValue from '#/hooks/useValue';
+import { filterDuplicate } from '#/utils/arrays';
 import { AxiosResponse } from 'axios';
 import { useEffect, useMemo } from 'react';
 import { atomFamily, useRecoilState } from 'recoil';
@@ -34,15 +35,6 @@ export const useTimelinePagination = ({
   const key = useValue(createKey());
   const [pages, setPages] = useApiResponse(key.get);
   const [newPages, setNewPages] = useApiResponse(`new:${key.get}`);
-
-  const filterDuplicate = (items: Post[]) => {
-    const seenIds = new Set<number>();
-    return items.filter((item, index, self) => {
-      if (seenIds.has(item.id)) return false;
-      seenIds.add(item.id);
-      return true;
-    });
-  };
 
   useEffect(() => {
     const timeout = setTimeout(() => key.set(createKey()), 500);

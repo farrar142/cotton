@@ -1,15 +1,18 @@
 import API from '#/api';
+import { Paginated } from '#/api/general';
 import { User } from '#/api/users/types';
 import { ClientOnlyHOC } from '#/components/ClientOnlyHOC';
 import TextInput from '#/components/inputs/TextInput';
 import { SimpleProfileItem } from '#/components/SimpleProfileComponent';
 import { PostTimeline } from '#/components/timelines';
+import { useCursorPagination } from '#/hooks/paginations/useCursorPagination';
 import { useRouter } from '#/hooks/useCRouter';
 import { useObserver } from '#/hooks/useObserver';
 import useValue from '#/hooks/useValue';
 import paths from '#/paths';
 import DraftEditor from '#/PostWriter/DraftEditor';
 import { glassmorphism } from '#/styles';
+import { filterDuplicate } from '#/utils/arrays';
 import { Search } from '@mui/icons-material';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -25,7 +28,8 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import React, { SyntheticEvent, useEffect, useRef } from 'react';
+import { AxiosResponse } from 'axios';
+import React, { SyntheticEvent, useEffect, useMemo, useRef } from 'react';
 import { atom, useRecoilState } from 'recoil';
 import { recoilPersist } from 'recoil-persist';
 
@@ -44,44 +48,13 @@ const useSearchTabAtom = () => {
 const UserSearchComponent: React.FC<{ search: string }> = ({ search }) => {
   const router = useRouter();
   const searchKey = useValue(search);
-  const users = useValue<User[]>([]);
   const fetchBlockRef = useRef<HTMLElement>();
-  const cursorRef = useRef<string | null>(null);
   const observer = useObserver();
-  useEffect(() => {
-    const timeout = setTimeout(() => searchKey.set(search), 500);
-    return () => clearTimeout(timeout);
-  }, [search]);
-
-  const getCursor = (url?: string) => {
-    if (!url) return null;
-    return new URLSearchParams(url.split('?')[1]).get('cursor');
-  };
-
-  const fetchNext = () => {
-    if (users.get.length === 0) return;
-    if (cursorRef.current === null) return;
-    API.Users.users(
-      { search: search },
-      { cursor: cursorRef.current || undefined }
-    )
-      .then((r) => {
-        cursorRef.current = getCursor(r.data.next);
-        return r;
-      })
-      .then((r) => r.data.results)
-      .then((r) => users.set((p) => [...p, ...r]));
-  };
-
-  useEffect(() => {
-    API.Users.users({ search: search })
-      .then((r) => {
-        cursorRef.current = getCursor(r.data.next);
-        return r;
-      })
-      .then((r) => r.data.results)
-      .then(users.set);
-  }, [searchKey.get]);
+  const { data: users, fetchNext } = useCursorPagination({
+    getter: API.Users.users,
+    params: { search },
+    apiKey: 'userSearch',
+  });
 
   useEffect(() => {
     const block = fetchBlockRef.current;
@@ -89,11 +62,11 @@ const UserSearchComponent: React.FC<{ search: string }> = ({ search }) => {
     observer.onIntersection(fetchNext);
     observer.observe(block);
     return () => observer.unobserve(block);
-  }, [searchKey.get, users.get]);
+  }, [searchKey.get, users]);
 
   return (
     <Stack spacing={1}>
-      {users.get.map((user) => (
+      {users.map((user) => (
         <SimpleProfileItem
           key={user.id}
           profile={user}
