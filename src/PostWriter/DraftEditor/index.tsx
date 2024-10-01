@@ -250,6 +250,7 @@ const DraftEditor: React.FC<
         >
           <PostItem
             post={quote}
+            showQuote={false}
             disableAction
             disableLatestRepost
             disableDivider

@@ -122,6 +122,7 @@ const _PostItem: React.FC<{
   showParent?: boolean;
   showChildLine?: boolean;
   routingToDetail?: boolean;
+  showQuote?: boolean;
 }> = ({
   post: _post,
   disableAction = false,
@@ -130,6 +131,7 @@ const _PostItem: React.FC<{
   disableDivider = false,
   showParent = false,
   showChildLine = false,
+  showQuote = true,
   routingToDetail = true,
 }) => {
   const router = useRouter();
@@ -363,7 +365,7 @@ const _PostItem: React.FC<{
           <DraftEditor
             readOnly={true}
             blocks={post.blocks}
-            quote={quote || undefined}
+            quote={(showQuote && quote) || undefined}
           />
           {disableImages ? <></> : <ImageViewer post={post} />}
           {disableAction ? (
