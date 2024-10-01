@@ -67,18 +67,9 @@ export const ElevatedPostWriter = () => {
                 disableDivider
               />
               <Stack direction='row' spacing={1} pl={2} alignItems='center'>
-                <MentionEntry
-                  onMouseDown={(e) => {}}
-                  onMouseUp={(e) => {}}
-                  onMouseEnter={(e) => {}}
-                  role={''}
-                  id={''}
-                  mention={{
-                    ...isWrite.parent.user,
-                    name: isWrite.parent.user.nickname,
-                  }}
-                  isFocused={false}
-                />
+                <Typography color='primary'>
+                  @{isWrite.parent.user.username}
+                </Typography>
                 <Typography color='textDisabled' variant='subtitle2'>
                   님에게 보내는 답글
                 </Typography>
