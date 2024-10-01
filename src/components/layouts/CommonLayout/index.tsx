@@ -30,8 +30,8 @@ const CommonLayout: React.FC<{
   }, []);
 
   const SideFlexBox = useMemo(
-    () => styled(Box)({ flex: 1, minWidth: isMd ? 80 : 120 }),
-    [isMd]
+    () => styled(Box)({ flex: 1, minWidth: isSmall ? 0 : isMd ? 80 : 120 }),
+    [isMd, isSmall]
   );
 
   return (
@@ -64,7 +64,7 @@ const CommonLayout: React.FC<{
                   top: 0,
                   left: '100%',
                 },
-            isMd ? {} : { pr: 2 },
+            isMd ? {} : {},
           ]}
         >
           <Box
