@@ -14,19 +14,21 @@ import {
   Avatar,
   Divider,
 } from '@mui/material';
-import React from 'react';
+import React, { useRef } from 'react';
 
 export const PostDetailItem: React.FC<{ post: Post }> = ({ post: _post }) => {
   const [user] = useUser();
   const replyClick = useValue(false);
   const postWriteService = usePostWriteService();
   const [post, setPost] = useCurrentPostItem(_post);
+  const fetchChild = useRef(() => {});
   const onReplyPost: DraftOnPost = async (text, blocks, images) => {
     return postWriteService.onPost(text, blocks, images, post).then((e) => {
       API.Posts.post
         .getItem(post.id)
         .then((r) => r.data)
-        .then(setPost);
+        .then(setPost)
+        .then(fetchChild.current);
       return e;
     });
   };
@@ -72,6 +74,7 @@ export const PostDetailItem: React.FC<{ post: Post }> = ({ post: _post }) => {
         getter={API.Posts.post.getReplies(post.id)}
         type={`${post.id}/replies`}
         disableLatestRepost
+        fetchNew={fetchChild}
       />
     </Stack>
   );
