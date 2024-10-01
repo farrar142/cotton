@@ -1,14 +1,16 @@
-import { Paginated } from '#/api/general';
+import { Paginated, TimeLinePaginated } from '#/api/general';
 import { Post } from '#/api/posts';
 import { useKeepScrollPosition } from '#/hooks/useKeepScrollPosition';
 import useValue from '#/hooks/useValue';
 import { FilterNone } from '@mui/icons-material';
 import { Box, Grid2, useMediaQuery, useTheme } from '@mui/material';
 import { AxiosResponse } from 'axios';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { IntersectingOnly } from '../utils/IntersectingOnly';
 import { usePostList } from './hooks';
 import { OriginalImageViewer } from './OriginalImageViewer';
+import { useTimelinePagination } from './usePostPagination';
+import { useObserver } from '#/hooks/useObserver';
 
 const MergedPostMedia: React.FC<{ item: Post }> = ({ item }) => {
   const index = useValue(-1);
@@ -28,7 +30,7 @@ const MergedPostMedia: React.FC<{ item: Post }> = ({ item }) => {
       onClick={() => index.set(0)}
     >
       <img
-        src={sampleImage.medium || sampleImage.url}
+        src={sampleImage.large || sampleImage.url}
         alt=''
         height='100%'
         width='100%'
@@ -48,22 +50,37 @@ const MergedPostMedia: React.FC<{ item: Post }> = ({ item }) => {
 const _MediaTimeline: React.FC<{
   getter: (
     params?: {},
-    options?: { page: number | string }
-  ) => Promise<AxiosResponse<Paginated<Post>>>;
+    options?: { offset?: number | string }
+  ) => Promise<AxiosResponse<TimeLinePaginated<Post>>>;
   type: string;
   keepScrollPosition?: boolean;
 }> = ({ getter, type, keepScrollPosition = true }) => {
   useKeepScrollPosition(type, keepScrollPosition);
-  const [items, setItems] = usePostList(type);
 
-  useEffect(() => {
-    if (0 < items.length) return;
-    getter()
-      .then(({ data }) => data.results)
-      .then(setItems);
-  }, []);
+  const {
+    data: items,
+    getNextPage,
+    newData,
+    mergeDatas,
+    getPrevPage,
+  } = useTimelinePagination({
+    func: getter,
+    apiKey: type,
+    params: {},
+  });
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down('md'));
+
+  const observer = useObserver();
+  const nextCallblock = useRef<HTMLDivElement>();
+  useEffect(() => {
+    if (!nextCallblock.current) return;
+    const block = nextCallblock.current;
+    observer.onIntersection(getNextPage);
+    observer.observe(block);
+    0;
+    return () => observer.unobserve(block);
+  }, [items]);
 
   return (
     <Box px={0.5}>
@@ -74,6 +91,7 @@ const _MediaTimeline: React.FC<{
           </Grid2>
         ))}
       </Grid2>
+      <Box ref={nextCallblock} />
     </Box>
   );
 };
