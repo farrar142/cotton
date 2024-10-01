@@ -31,6 +31,7 @@ import { glassmorphism } from '#/styles';
 import { atom, atomFamily, useRecoilState } from 'recoil';
 import dynamic from 'next/dynamic';
 import { Post } from '#/api/posts';
+import { PostItem } from '#/components/timelines/PostItem';
 
 const Editor = dynamic(
   //@ts-ignore
@@ -56,7 +57,8 @@ export type DraftOnPost = (
   text: string,
   blocks: Block[][],
   images: ImageType[],
-  parent?: Post
+  parent?: Post,
+  quote?: Post
 ) => Promise<any>;
 
 type ReadOnly = {
@@ -100,6 +102,7 @@ const DraftEditor: React.FC<
     additionalWidth?: number;
     editorKey?: string;
     placeholder?: string;
+    quote?: Post;
     showToolbar?: boolean;
   } & (ReadOnly | EditOnly)
 > = ({
@@ -111,6 +114,7 @@ const DraftEditor: React.FC<
   additionalWidth = 0,
   editorKey, //cache용 같은키의 에디터가 두개있을시 오류발생하니 주의
   placeholder,
+  quote,
 }) => {
   const theme = useTheme();
   const key = useMemo(
@@ -234,6 +238,24 @@ const DraftEditor: React.FC<
         entryComponent={MentionEntry}
       />
       <ImageEditor images={images} />
+      {quote && (
+        <Box
+          sx={{
+            borderWidth: 1,
+            borderStyle: 'solid',
+            borderColor: 'divider',
+            borderRadius: 3,
+            pt: 1,
+          }}
+        >
+          <PostItem
+            post={quote}
+            disableAction
+            disableLatestRepost
+            disableDivider
+          />
+        </Box>
+      )}
       <Collapse in={readOnly === false && showToolbar}>
         <DraftEditorToolbar
           maxLength={maxLength}

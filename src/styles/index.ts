@@ -71,5 +71,9 @@ export const glassmorphism = (theme: Theme) => {
     backdropFilter: 'blur(5px)',
   };
 };
-
+export const borderGlowing = (theme: Theme) => {
+  return {
+    boxShadow: `0 0 5px ${theme.palette.text.primary}`,
+  };
+};
 export default customTheme;

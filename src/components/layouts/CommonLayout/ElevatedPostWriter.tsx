@@ -1,4 +1,3 @@
-import API from '#/api';
 import { ImageType } from '#/api/commons/types';
 import { PostItem } from '#/components/timelines/PostItem';
 import { ScrollPreventedBackdrop } from '#/components/utils/ScrollPreventedBackdrop';
@@ -6,18 +5,9 @@ import { usePostWriteService } from '#/hooks/posts/usePostWriteService';
 import { useRouter } from '#/hooks/useCRouter';
 import { usePostWrite } from '#/hooks/usePostWrite';
 import DraftEditor from '#/PostWriter/DraftEditor';
-import { MentionEntry } from '#/PostWriter/DraftEditor/mention';
 import { Block } from '#/utils/textEditor/blockTypes';
 import { Close } from '@mui/icons-material';
-import {
-  Backdrop,
-  Box,
-  Divider,
-  IconButton,
-  Stack,
-  Typography,
-} from '@mui/material';
-import { MouseEvent } from 'react';
+import { Box, IconButton, Stack, Typography } from '@mui/material';
 
 export const ElevatedPostWriter = () => {
   const router = useRouter();
@@ -25,7 +15,7 @@ export const ElevatedPostWriter = () => {
   const postWriteService = usePostWriteService();
   const onPost = (text: string, blocks: Block[][], images: ImageType[]) => {
     return postWriteService
-      .onPost(text, blocks, images, isWrite.parent)
+      .onPost(text, blocks, images, isWrite.parent, isWrite.quote)
       .then(onClose)
       .then(({ data }) => {
         router.reload();
@@ -83,6 +73,7 @@ export const ElevatedPostWriter = () => {
               onPost={onPost}
               editorKey='elevatedEditor'
               placeholder={isWrite.parent ? `답글 게시하기` : undefined}
+              quote={isWrite.quote}
             />
           </Box>
         </Box>

@@ -29,7 +29,7 @@ import { Dispatch, MouseEvent, MouseEventHandler, SetStateAction } from 'react';
 import { usePostWrite } from '#/hooks/usePostWrite';
 import { User } from '#/api/users/types';
 import useValue from '#/hooks/useValue';
-import { glassmorphism } from '#/styles';
+import { borderGlowing, glassmorphism } from '#/styles';
 
 export const PostItemToolbar: React.FC<{
   post: Post;
@@ -145,7 +145,7 @@ export const PostItemToolbar: React.FC<{
             paper: {
               sx: {
                 ...glassmorphism(theme),
-                boxShadow: `0 0 5px ${theme.palette.text.primary}`,
+                ...borderGlowing(theme),
                 backgroundImage: `linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0))`,
                 borderRadius: 3,
                 ul: {
@@ -174,7 +174,7 @@ export const PostItemToolbar: React.FC<{
           <MenuItem
             onClick={() => {
               handleRepostClose();
-              setIsWrite({ open: true, repost: post });
+              setIsWrite({ open: true, quote: post });
             }}
           >
             <ListItemIcon>

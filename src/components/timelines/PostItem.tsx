@@ -190,7 +190,7 @@ const _PostItem: React.FC<{
   const registPostItem = useSetRelatedPostItem(post.id);
   const [origin] = useRelatedPostItem(showParent ? post.origin : undefined);
   const [parent] = useRelatedPostItem(showParent ? post.parent : undefined);
-
+  const [quote] = useRelatedPostItem(post.quote);
   useEffect(() => {
     registPostItem(post);
   }, [post.id]);
@@ -365,7 +365,11 @@ const _PostItem: React.FC<{
           ) : (
             <></>
           )}
-          <DraftEditor readOnly={true} blocks={post.blocks} />
+          <DraftEditor
+            readOnly={true}
+            blocks={post.blocks}
+            quote={quote || undefined}
+          />
           {disableImages ? <></> : <ImageViewer post={post} />}
           {disableAction ? (
             <></>

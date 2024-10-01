@@ -10,6 +10,7 @@ export type PostUpsert = {
   images: ImageType[];
   parent?: number;
   origin?: number;
+  quote?: number;
 };
 export type Post = PostUpsert & {
   id: number;
