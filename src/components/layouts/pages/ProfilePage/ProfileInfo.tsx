@@ -3,6 +3,7 @@ import { ImageType } from '#/api/commons/types';
 import { RegisteredUser } from '#/api/users/types';
 import TextInput from '#/components/inputs/TextInput';
 import { ScrollPreventedBackdrop } from '#/components/utils/ScrollPreventedBackdrop';
+import useMediaSize from '#/hooks/useMediaSize';
 import useUser, { useUserProfile } from '#/hooks/useUser';
 import useValue, { UseValue } from '#/hooks/useValue';
 import { glassmorphism } from '#/styles';
@@ -371,6 +372,7 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
 }) => {
   const [profile, user] = useUserProfile(_profile);
   const profileEditorOpen = useValue(false);
+  const { isSmall } = useMediaSize();
   if (!profile.is_registered) return <></>;
   return (
     <Box>
@@ -389,13 +391,13 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
       <Box display='flex' flexDirection='row' position='relative' pb={3}>
         <Box
           sx={{
-            width: '22%',
-            maxWidth: '22%',
+            height: isSmall ? '150%' : '200%',
+            maxHeight: '200%',
             aspectRatio: '1',
             ml: 2,
             left: 0,
             position: 'absolute',
-            top: '-110%',
+            top: isSmall ? '-90%' : '-120%',
           }}
         >
           <Box
