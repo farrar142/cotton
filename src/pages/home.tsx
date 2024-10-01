@@ -73,7 +73,7 @@ const Home = () => {
             onChange={handleChange}
             aria-label='lab API tabs example'
             sx={{
-              button: { width: '50%' },
+              button: { minWidth: '50%' },
               borderLeftWidth: '0px',
               borderRightWidth: '0px',
               borderBottomWidth: '0px',
