@@ -59,6 +59,7 @@ const NavBarItem: React.FC<{
         direction='row'
         width={isMd ? undefined : '100%'}
         alignItems='center'
+        color={isCurrentUrl ? 'primary.main' : 'info.main'}
       >
         <IconButton size='small' color='inherit'>
           {isCurrentUrl ? (
@@ -143,11 +144,11 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
               justifyContent={isMd ? 'center' : undefined}
             >
               {isMd ? (
-                <IconButton color='info'>
+                <IconButton>
                   <Create />
                 </IconButton>
               ) : (
-                <Button variant='contained' color='info' fullWidth>
+                <Button variant='contained' fullWidth color='info'>
                   게시하기
                 </Button>
               )}

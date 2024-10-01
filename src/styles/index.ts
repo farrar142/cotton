@@ -17,7 +17,7 @@ const customTheme = createTheme({
       main: '#78d400',
     },
     info: {
-      main: '#78d400',
+      main: '#fffe',
     },
   },
   breakpoints: {
