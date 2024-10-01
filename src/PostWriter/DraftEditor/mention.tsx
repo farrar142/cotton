@@ -46,9 +46,13 @@ export const MentionEntry: React.FC<EntryComponentProps> = (props) => {
   );
 };
 
-export const MentionComponent: React.FC<SubMentionComponentProps> = (e) => {
+export const MentionComponent: React.FC<{
+  children?: SubMentionComponentProps['children'];
+  mention: SubMentionComponentProps['mention'];
+  className: string;
+}> = (e) => {
   //@ts-ignore
-  const key = e.children[0].key;
+  const key = [...(e.children || []), { key: 'none' }][0].key;
   const theme = useTheme();
   return (
     <span

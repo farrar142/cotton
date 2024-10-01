@@ -45,6 +45,7 @@ import NextLink from '../NextLink';
 import { PickBoolean, useOverrideAtom } from './postActionAtoms';
 import { PostItemToolbar } from './PostItemToolbar';
 import { ClientOnlyHOC } from '../ClientOnlyHOC';
+import { MentionComponent } from '#/PostWriter/DraftEditor/mention';
 
 const postItemAtom = atomFamily<Post | null, number | undefined>({
   key: 'postItemAtom',
@@ -345,15 +346,8 @@ const _PostItem: React.FC<{
             </Stack>
           </NextLink>
           {!_showParent && parent ? (
-            <Stack direction='row' spacing={1}>
-              <Typography
-                display='flex'
-                alignItems='center'
-                variant='caption'
-                color='primary'
-              >
-                @{parent.user.nickname}
-              </Typography>
+            <Stack direction='row' spacing={1} alignItems='center'>
+              <MentionComponent mention={parent.user} className='' />
               <Typography
                 display='flex'
                 alignItems='center'

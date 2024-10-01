@@ -17,6 +17,7 @@ export type UserUpsert = {
 type UserBase = UserUpsert & {
   id: number;
   username: string;
+  name: string; //same as username
   email: string;
   is_staff: boolean;
 
