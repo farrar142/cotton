@@ -42,6 +42,8 @@ import { useRouter } from '#/hooks/useCRouter';
 import paths from '#/paths';
 import { SuspendHOC } from '../SuspendHOC';
 import NextLink from '../NextLink';
+import { PickBoolean, useOverrideAtom } from './postActionAtoms';
+import { PostItemToolbar } from './PostItemToolbar';
 
 const postItemAtom = atomFamily<Post | null, number | undefined>({
   key: 'postItemAtom',
@@ -109,19 +111,6 @@ export const useCurrentPostItem = (post: Post) => {
   return [currentPost || post, setCurrentPost] as const;
 };
 
-type PickBoolean<T> = {
-  [K in keyof T]: T[K] extends boolean ? K : never;
-}[keyof T];
-
-const boolOverridedAtom = atomFamily({
-  key: 'boolOverridedAtom',
-  default: (field: string) => new Map<number, boolean>(),
-});
-
-const useOverrideAtom = (field: string) => {
-  return useRecoilState(boolOverridedAtom(field));
-};
-
 const _PostItem: React.FC<{
   post: Post;
   disableAction?: boolean;
@@ -163,9 +152,6 @@ const _PostItem: React.FC<{
     if (modified === undefined) return post[field];
     return modified;
   };
-  const hasRepost = isChecked('has_repost', repost);
-  const hasBookmark = isChecked('has_bookmark', bookmark);
-  const hasFavorite = isChecked('has_favorite', favorite);
   const hasView = isChecked('has_view', view);
 
   const getCaller = (bool: boolean) =>
@@ -179,18 +165,6 @@ const _PostItem: React.FC<{
           .then(setPost),
       100
     );
-  };
-  const onRepost = (bool: boolean) => () => {
-    getCaller(bool)(post, 'reposts').then(refetchPost);
-    setRepost((p) => new Map(p.entries()).set(post.id, bool));
-  };
-  const onBookmark = (bool: boolean) => () => {
-    getCaller(bool)(post, 'bookmarks').then(refetchPost);
-    setBookmark((p) => new Map(p.entries()).set(post.id, bool));
-  };
-  const onFavorite = (bool: boolean) => () => {
-    getCaller(bool)(post, 'favorites').then(refetchPost);
-    setFavorite((p) => new Map(p.entries()).set(post.id, bool));
   };
   const onView = () => {
     getCaller(true)(post, 'views').then(refetchPost);
@@ -396,116 +370,7 @@ const _PostItem: React.FC<{
           {disableAction ? (
             <></>
           ) : (
-            <Box
-              width='100%'
-              display='flex'
-              justifyContent='space-between'
-              sx={{
-                color: theme.palette.text.disabled,
-              }}
-              pr={3}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Grid2 size={2}>
-                <Stack direction='row' alignItems='center'>
-                  <Tooltip title='reply'>
-                    <IconButton
-                      color='inherit'
-                      disabled={!Boolean(user)}
-                      onClick={() => setIsWrite({ open: true, parent: post })}
-                    >
-                      <ModeCommentOutlined />
-                    </IconButton>
-                  </Tooltip>
-                  <Typography variant='caption'>
-                    {post.replies_count}
-                  </Typography>
-                </Stack>
-              </Grid2>
-              <Grid2 size={2}>
-                <Stack direction='row' alignItems='center'>
-                  <Tooltip title='cottoning'>
-                    {hasRepost ? (
-                      <IconButton
-                        onClick={onRepost(false)}
-                        disabled={!Boolean(user)}
-                        color='info'
-                      >
-                        <Cloud />
-                      </IconButton>
-                    ) : (
-                      <IconButton
-                        onClick={onRepost(true)}
-                        disabled={!Boolean(user)}
-                        color='inherit'
-                      >
-                        <CloudOutlined />
-                      </IconButton>
-                    )}
-                  </Tooltip>
-                  <Typography variant='caption'>
-                    {post.reposts_count}
-                  </Typography>
-                </Stack>
-              </Grid2>
-              <Grid2 size={2}>
-                <Stack direction='row' alignItems='center'>
-                  <Tooltip title='favorite'>
-                    {hasFavorite ? (
-                      <IconButton
-                        onClick={onFavorite(false)}
-                        disabled={!Boolean(user)}
-                        color='error'
-                      >
-                        <Favorite />
-                      </IconButton>
-                    ) : (
-                      <IconButton
-                        onClick={onFavorite(true)}
-                        disabled={!Boolean(user)}
-                        color='inherit'
-                      >
-                        <FavoriteBorderOutlined />
-                      </IconButton>
-                    )}
-                  </Tooltip>
-                  <Typography variant='caption'>
-                    {post.favorites_count}
-                  </Typography>
-                </Stack>
-              </Grid2>
-              <Grid2 size={2}>
-                <Tooltip title='bookmark'>
-                  {hasBookmark ? (
-                    <IconButton
-                      onClick={onBookmark(false)}
-                      disabled={!Boolean(user)}
-                      color='warning'
-                    >
-                      <Bookmark />
-                    </IconButton>
-                  ) : (
-                    <IconButton
-                      onClick={onBookmark(true)}
-                      disabled={!Boolean(user)}
-                      color='inherit'
-                    >
-                      <BookmarkBorderOutlined />
-                    </IconButton>
-                  )}
-                </Tooltip>
-              </Grid2>
-              <Grid2 size={3}>
-                <Stack direction='row' alignItems='center'>
-                  <Tooltip title='views'>
-                    <IconButton color='inherit'>
-                      <BarChartOutlined />
-                    </IconButton>
-                  </Tooltip>
-                  <Typography variant='caption'>{post.views_count}</Typography>
-                </Stack>
-              </Grid2>
-            </Box>
+            <PostItemToolbar post={post} setPost={setPost} user={user} />
           )}
         </Stack>
       </Box>

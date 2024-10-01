@@ -1,7 +1,7 @@
 import { Post } from '#/api/posts';
 import { atom, useRecoilState } from 'recoil';
 
-const onPostWriteAtom = atom<{ open: boolean; parent?: Post }>({
+const onPostWriteAtom = atom<{ open: boolean; parent?: Post; repost?: Post }>({
   key: 'onPostWriteAtom',
   default: { open: false },
 });
