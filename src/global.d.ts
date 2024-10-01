@@ -14,6 +14,6 @@ declare global {
     InitialProps = Props
   > = NextPage<Props, InitialProps> & {
     getMeta?: (props: InitialProps) => React.ReactNode;
-    getLayout?: React.FC<{ children?: ReactNode }>;
+    getLayout?: React.FC<{ children?: ReactNode; props: InitialProps }>;
   };
 }

@@ -139,7 +139,8 @@ function App({ Component, pageProps }: CustomAppProps) {
           bgcolor: 'background.default',
         }}
       >
-        <Layout>
+        {/* @ts-ignore */}
+        <Layout props={pageProps}>
           {Boolean(isError) && isError}
           {/* @ts-ignore */}
           {!Boolean(isError) && <Component {...pageProps} />}

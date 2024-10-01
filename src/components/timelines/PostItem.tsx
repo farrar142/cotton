@@ -60,17 +60,7 @@ const relatedPostItemSelector = selectorFamily<Post | null, number | undefined>(
       ({ get }) => {
         if (!key) return null;
         const value = get(postItemAtom(key));
-        if (value) return value;
-        return API.Posts.post
-          .getItem(key)
-          .then((r) => {
-            const d = r.data;
-            return d;
-          })
-          .catch(() => {
-            console.log('error');
-            return null;
-          });
+        return value;
       },
     set:
       (key) =>
@@ -82,8 +72,18 @@ const relatedPostItemSelector = selectorFamily<Post | null, number | undefined>(
   }
 );
 
-const useRelatedPostItem = (id: number | undefined) =>
-  useRecoilState(relatedPostItemSelector(id));
+const useRelatedPostItem = (id: number | undefined) => {
+  const [getter, setter] = useRecoilState(relatedPostItemSelector(id));
+
+  useEffect(() => {
+    if (!id) return;
+    API.Posts.post
+      .getItem(id)
+      .then((r) => r.data)
+      .then(setter);
+  }, [id]);
+  return [getter, setter] as const;
+};
 const useSetRelatedPostItem = (id: number) =>
   useSetRecoilState(relatedPostItemSelector(id));
 
@@ -378,4 +378,4 @@ const _PostItem: React.FC<{
   );
 };
 
-export const PostItem = ClientOnlyHOC(_PostItem);
+export const PostItem = _PostItem;
