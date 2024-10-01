@@ -105,9 +105,7 @@ const CommonLayout: React.FC<{
         </Box>
       </Box>
       <SideFlexBox display={isMd ? 'none' : 'block'}>
-        <Box position='sticky' top={0}>
-          오른쪽사이드바
-        </Box>
+        <Box position='sticky' top={0}></Box>
       </SideFlexBox>
       <ElevatedPostWriter />
     </Box>
