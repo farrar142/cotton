@@ -106,9 +106,11 @@ export class AxiosWrapper {
             );
           })
           .catch(() => {
+            this.deleteTokens();
             reject(error);
           });
       } else {
+        this.deleteTokens();
         reject(error);
       }
     });

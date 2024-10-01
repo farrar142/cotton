@@ -271,24 +271,31 @@ const _PostItem: React.FC<{
         </NextLink>
       )}
       {showRelavantPost ? (
-        <Stack direction='row' spacing={1} pl={smallPading + 2.5}>
-          <Typography
-            display='flex'
-            alignItems='center'
-            variant='caption'
-            color='textSecondary'
-          >
-            <Cloud fontSize='small' />
-          </Typography>
-          <Typography
-            display='flex'
-            alignItems='center'
-            variant='caption'
-            color='textSecondary'
-          >
-            {post.relavant_repost?.nickname} 님이 높이 띄움
-          </Typography>
-        </Stack>
+        <NextLink href={paths.mypage(post.relavant_repost?.username || '')}>
+          <Stack direction='row' spacing={1} pl={smallPading + 2.5}>
+            <Typography
+              display='flex'
+              alignItems='center'
+              variant='caption'
+              color='textSecondary'
+            >
+              <Cloud fontSize='small' />
+            </Typography>
+            <Typography
+              display='flex'
+              alignItems='center'
+              variant='caption'
+              color='textSecondary'
+              sx={{
+                ':hover': {
+                  textDecoration: 'underline',
+                },
+              }}
+            >
+              {post.relavant_repost?.nickname} 님이 높이 띄움
+            </Typography>
+          </Stack>
+        </NextLink>
       ) : (
         <></>
       )}
@@ -298,6 +305,7 @@ const _PostItem: React.FC<{
         flexDirection='row'
         width='100%'
         px={smallPading}
+        onClick={(e) => e.stopPropagation()}
       >
         <Box
           mt={1.5}
@@ -306,7 +314,9 @@ const _PostItem: React.FC<{
           flexDirection='column'
           alignItems='center'
         >
-          <Avatar src={profile?.profile_image?.url} />
+          <NextLink href={paths.mypage(profile.username)}>
+            <Avatar src={profile.profile_image?.url} />
+          </NextLink>
           {showChildLine ? (
             <Box
               flex={1}
@@ -323,24 +333,36 @@ const _PostItem: React.FC<{
           )}
         </Box>
         <Stack flex={1} width='100%'>
-          <Stack direction='row' spacing={1} alignItems='center'>
-            <Typography fontWeight='bold' variant='h6'>
-              {profile.nickname}
-            </Typography>
-            <Typography
-              variant='caption'
-              sx={(theme) => ({ color: theme.palette.text.secondary })}
-            >
-              @{profile.username}
-            </Typography>
-            <Typography>·</Typography>
-            <Typography
-              variant='caption'
-              sx={(theme) => ({ color: theme.palette.text.secondary })}
-            >
-              {formatRelativeTime(post.created_at)}
-            </Typography>
-          </Stack>
+          <NextLink href={paths.mypage(profile.username)}>
+            <Stack direction='row' spacing={1} alignItems='center'>
+              <Typography
+                fontWeight='bold'
+                variant='h6'
+                color='textSecondary'
+                sx={(theme) => ({
+                  ':hover': {
+                    textDecorationLine: 'underline',
+                    color: theme.palette.text.primary,
+                  },
+                })}
+              >
+                {profile.nickname}
+              </Typography>
+              <Typography
+                variant='caption'
+                sx={(theme) => ({ color: theme.palette.text.secondary })}
+              >
+                @{profile.username}
+              </Typography>
+              <Typography>·</Typography>
+              <Typography
+                variant='caption'
+                sx={(theme) => ({ color: theme.palette.text.secondary })}
+              >
+                {formatRelativeTime(post.created_at)}
+              </Typography>
+            </Stack>
+          </NextLink>
           {!_showParent && parent ? (
             <Stack direction='row' spacing={1}>
               <Typography

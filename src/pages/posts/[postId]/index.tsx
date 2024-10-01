@@ -1,5 +1,6 @@
 import API from '#/api';
 import { Post } from '#/api/posts';
+import { ClientOnlyHOC } from '#/components/ClientOnlyHOC';
 import TextInput from '#/components/inputs/TextInput';
 import { PostTimeline } from '#/components/timelines';
 import { PostItem, useCurrentPostItem } from '#/components/timelines/PostItem';
@@ -115,4 +116,4 @@ PostDetailPage.getInitialProps = getInitialPropsWrapper(
     })
 );
 
-export default PostDetailPage;
+export default ClientOnlyHOC(PostDetailPage);
