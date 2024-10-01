@@ -4,6 +4,7 @@ import { RegisteredUser } from '#/api/users/types';
 import TextInput from '#/components/inputs/TextInput';
 import { ScrollPreventedBackdrop } from '#/components/utils/ScrollPreventedBackdrop';
 import useMediaSize from '#/hooks/useMediaSize';
+import { usePromiseState } from '#/hooks/usePromiseState';
 import useUser, { useUserProfile } from '#/hooks/useUser';
 import useValue, { UseValue } from '#/hooks/useValue';
 import { glassmorphism } from '#/styles';
@@ -370,9 +371,23 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
 const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
   profile: _profile,
 }) => {
-  const [profile, user] = useUserProfile(_profile);
+  const [profile, user, { isMyProfile, setProfile }] = useUserProfile(_profile);
   const profileEditorOpen = useValue(false);
   const { isSmall } = useMediaSize();
+  const { done, wrapper } = usePromiseState();
+  const followUser = () => {
+    return (() => {
+      if (profile.is_following_to) {
+        return API.Relations.unfollowUser(profile.id);
+      } else {
+        return API.Relations.followUser(profile.id);
+      }
+    })().then(({ data }) => {
+      return API.Relations.getUserByUsername(profile.username)
+        .then((r) => r.data)
+        .then(setProfile);
+    });
+  };
   if (!profile.is_registered) return <></>;
   return (
     <Box>
@@ -419,14 +434,26 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
         </Box>
         <Box flex={1} />
         <Box pt={1} pr={1.5}>
-          <Button
-            variant='outlined'
-            color='inherit'
-            onClick={() => profileEditorOpen.set(true)}
-            sx={{ borderRadius: 15 }}
-          >
-            프로필 수정
-          </Button>
+          {isMyProfile ? (
+            <Button
+              variant='outlined'
+              color='inherit'
+              onClick={() => profileEditorOpen.set(true)}
+              sx={{ borderRadius: 15 }}
+            >
+              프로필 수정
+            </Button>
+          ) : (
+            <Button
+              variant='outlined'
+              color={profile.is_following_to ? 'info' : 'inherit'}
+              sx={{ borderRadius: 15 }}
+              disabled={done.get === false}
+              onClick={wrapper(followUser)}
+            >
+              {profile.is_following_to ? '팔로우 해제' : '팔로우'}
+            </Button>
+          )}
         </Box>
       </Box>
       {/**프로필 정보 칸 */}

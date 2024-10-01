@@ -15,7 +15,9 @@ export type Paginated<T> = PaginationBase<T> & {
 export type PageNumPaginated<T> = PaginationBase<T> & {
   total_page: number;
 };
-
+export type SimpleResponse = {
+  is_success: boolean;
+};
 export class GenericAPI<
   M extends { id: number },
   U,

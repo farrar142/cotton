@@ -17,7 +17,7 @@ const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
   const mediaKey = `timeline/${profile.username}/media`;
   const favoriteKey = `timeline/${profile.username}/favorite`;
   const theme = useTheme();
-  const tabValue = useValue(articleKey);
+  const tabValue = useValue('timeline');
   const [_, setScroll] = useKeyScrollPosition();
   return (
     <Box
@@ -40,7 +40,7 @@ const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
         >
           <Tab
             label='게시물'
-            value={articleKey}
+            value='timeline'
             sx={{ flex: 1 }}
             onClick={(e) =>
               e.currentTarget.tabIndex === 0 &&
@@ -49,7 +49,7 @@ const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
           />
           <Tab
             label='답글'
-            value={replyKey}
+            value='reply'
             sx={{ flex: 1 }}
             onClick={(e) =>
               e.currentTarget.tabIndex === 0 &&
@@ -58,7 +58,7 @@ const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
           />
           <Tab
             label='미디어'
-            value={mediaKey}
+            value='media'
             sx={{ flex: 1 }}
             onClick={(e) =>
               e.currentTarget.tabIndex === 0 &&
@@ -67,7 +67,7 @@ const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
           />
           <Tab
             label='마음에들어요'
-            value={favoriteKey}
+            value='favorite'
             sx={{ flex: 1 }}
             onClick={(e) =>
               e.currentTarget.tabIndex === 0 &&
@@ -76,13 +76,13 @@ const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
           />
         </TabList>
         <Divider sx={{ mb: 0.5 }} />
-        <TabPanel value={articleKey}>
+        <TabPanel value='timeline'>
           <PostTimeline
             getter={API.Posts.post.getUserTimeline(profile.username)}
             type={articleKey}
           />
         </TabPanel>
-        <TabPanel value={replyKey}>
+        <TabPanel value='reply'>
           <Suspense fallback={<CircularProgress />}>
             <PostTimeline
               getter={API.Posts.post.getUserRepliesItems(profile.username)}
@@ -91,13 +91,13 @@ const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
             />
           </Suspense>
         </TabPanel>
-        <TabPanel value={mediaKey}>
+        <TabPanel value='media'>
           <MediaTimeline
             getter={API.Posts.post.getUserMediaItems(profile.username)}
             type={mediaKey}
           />
         </TabPanel>
-        <TabPanel value={favoriteKey}>
+        <TabPanel value='favorite'>
           <PostTimeline
             getter={API.Posts.post.getFavoriteItems(profile.username)}
             type={favoriteKey}

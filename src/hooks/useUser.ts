@@ -50,7 +50,8 @@ export const useUserProfile = (profile: User) => {
   }, [me, user]);
   const returnUser = (user?.id === profile.id ? user : profile) || profile;
 
-  return [returnUser, me] as const;
+  const isMe = profile.id === me?.id;
+  return [returnUser, me, { isMyProfile: isMe, setProfile: setUser }] as const;
 };
 
 const useUser = (user?: User) => {
