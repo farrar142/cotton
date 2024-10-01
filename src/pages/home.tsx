@@ -16,6 +16,7 @@ import { SyntheticEvent, useRef } from 'react';
 import { usePostWriteService } from '#/hooks/posts/usePostWriteService';
 import { atom, useRecoilState } from 'recoil';
 import { recoilPersist } from 'recoil-persist';
+import { useKeyScrollPosition } from '#/hooks/useKeepScrollPosition';
 
 const { persistAtom } = recoilPersist();
 // import PostWriter from '#/PostWriter';
@@ -39,6 +40,7 @@ const Home = () => {
   const [user] = useUser();
   const tabValue = useHomeTabAtom();
   const [openLoginWindow] = useLoginWindow();
+  const [_, setScrollPosition] = useKeyScrollPosition();
   const postWriteService = usePostWriteService();
 
   const handleChange = (event: SyntheticEvent, newValue: string) => {
@@ -80,8 +82,22 @@ const Home = () => {
               borderColor: theme.palette.divider,
             }}
           >
-            <Tab label='추천' value='1' />
-            <Tab label='팔로우 중' value='2' />
+            <Tab
+              label='추천'
+              value='1'
+              onClick={(e) => {
+                if (e.currentTarget.tabIndex !== 0) return;
+                setScrollPosition({ key: 'global', value: 0 });
+              }}
+            />
+            <Tab
+              label='팔로우 중'
+              value='2'
+              onClick={(e) => {
+                if (e.currentTarget.tabIndex !== 0) return;
+                setScrollPosition({ key: 'followings', value: 0 });
+              }}
+            />
           </TabList>
         </Box>
         <TabPanel
