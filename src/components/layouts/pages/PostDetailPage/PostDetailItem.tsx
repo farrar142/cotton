@@ -35,7 +35,13 @@ export const PostDetailItem: React.FC<{ post: Post }> = ({ post: _post }) => {
   };
   return (
     <Stack spacing={1}>
-      <PostItem post={post} routingToDetail={false} showChildLine showParent />
+      <PostItem
+        post={post}
+        routingToDetail={false}
+        showChildLine
+        showParent
+        isDetailView
+      />
       {user ? (
         <>
           <Stack px={2} spacing={1}>

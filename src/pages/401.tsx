@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 const NotAuthenticated = () => {
   const router = useRouter();
   useEffect(() => {
-    router.push(paths.signin);
+    router.push(paths.home);
   });
   return <div></div>;
 };

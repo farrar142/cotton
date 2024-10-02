@@ -35,6 +35,7 @@ import {
   usePostData,
   useSetPostData,
 } from '#/hooks/posts/usePostData';
+import { User } from '#/api/users/types';
 
 const _PostItem: React.FC<{
   post: Post;
@@ -46,6 +47,7 @@ const _PostItem: React.FC<{
   showChildLine?: boolean;
   routingToDetail?: boolean;
   showQuote?: boolean;
+  isDetailView?: boolean;
 }> = ({
   post: _post,
   disableAction = false,
@@ -56,6 +58,7 @@ const _PostItem: React.FC<{
   showChildLine = false,
   showQuote = true,
   routingToDetail = true,
+  isDetailView = false,
 }) => {
   const router = useRouter();
   const theme = useTheme();
@@ -119,6 +122,8 @@ const _PostItem: React.FC<{
   }, [post.id]);
 
   const isLastReplyOfOrigin = showParent && post.reply_row_number_desc === 1;
+  const isParentOriginSame =
+    Boolean(origin && parent) && origin?.id !== parent?.id;
   const _showOrigin = isLastReplyOfOrigin && origin;
   const _showParent =
     isLastReplyOfOrigin && parent && parent.user.id !== profile.id;
@@ -150,7 +155,7 @@ const _PostItem: React.FC<{
       ) : (
         <></>
       )}
-      {_showParent ? (
+      {_showParent && isParentOriginSame ? (
         <PostItem
           post={parent}
           disableDivider
@@ -210,13 +215,15 @@ const _PostItem: React.FC<{
           flexDirection='column'
           alignItems='center'
         >
-          <NextLink
-            href={paths.mypage(profile.username)}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Avatar src={profile.profile_image?.url} />
-          </NextLink>
-          {showChildLine ? (
+          {!isDetailView && (
+            <NextLink
+              href={paths.mypage(profile.username)}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Avatar src={profile.profile_image?.url} />
+            </NextLink>
+          )}
+          {!isDetailView && showChildLine ? (
             <Box
               onClick={route}
               flex={1}
@@ -233,7 +240,12 @@ const _PostItem: React.FC<{
           )}
         </Box>
         <Stack flex={1} width='100%' onClick={route}>
-          <NextLink
+          {isDetailView ? (
+            <PostDetailHeader post={post} profile={profile} />
+          ) : (
+            <PostHeader post={post} profile={profile} />
+          )}
+          {/* <NextLink
             onClick={(e) => e.stopPropagation()}
             href={paths.mypage(profile.username)}
           >
@@ -265,7 +277,7 @@ const _PostItem: React.FC<{
                 {formatRelativeTime(post.created_at)}
               </Typography>
             </Stack>
-          </NextLink>
+          </NextLink> */}
           {!_showParent && parent ? (
             <Stack direction='row' spacing={1} alignItems='center'>
               <MentionComponent mention={parent.user} className='' />
@@ -296,6 +308,94 @@ const _PostItem: React.FC<{
       </Box>
       {disableDivider ? <></> : <Divider />}
     </Stack>
+  );
+};
+
+const PostHeader: React.FC<{ post: Post; profile: User }> = ({
+  post,
+  profile,
+}) => {
+  return (
+    <NextLink
+      onClick={(e) => e.stopPropagation()}
+      href={paths.mypage(profile.username)}
+    >
+      <Stack direction='row' spacing={1} alignItems='center'>
+        <Typography
+          fontWeight='bold'
+          variant='h6'
+          color='textSecondary'
+          sx={(theme) => ({
+            ':hover': {
+              textDecorationLine: 'underline',
+              color: theme.palette.text.primary,
+            },
+          })}
+        >
+          {profile.nickname}
+        </Typography>
+        <Typography
+          variant='caption'
+          sx={(theme) => ({ color: theme.palette.text.secondary })}
+        >
+          @{profile.username}
+        </Typography>
+        <Typography>·</Typography>
+        <Typography
+          variant='caption'
+          sx={(theme) => ({ color: theme.palette.text.secondary })}
+        >
+          {formatRelativeTime(post.created_at)}
+        </Typography>
+      </Stack>
+    </NextLink>
+  );
+};
+const PostDetailHeader: React.FC<{ post: Post; profile: User }> = ({
+  post,
+  profile,
+}) => {
+  return (
+    <NextLink
+      onClick={(e) => e.stopPropagation()}
+      href={paths.mypage(profile.username)}
+      position='relative'
+    >
+      <Stack
+        direction='row'
+        alignItems='center'
+        position='relative'
+        spacing={1}
+        left={-8}
+        pb={1}
+      >
+        <Avatar
+          src={profile.profile_image?.small || profile?.profile_image?.url}
+        />
+        <Stack>
+          <Typography
+            fontWeight='bold'
+            variant='h6'
+            lineHeight={1.4}
+            color='textSecondary'
+            sx={(theme) => ({
+              ':hover': {
+                textDecorationLine: 'underline',
+                color: theme.palette.text.primary,
+              },
+            })}
+          >
+            {profile.nickname}
+          </Typography>
+          <Typography
+            variant='caption'
+            sx={(theme) => ({ color: theme.palette.text.secondary })}
+          >
+            @{profile.username}
+          </Typography>
+        </Stack>
+      </Stack>
+    </NextLink>
   );
 };
 

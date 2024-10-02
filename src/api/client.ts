@@ -88,6 +88,7 @@ export class AxiosWrapper {
     return new Promise((resolve, reject) => {
       let { access, refresh } = this.getTokens();
       if (refresh) {
+        console.log(`refresh:${refresh}`);
         this.onRefresh = true;
         this.client
           .post<{

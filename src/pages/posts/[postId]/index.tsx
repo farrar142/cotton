@@ -1,28 +1,11 @@
 import API from '#/api';
 import { Post } from '#/api/posts';
 import { ClientOnlyHOC } from '#/components/ClientOnlyHOC';
-import TextInput from '#/components/inputs/TextInput';
 import { PostDetailItem } from '#/components/layouts/pages/PostDetailPage/PostDetailItem';
-import { PostTimeline } from '#/components/timelines';
-import { PostItem, useCurrentPostItem } from '#/components/timelines/PostItem';
 import getInitialPropsWrapper from '#/functions/getInitialPropsWrapper';
-import { usePostWriteService } from '#/hooks/posts/usePostWriteService';
 import { useRouter } from '#/hooks/useCRouter';
-import useUser from '#/hooks/useUser';
-import useValue from '#/hooks/useValue';
-import DraftEditor, { DraftOnPost } from '#/PostWriter/DraftEditor';
 import { ArrowBack } from '@mui/icons-material';
-import {
-  Avatar,
-  Box,
-  CircularProgress,
-  Collapse,
-  Divider,
-  IconButton,
-  Stack,
-  Typography,
-} from '@mui/material';
-import React, { Suspense } from 'react';
+import { IconButton, Stack, Typography } from '@mui/material';
 
 const PostDetailPage: ExtendedNextPage<{ post: Post }> = ({ post }) => {
   const router = useRouter();

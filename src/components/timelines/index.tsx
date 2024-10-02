@@ -125,7 +125,7 @@ export const PostTimeline: React.FC<{
           <Divider flexItem />
         </Stack>
       )}
-      {items.map((post) => (
+      {filterDuplicate(items).map((post) => (
         <PostItem
           key={post.id}
           post={post}
