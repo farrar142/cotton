@@ -47,7 +47,14 @@ export class GenericAPI<
     const endpoint = this.getEndpoint(`/${id}`);
     return client.get<M>(endpoint);
   };
-  getItems = (params?: Q, options?: { cursor?: string }) => {
+  getItems = (
+    params?: Q,
+    options?: {
+      cursor?: string;
+      offset?: string | number;
+      direction?: 'next' | 'prev';
+    }
+  ) => {
     const endpoint = this.getEndpoint('/');
     return this.getItemsRequest<M, Q, Pagination>(endpoint)(params, options);
   };

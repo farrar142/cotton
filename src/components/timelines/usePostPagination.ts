@@ -3,20 +3,26 @@ import { Post } from '#/api/posts';
 import useValue from '#/hooks/useValue';
 import { filterDuplicate } from '#/utils/arrays';
 import { AxiosResponse } from 'axios';
-import { useEffect, useMemo } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo } from 'react';
 import { atomFamily, useRecoilState } from 'recoil';
 
 const apiResponseAtom = atomFamily<
-  AxiosResponse<TimeLinePaginated<Post>>[],
+  AxiosResponse<TimeLinePaginated<{ id: number }>>[],
   string
 >({
   key: 'apiResponseAto',
   default: [],
 });
 
-const useApiResponse = (key: string) => useRecoilState(apiResponseAtom(key));
-[{ id: 1 }, { id: 1 }, { id: 1 }, { id: 2 }, { id: 2 }, { id: 2 }];
-export const useTimelinePagination = ({
+const useApiResponse = <T extends { id: number }>(
+  key: string
+): [
+  AxiosResponse<TimeLinePaginated<T>>[],
+  Dispatch<SetStateAction<AxiosResponse<TimeLinePaginated<T>>[]>>
+  //@ts-ignore
+] => useRecoilState(apiResponseAtom(key));
+
+export const useTimelinePagination = <T extends { id: number }>({
   func,
   apiKey,
   params = {},
@@ -24,7 +30,7 @@ export const useTimelinePagination = ({
   func: (
     params?: {},
     options?: { offset?: string | number; direction?: 'next' | 'prev' }
-  ) => Promise<AxiosResponse<TimeLinePaginated<Post>>>;
+  ) => Promise<AxiosResponse<TimeLinePaginated<T>>>;
   apiKey: string;
   params?: {};
 }) => {
@@ -33,8 +39,8 @@ export const useTimelinePagination = ({
       .flatMap((r) => r.join('='))
       .join(':')}`;
   const key = useValue(createKey());
-  const [pages, setPages] = useApiResponse(key.get);
-  const [newPages, setNewPages] = useApiResponse(`new:${key.get}`);
+  const [pages, setPages] = useApiResponse<T>(key.get);
+  const [newPages, setNewPages] = useApiResponse<T>(`new:${key.get}`);
 
   useEffect(() => {
     const timeout = setTimeout(() => key.set(createKey()), 500);
@@ -105,14 +111,14 @@ export const useTimelinePagination = ({
     };
   }, [newPages, pages]);
 
-  const data = useMemo<Post[]>(
+  const data = useMemo<T[]>(
     () =>
       filterDuplicate(
         pages.map(({ data: { results } }) => results).flatMap((r) => r)
       ),
     [pages]
   );
-  const newData = useMemo<Post[]>(
+  const newData = useMemo<T[]>(
     () =>
       filterDuplicate(
         newPages.map(({ data: { results } }) => results).flatMap((r) => r)

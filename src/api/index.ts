@@ -1,5 +1,6 @@
 import { client } from './client';
 import { Misc } from './misc';
+import { Notifications } from './notifications';
 import { Posts } from './posts';
 import { Relations } from './relations';
 import { Auth, Users } from './users';
@@ -11,6 +12,7 @@ const API = {
   Misc,
   Posts,
   Relations,
+  Notifications,
 };
 
 export default API;

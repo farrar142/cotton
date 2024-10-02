@@ -118,10 +118,10 @@ export const PostItemToolbar: React.FC<{
       <Grid2 size={2}>
         <Stack direction='row' alignItems='center'>
           <Tooltip title='cottoning'>
-            {hasRepost || hasQuote ? (
+            {hasRepost ? (
               <IconButton
                 onClick={onRepost(false)}
-                disabled={!Boolean(user) || hasQuote}
+                disabled={!Boolean(user)}
                 color='info'
               >
                 <Cloud />
