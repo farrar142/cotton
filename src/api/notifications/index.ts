@@ -6,12 +6,12 @@ export type NotificationType = {
   user: User;
   from_user: User;
   text: string;
-  mentioned_post: { mentioned_to: User; post: number };
-  reposted_post: { post: number };
-  favorited_post: { post: number };
-  quoted_post: number;
-  followed_user: number;
-  replied_post: number;
+  mentioned_post?: { mentioned_to: User; post: number };
+  reposted_post?: { post: number };
+  favorited_post?: { post: number };
+  quoted_post?: number;
+  followed_user?: number;
+  replied_post?: number;
   created_at: number;
 };
 

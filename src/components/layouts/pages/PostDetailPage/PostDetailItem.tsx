@@ -1,7 +1,8 @@
 import API from '#/api';
 import { Post } from '#/api/posts';
 import { PostTimeline } from '#/components/timelines';
-import { useCurrentPostItem, PostItem } from '#/components/timelines/PostItem';
+import { PostItem } from '#/components/timelines/PostItem';
+import { useCurrentPostData } from '#/hooks/posts/usePostData';
 import { usePostWriteService } from '#/hooks/posts/usePostWriteService';
 import useUser from '#/hooks/useUser';
 import useValue from '#/hooks/useValue';
@@ -20,7 +21,7 @@ export const PostDetailItem: React.FC<{ post: Post }> = ({ post: _post }) => {
   const [user] = useUser();
   const replyClick = useValue(false);
   const postWriteService = usePostWriteService();
-  const [post, setPost] = useCurrentPostItem(_post);
+  const [post, setPost] = useCurrentPostData(_post);
   const fetchChild = useRef(() => {});
   const onReplyPost: DraftOnPost = async (text, blocks, images) => {
     return postWriteService.onPost(text, blocks, images, post).then((e) => {

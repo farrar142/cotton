@@ -2,7 +2,7 @@ import { User } from '#/api/users/types';
 import { SimpleProfileItem } from '#/components/SimpleProfileComponent';
 import { MentionPluginTheme, MentionData } from '@draft-js-plugins/mention';
 import { SubMentionComponentProps } from '@draft-js-plugins/mention/lib/Mention';
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, styled, Typography, useTheme } from '@mui/material';
 import { MouseEventHandler } from 'react';
 
 export interface EntryComponentProps {
@@ -46,20 +46,29 @@ export const MentionEntry: React.FC<EntryComponentProps> = (props) => {
   );
 };
 
+const StyledSpan = styled('span')();
+
 export const MentionComponent: React.FC<{
   children?: SubMentionComponentProps['children'];
   mention: SubMentionComponentProps['mention'];
-  className: string;
+  className?: string;
 }> = (e) => {
   //@ts-ignore
   const key = [...(e.children || []), { key: 'none' }][0].key;
   const theme = useTheme();
   return (
-    <span
-      className={e.className}
+    <StyledSpan
+      // className={e.className}
       spellCheck={false}
       data-testid='mentionText'
-      style={{ cursor: 'pointer', color: theme.palette.primary.main }}
+      color='primary'
+      sx={{
+        cursor: 'pointer',
+        color: theme.palette.primary.main,
+        ':hover': {
+          textDecoration: 'underline',
+        },
+      }}
       onClick={() => {
         console.log(e.mention);
       }}
@@ -67,7 +76,7 @@ export const MentionComponent: React.FC<{
       <span data-offset-key={key}>
         <span data-text={true}>@{e.mention.username}</span>
       </span>
-    </span>
+    </StyledSpan>
   );
 };
 export const userToMentonData = (user: User): MentionData => ({
