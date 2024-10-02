@@ -45,6 +45,27 @@ const useTokenWatcher = () => {
   }, [user]);
 };
 
+export const useFetchedProfile = (
+  profileId: number | string,
+  prefetch: boolean = false
+) => {
+  const [profile, setProfile] = useRecoilState(
+    //@ts-ignore
+    userSelector(parseInt(profileId))
+  );
+  const fetchUser = () => {
+    if (profile) return;
+    API.Users.user(profileId)
+      .then((r) => r.data)
+      .then(setProfile);
+  };
+  useEffect(() => {
+    if (!prefetch) return;
+    fetchUser();
+  }, [profileId, profile, prefetch]);
+  return [profile, fetchUser] as const;
+};
+
 export const useUserProfile = (profile: User) => {
   const [me, setMe] = useRecoilState(userAtom(undefined));
   const [user, setUser] = useRecoilState(userSelector(profile.id));

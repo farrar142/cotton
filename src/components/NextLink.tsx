@@ -3,22 +3,36 @@ import Link, { LinkProps } from 'next/link';
 import { formatUrl } from 'next/dist/shared/lib/router/utils/format-url';
 import { forwardRef, useMemo } from 'react';
 
-const CustomLink = styled(MLink)(() => ({
-  // display: 'inline-flex',
-  // alignItems: 'center',
-  // justifyContent: 'center',
-  // position: 'relative',
-  // boxSizing: 'border-box',
-  // outline: 0,
-  // border: 0,
-  // userSelect: 'none',
-  textDecoration: 'none',
-  verticalAlign: 'center',
-}));
+const CustomLink = styled(MLink)<{ $?: boolean }>(({ $, theme }) => [
+  {
+    // display: 'inline-flex',
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    // position: 'relative',
+    // boxSizing: 'border-box',
+    // outline: 0,
+    // border: 0,
+    // userSelect: 'none',
+    verticalAlign: 'center',
+    textDecoration: 'none',
+  },
+  $
+    ? {
+        ':hover': {
+          textDecoration: 'underline',
+          textDecorationColor: theme.palette.text.primary,
+        },
+      }
+    : {},
+]);
 
 const NextLink = forwardRef(
   (
-    { children, ...props }: Omit<MLinkProps, 'href'> & Pick<LinkProps, 'href'>,
+    {
+      children,
+      $ = false,
+      ...props
+    }: Omit<MLinkProps, 'href'> & Pick<LinkProps, 'href'> & { $?: boolean },
     ref
   ): JSX.Element => {
     const href = useMemo(() => {
@@ -29,7 +43,7 @@ const NextLink = forwardRef(
     }, [props.href]);
 
     return (
-      <CustomLink component={Link} {...props} href={href}>
+      <CustomLink component={Link} {...props} href={href} $={$}>
         {children}
       </CustomLink>
     );

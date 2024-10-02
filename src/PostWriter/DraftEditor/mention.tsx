@@ -1,17 +1,29 @@
 import { User } from '#/api/users/types';
+import { ProfileFollowInfo } from '#/components/layouts/pages/ProfilePage/ProfileFollowInfo';
+import { ProfilePopper } from '#/components/layouts/pages/ProfilePage/ProfilePopper';
+import NextLink from '#/components/NextLink';
 import { SimpleProfileItem } from '#/components/SimpleProfileComponent';
+import { useFetchedProfile, useUserProfile } from '#/hooks/useUser';
 import useValue from '#/hooks/useValue';
+import paths from '#/paths';
+import { borderGlowing, glassmorphism } from '#/styles';
 import { MentionPluginTheme, MentionData } from '@draft-js-plugins/mention';
 import { SubMentionComponentProps } from '@draft-js-plugins/mention/lib/Mention';
 import {
+  Avatar,
   Box,
+  BoxProps,
+  Fade,
   Menu,
   MenuItem,
+  Popover,
+  Popper,
+  Stack,
   styled,
   Typography,
   useTheme,
 } from '@mui/material';
-import React from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import { MouseEvent, MouseEventHandler, useId } from 'react';
 
 export interface EntryComponentProps {
@@ -62,48 +74,33 @@ export const MentionComponent: React.FC<{
   mention: SubMentionComponentProps['mention'];
   className?: string;
 }> = (e) => {
-  const user: User = e.mention as User;
-  const id = useId();
   //@ts-ignore
   const key = [...(e.children || []), { key: 'none' }][0].key;
   const theme = useTheme();
 
-  const anchorEl = useValue<HTMLElement | null>(null);
-  const open = Boolean(anchorEl.get);
-  const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-    anchorEl.set(e.currentTarget);
-  };
-  const handleClose = () => anchorEl.set(null);
   return (
-    <span>
-      <StyledSpan
-        // className={e.className}
-        spellCheck={false}
-        data-testid='mentionText'
-        color='primary'
-        sx={{
-          cursor: 'pointer',
-          color: theme.palette.primary.main,
-          ':hover': {
-            textDecoration: 'underline',
-          },
-        }}
-        onMouseEnter={handleClick}
-      >
-        <span data-offset-key={key}>
-          <span data-text={true}>@{e.mention.username}</span>
-        </span>
-      </StyledSpan>
-      <Menu
-        id={id}
-        anchorEl={anchorEl.get}
-        open={open}
-        onClick={(e) => e.stopPropagation()}
-        onClose={handleClose}
-      >
-        <MenuItem onMouseLeave={handleClose}>{user.username}</MenuItem>
-      </Menu>
-    </span>
+    <ProfilePopper profileId={e.mention.id || 0}>
+      <span>
+        <StyledSpan
+          // className={e.className}
+          spellCheck={false}
+          data-testid='mentionText'
+          color='primary'
+          sx={{
+            cursor: 'pointer',
+            color: theme.palette.primary.main,
+            ':hover': {
+              textDecoration: 'underline',
+            },
+            zIndex: 2,
+          }}
+        >
+          <span data-offset-key={key}>
+            <span data-text={true}>@{e.mention.username}</span>
+          </span>
+        </StyledSpan>
+      </span>
+    </ProfilePopper>
   );
 };
 export const userToMentonData = (user: User): MentionData => ({

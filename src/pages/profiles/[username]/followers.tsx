@@ -42,7 +42,6 @@ const FollowersPage: ExtendedNextPage<{ profile: User }> = ({ profile }) => {
 
 FollowersPage.getLayout = ({ children, props }) => {
   const router = useRouter();
-  console.log(props);
   return (
     <CommonLayout>
       <Box>

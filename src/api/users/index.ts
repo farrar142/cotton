@@ -25,6 +25,7 @@ export const Auth = {
 
 export const Users = {
   me: () => client.get<User>('/users/me/'),
+  user: (userId: number | string) => client.get<User>(`/users/${userId}/`),
   users: (queries?: { search?: string }, params?: { cursor?: string }) =>
     client.get<Paginated<User>>('/users/', {
       params: { ...queries, ...params },

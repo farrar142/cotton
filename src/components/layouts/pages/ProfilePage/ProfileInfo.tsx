@@ -29,6 +29,7 @@ import {
 import moment from 'moment';
 import React from 'react';
 import { ChangeEventHandler, createRef, useEffect, useRef } from 'react';
+import { ProfileFollowInfo } from './ProfileFollowInfo';
 
 const HiddenInput = styled('input')({
   display: 'none',
@@ -481,44 +482,8 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
             가입일 : {moment(profile.registered_at).format('YYYY년 MM월')}
           </Typography>
         </Stack>
-        <Stack direction='row' spacing={2}>
-          <NextLink href={paths.userfollowings(profile.username)}>
-            <Stack direction='row' alignItems='center' spacing={1}>
-              <Typography
-                variant='subtitle2'
-                fontWeight={700}
-                color='textPrimary'
-              >
-                {profile.followings_count}
-              </Typography>
-              <Typography
-                variant='subtitle2'
-                fontWeight={100}
-                color='textDisabled'
-              >
-                팔로우 중
-              </Typography>
-            </Stack>
-          </NextLink>
-          <NextLink href={paths.userfollowers(profile.username)}>
-            <Stack direction='row' alignItems='center' spacing={1}>
-              <Typography
-                variant='subtitle2'
-                fontWeight={700}
-                color='textPrimary'
-              >
-                {profile.followers_count}
-              </Typography>
-              <Typography
-                variant='subtitle2'
-                fontWeight={100}
-                color='textDisabled'
-              >
-                팔로워
-              </Typography>
-            </Stack>
-          </NextLink>
-        </Stack>
+
+        <ProfileFollowInfo profile={profile} />
       </Stack>
     </Box>
   );

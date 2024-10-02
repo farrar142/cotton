@@ -36,6 +36,7 @@ import {
   useSetPostData,
 } from '#/hooks/posts/usePostData';
 import { User } from '#/api/users/types';
+import { ProfilePopper } from '../layouts/pages/ProfilePage/ProfilePopper';
 
 const _PostItem: React.FC<{
   post: Post;
@@ -239,7 +240,7 @@ const _PostItem: React.FC<{
             <></>
           )}
         </Box>
-        <Stack flex={1} width='100%' onClick={route}>
+        <Stack flex={1} onClick={route}>
           {isDetailView ? (
             <PostDetailHeader post={post} profile={profile} />
           ) : (
@@ -321,25 +322,29 @@ const PostHeader: React.FC<{ post: Post; profile: User }> = ({
       href={paths.mypage(profile.username)}
     >
       <Stack direction='row' spacing={1} alignItems='center'>
-        <Typography
-          fontWeight='bold'
-          variant='h6'
-          color='textSecondary'
-          sx={(theme) => ({
-            ':hover': {
-              textDecorationLine: 'underline',
-              color: theme.palette.text.primary,
-            },
-          })}
-        >
-          {profile.nickname}
-        </Typography>
-        <Typography
-          variant='caption'
-          sx={(theme) => ({ color: theme.palette.text.secondary })}
-        >
-          @{profile.username}
-        </Typography>
+        <ProfilePopper profileId={profile.id}>
+          <Typography
+            fontWeight='bold'
+            variant='h6'
+            color='textSecondary'
+            sx={(theme) => ({
+              ':hover': {
+                textDecorationLine: 'underline',
+                color: theme.palette.text.primary,
+              },
+            })}
+          >
+            {profile.nickname}
+          </Typography>
+        </ProfilePopper>
+        <ProfilePopper profileId={profile.id}>
+          <Typography
+            variant='caption'
+            sx={(theme) => ({ color: theme.palette.text.secondary })}
+          >
+            @{profile.username}
+          </Typography>
+        </ProfilePopper>
         <Typography>·</Typography>
         <Typography
           variant='caption'
@@ -373,26 +378,30 @@ const PostDetailHeader: React.FC<{ post: Post; profile: User }> = ({
           src={profile.profile_image?.small || profile?.profile_image?.url}
         />
         <Stack>
-          <Typography
-            fontWeight='bold'
-            variant='h6'
-            lineHeight={1.4}
-            color='textSecondary'
-            sx={(theme) => ({
-              ':hover': {
-                textDecorationLine: 'underline',
-                color: theme.palette.text.primary,
-              },
-            })}
-          >
-            {profile.nickname}
-          </Typography>
-          <Typography
-            variant='caption'
-            sx={(theme) => ({ color: theme.palette.text.secondary })}
-          >
-            @{profile.username}
-          </Typography>
+          <ProfilePopper profileId={profile.id}>
+            <Typography
+              fontWeight='bold'
+              variant='h6'
+              lineHeight={1.4}
+              color='textSecondary'
+              sx={(theme) => ({
+                ':hover': {
+                  textDecorationLine: 'underline',
+                  color: theme.palette.text.primary,
+                },
+              })}
+            >
+              {profile.nickname}
+            </Typography>
+          </ProfilePopper>
+          <ProfilePopper profileId={profile.id}>
+            <Typography
+              variant='caption'
+              sx={(theme) => ({ color: theme.palette.text.secondary })}
+            >
+              @{profile.username}
+            </Typography>
+          </ProfilePopper>
         </Stack>
       </Stack>
     </NextLink>
