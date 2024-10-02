@@ -63,10 +63,6 @@ const _PostItem: React.FC<{
   const [profile, user] = useUserProfile(post.user);
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const [isWrite, setIsWrite] = usePostWrite();
-  const [favorite, setFavorite] = useOverrideAtom('favorite');
-  const [bookmark, setBookmark] = useOverrideAtom('bookmark');
-  const [repost, setRepost] = useOverrideAtom('repost');
   const [view, setView] = useOverrideAtom('view');
   // 부가기능
   const isChecked = (

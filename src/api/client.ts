@@ -47,13 +47,14 @@ export class AxiosWrapper {
   };
 
   setTokens = ({ access, refresh }: { access: string; refresh: string }) => {
-    nookies.set(this.context, 'access', access);
-    nookies.set(this.context, 'refresh', refresh);
+    nookies.set(this.context, 'access', access, { path: '/' });
+    nookies.set(this.context, 'refresh', refresh, { path: '/' });
     return { access, refresh };
   };
   deleteTokens = () => {
-    nookies.destroy(this.context, 'access');
-    nookies.destroy(this.context, 'refresh');
+    console.log('delete!');
+    nookies.destroy(this.context, 'access', { path: '/' });
+    nookies.destroy(this.context, 'refresh', { path: '/' });
   };
 
   //interceptors

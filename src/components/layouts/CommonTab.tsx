@@ -18,7 +18,7 @@ const normalizeTabProps = (prop: TabProp | string) => {
 
 export const CommonTab: React.FC<{
   panels: ReactNode[];
-  labels: (string | TabProp)[];
+  labels: (string | TabProp | undefined)[];
   top?: number;
   defaultTabIndex?: number;
   pannelProps?: Partial<TabPanelProps>;
@@ -31,11 +31,14 @@ export const CommonTab: React.FC<{
   defaultTabIndex = 0,
   pannelProps = {},
 }) => {
-  const normalized = useMemo(() => labels.map(normalizeTabProps), [labels]);
+  const normalized = useMemo(
+    () => labels.filter((r) => r !== undefined).map(normalizeTabProps),
+    [labels]
+  );
   const tabValue = useValue(normalized[defaultTabIndex].value);
   const keypanels = (() => {
     const keypanels: { label: TabProp; children: ReactNode }[] = [];
-    for (let i = 0; i < labels.length; i++) {
+    for (let i = 0; i < normalized.length; i++) {
       keypanels.push({ label: normalized[i], children: panels[i] });
     }
     return keypanels;

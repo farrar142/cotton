@@ -70,14 +70,16 @@ const Home = () => {
               setScrollPosition({ key: 'global', value: 0 });
             },
           },
-          {
-            label: '팔로우 중',
-            value: '팔로우 중',
-            onClick: (e) => {
-              if (e.currentTarget.tabIndex !== 0) return;
-              setScrollPosition({ key: 'followings', value: 0 });
-            },
-          },
+          user
+            ? {
+                label: '팔로우 중',
+                value: '팔로우 중',
+                onClick: (e) => {
+                  if (e.currentTarget.tabIndex !== 0) return;
+                  setScrollPosition({ key: 'followings', value: 0 });
+                },
+              }
+            : undefined,
         ]}
         panels={[
           <PostTimeline
@@ -91,22 +93,24 @@ const Home = () => {
           />,
         ]}
         sharedTopSlot={
-          <>
-            <Box
-              pt={2}
-              px={isMd ? 2 : 1}
-              display='flex'
-              flexDirection='column'
-              width='100%'
-            >
-              <Avatar
-                sx={{ mr: 1 }}
-                src={user?.profile_image?.small || user?.profile_image?.url}
-              />
-              <DraftEditor onPost={onPost} additionalWidth={-48} />
-            </Box>
-            <Divider sx={{ mb: 1, width: '100%' }} flexItem />
-          </>
+          user && (
+            <>
+              <Box
+                pt={2}
+                px={isMd ? 2 : 1}
+                display='flex'
+                flexDirection='column'
+                width='100%'
+              >
+                <Avatar
+                  sx={{ mr: 1 }}
+                  src={user?.profile_image?.small || user?.profile_image?.url}
+                />
+                <DraftEditor onPost={onPost} additionalWidth={-48} />
+              </Box>
+              <Divider sx={{ mb: 1, width: '100%' }} flexItem />
+            </>
+          )
         }
         pannelProps={{ sx: { p: 0 } }}
       />
