@@ -32,9 +32,23 @@ const userSelector = selectorFamily<User | null, number>({
     },
 });
 
+const useTokenWatcher = () => {
+  const [user, setUser] = useRecoilState(userAtom(undefined));
+
+  useEffect(() => {
+    if (!user) return;
+    const interval = setInterval(() => {
+      const { access, refresh } = API.client.instance.getTokens();
+      if (!access) setUser(null);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [user]);
+};
+
 export const useUserProfile = (profile: User) => {
   const [me, setMe] = useRecoilState(userAtom(undefined));
   const [user, setUser] = useRecoilState(userSelector(profile.id));
+  useTokenWatcher();
 
   useEffect(() => {
     if (user) return;
@@ -61,6 +75,7 @@ export const useUserProfile = (profile: User) => {
 const useUser = (user?: User) => {
   const router = useRouter();
   const [_user, setUser] = useRecoilState(userAtom(undefined));
+  useTokenWatcher();
   useEffect(() => {
     if (!user) return;
     setUser(user);
