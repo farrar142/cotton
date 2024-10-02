@@ -3,16 +3,26 @@ import { Post } from '#/api/posts';
 import { useKeepScrollPosition } from '#/hooks/useKeepScrollPosition';
 import { useObserver } from '#/hooks/useObserver';
 import useValue from '#/hooks/useValue';
-import { Box, Button, Divider, Stack } from '@mui/material';
+import {
+  Avatar,
+  AvatarGroup,
+  Box,
+  Button,
+  Divider,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { AxiosResponse } from 'axios';
 import React, {
   MutableRefObject,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
 } from 'react';
 import { PostItem } from './PostItem';
 import { useTimelinePagination } from './usePostPagination';
+import { filterDuplicate } from '#/utils/arrays';
 
 export const PostTimeline: React.FC<{
   getter: (
@@ -78,15 +88,42 @@ export const PostTimeline: React.FC<{
     return () => clearTimeout(timeout);
   }, [fetch.get, mergeDatas]);
 
+  const newDataUsers = useMemo(
+    () => filterDuplicate(newData.map((d) => d.user)),
+    [newData]
+  );
+
   return (
     <Stack spacing={1}>
       {1 <= newData.length && (
-        <>
-          <Button sx={{ pt: 1.5 }} onClick={mergeDatas}>
-            {newData.length} 게시글 보기
-          </Button>
-          <Divider />
-        </>
+        <Stack
+          alignItems='center'
+          spacing={2}
+          pt={2}
+          onClick={mergeDatas}
+          sx={(theme) => ({
+            width: '100%',
+            cursor: 'pointer',
+            ':hover': { bgcolor: theme.palette.action.hover },
+          })}
+        >
+          <Stack
+            spacing={1}
+            direction='row'
+            justifyContent='center'
+            alignItems='center'
+          >
+            <AvatarGroup max={3}>
+              {newDataUsers.map(({ profile_image, nickname }) => (
+                <Avatar alt={nickname} src={profile_image?.small} />
+              ))}
+            </AvatarGroup>
+            <Typography pl={2} color='primary'>
+              {newData.length} 게시글 보기
+            </Typography>
+          </Stack>
+          <Divider flexItem />
+        </Stack>
       )}
       {items.map((post) => (
         <PostItem
