@@ -52,7 +52,6 @@ export class AxiosWrapper {
     return { access, refresh };
   };
   deleteTokens = () => {
-    console.log('delete!');
     nookies.destroy(this.context, 'access', { path: '/' });
     nookies.destroy(this.context, 'refresh', { path: '/' });
   };
