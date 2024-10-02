@@ -6,6 +6,10 @@ import { useTimelinePagination } from '#/components/timelines/usePostPagination'
 import getInitialPropsWrapper from '#/functions/getInitialPropsWrapper';
 import { LoginRequired } from '#/functions/getInitialPropsWrapper/middleware';
 import { usePostData } from '#/hooks/posts/usePostData';
+import {
+  useKeepScrollPosition,
+  useKeyScrollPosition,
+} from '#/hooks/useKeepScrollPosition';
 import useMediaSize from '#/hooks/useMediaSize';
 import { useObserver } from '#/hooks/useObserver';
 import paths from '#/paths';
@@ -109,6 +113,8 @@ const NotificationItem: React.FC<{ notification: NotificationType }> = ({
 
 const NotificationsPage: ExtendedNextPage = ({ user }) => {
   if (!user) throw Error;
+  useKeepScrollPosition('page:notification', true);
+  const [_, setScroll] = useKeyScrollPosition();
   const { data, getNextPage, newData, mergeDatas } = useTimelinePagination({
     func: API.Notifications.notification.getItems,
     params: {},
@@ -129,7 +135,13 @@ const NotificationsPage: ExtendedNextPage = ({ user }) => {
         position='sticky'
         top={0}
         p={1}
-        sx={(theme) => ({ ...glassmorphism(theme), zIndex: 10 })}
+        sx={(theme) => ({
+          ...glassmorphism(theme),
+          zIndex: 10,
+          cursor: 'pointer',
+          ':hover': { bgcolor: theme.palette.action.hover },
+        })}
+        onClick={() => setScroll({ key: 'page:notification', value: 0 })}
       >
         <Typography variant='h5'>Notification</Typography>
       </Box>
