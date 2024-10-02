@@ -159,7 +159,7 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
       {isSmall ? (
         <></>
       ) : (
-        <Tooltip title='Logout'>
+        <Tooltip title={Boolean(user) ? 'Logout' : 'Login'}>
           <Box bottom={0} right={0} mb={isSmall ? undefined : 3}>
             {!Boolean(user) ? (
               isMd ? (
