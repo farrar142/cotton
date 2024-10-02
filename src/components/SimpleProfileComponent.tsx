@@ -72,15 +72,17 @@ export const SimpleProfileItem: React.FC<{
           </Stack>
         </NextLink>
         {!isMyProfile && (
-          <Button
-            variant='outlined'
-            color={profile.is_following_to ? 'info' : 'inherit'}
-            sx={{ borderRadius: 15, zIndex: 3 }}
-            disabled={done.get === false}
-            onClick={wrapper(followUser)}
-          >
-            {profile.is_following_to ? '언팔로우' : '팔로우'}
-          </Button>
+          <Box display='flex' alignItems='center'>
+            <Button
+              variant='outlined'
+              color={profile.is_following_to ? 'info' : 'inherit'}
+              sx={{ borderRadius: 15, zIndex: 3 }}
+              disabled={done.get === false}
+              onClick={wrapper(followUser)}
+            >
+              {profile.is_following_to ? '언팔로우' : '팔로우'}
+            </Button>
+          </Box>
         )}
       </Stack>
     </Box>

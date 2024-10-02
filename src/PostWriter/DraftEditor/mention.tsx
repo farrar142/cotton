@@ -46,7 +46,7 @@ export const MentionEntry: React.FC<EntryComponentProps> = (props) => {
   );
 };
 
-const StyledSpan = styled('span')();
+const StyledSpan = styled('span')({});
 
 export const MentionComponent: React.FC<{
   children?: SubMentionComponentProps['children'];

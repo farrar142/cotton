@@ -137,7 +137,7 @@ const NotificationsPage: ExtendedNextPage = ({ user }) => {
         {1 <= newData.length && (
           <>
             <Button sx={{ pt: 1.5 }} onClick={mergeDatas}>
-              {newData.length} 게시글 보기
+              {newData.length} 개의 알람 더 보기
             </Button>
             <Divider />
           </>
