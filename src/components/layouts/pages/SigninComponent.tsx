@@ -42,7 +42,7 @@ const SigninComponent: React.FC<{ onClose: () => void; open?: boolean }> = ({
       .then(tokens.set)
       .then(API.Users.me)
       .then(({ data }) => {
-        router.reload();
+        // router.reload();
         setUser(data);
         if (!data.is_registered) tabValue.set('3');
         else onClose();
@@ -125,10 +125,19 @@ const SigninComponent: React.FC<{ onClose: () => void; open?: boolean }> = ({
                 <Button variant='contained' fullWidth type='submit'>
                   Login
                 </Button>
-                <Button fullWidth onClick={() => tabValue.set('2')}>
+                <Button
+                  variant='outlined'
+                  fullWidth
+                  onClick={() => tabValue.set('2')}
+                >
                   Sign up
                 </Button>
-                <Button fullWidth onClick={onClose} color='warning'>
+                <Button
+                  variant='outlined'
+                  fullWidth
+                  onClick={onClose}
+                  color='warning'
+                >
                   Close
                 </Button>
                 <Divider />

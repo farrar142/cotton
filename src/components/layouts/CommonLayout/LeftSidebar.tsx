@@ -114,15 +114,15 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
           deactive={SearchOutlined}
           isMd={isMd}
         />
-        <NavBarItem
-          url='/notification'
-          verbose='Notification'
-          active={Notifications}
-          deactive={NotificationsOutlined}
-          isMd={isMd}
-        />
         {user && (
           <React.Fragment>
+            <NavBarItem
+              url='/notification'
+              verbose='Notification'
+              active={Notifications}
+              deactive={NotificationsOutlined}
+              isMd={isMd}
+            />
             <NavBarItem
               url={paths.mypage(user.username)}
               verbose='Profile'
