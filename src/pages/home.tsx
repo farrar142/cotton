@@ -17,6 +17,8 @@ import { usePostWriteService } from '#/hooks/posts/usePostWriteService';
 import { atom, useRecoilState } from 'recoil';
 import { recoilPersist } from 'recoil-persist';
 import { useKeyScrollPosition } from '#/hooks/useKeepScrollPosition';
+import { CommonTab } from '#/components/layouts/CommonTab';
+import React from 'react';
 
 const { persistAtom } = recoilPersist();
 // import PostWriter from '#/PostWriter';
@@ -58,7 +60,57 @@ const Home = () => {
 
   return (
     <Box sx={{}}>
-      <TabContext value={user ? tabValue.get : '1'}>
+      <CommonTab
+        labels={[
+          {
+            label: '추천',
+            value: '추천',
+            onClick: (e) => {
+              if (e.currentTarget.tabIndex !== 0) return;
+              setScrollPosition({ key: 'global', value: 0 });
+            },
+          },
+          {
+            label: '팔로우 중',
+            value: '팔로우 중',
+            onClick: (e) => {
+              if (e.currentTarget.tabIndex !== 0) return;
+              setScrollPosition({ key: 'followings', value: 0 });
+            },
+          },
+        ]}
+        panels={[
+          <PostTimeline
+            getter={API.Posts.post.getGlobalTimeline}
+            type='global'
+          />,
+          <PostTimeline
+            getter={API.Posts.post.getFollowingTimeline}
+            type='followings'
+            fetchNew={fetchNew}
+          />,
+        ]}
+        sharedTopSlot={
+          <>
+            <Box
+              pt={2}
+              px={isMd ? 2 : 1}
+              display='flex'
+              flexDirection='column'
+              width='100%'
+            >
+              <Avatar
+                sx={{ mr: 1 }}
+                src={user?.profile_image?.small || user?.profile_image?.url}
+              />
+              <DraftEditor onPost={onPost} additionalWidth={-48} />
+            </Box>
+            <Divider sx={{ mb: 1, width: '100%' }} flexItem />
+          </>
+        }
+        pannelProps={{ sx: { p: 0 } }}
+      />
+      {/* <TabContext value={user ? tabValue.get : '1'}>
         <Box
           sx={{
             borderBottom: 1,
@@ -132,7 +184,7 @@ const Home = () => {
             fetchNew={fetchNew}
           />
         </TabPanel>
-      </TabContext>
+      </TabContext> */}
     </Box>
   );
 };

@@ -22,7 +22,15 @@ export const CommonTab: React.FC<{
   top?: number;
   defaultTabIndex?: number;
   pannelProps?: Partial<TabPanelProps>;
-}> = ({ panels, labels, top = 0, defaultTabIndex = 0, pannelProps = {} }) => {
+  sharedTopSlot?: ReactNode;
+}> = ({
+  panels,
+  labels,
+  sharedTopSlot,
+  top = 0,
+  defaultTabIndex = 0,
+  pannelProps = {},
+}) => {
   const normalized = useMemo(() => labels.map(normalizeTabProps), [labels]);
   const tabValue = useValue(normalized[defaultTabIndex].value);
   const keypanels = (() => {
@@ -40,6 +48,7 @@ export const CommonTab: React.FC<{
           position: 'sticky',
           top,
           zIndex: 5,
+          width: '100%',
           ...glassmorphism(theme),
         })}
         onChange={(e, value) => {
@@ -51,13 +60,18 @@ export const CommonTab: React.FC<{
             value={value}
             label={label}
             key={label}
-            sx={{ flex: 1 }}
+            sx={(theme) => ({
+              flex: 1,
+              minWidth: `${100 / normalized.length}%`,
+              ':hover': { bgcolor: theme.palette.action.hover },
+            })}
             onClick={onClick}
           />
         ))}
       </TabList>
       {keypanels.map(({ label, children }) => (
         <TabPanel {...pannelProps} value={label.value} key={label.value}>
+          {sharedTopSlot}
           {children}
         </TabPanel>
       ))}
