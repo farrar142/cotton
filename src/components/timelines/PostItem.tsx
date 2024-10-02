@@ -77,11 +77,12 @@ const useRelatedPostItem = (id: number | undefined) => {
 
   useEffect(() => {
     if (!id) return;
+    if (getter) return;
     API.Posts.post
       .getItem(id)
       .then((r) => r.data)
       .then(setter);
-  }, [id]);
+  }, [id, getter]);
   return [getter, setter] as const;
 };
 const useSetRelatedPostItem = (id: number) =>
