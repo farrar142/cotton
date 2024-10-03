@@ -92,7 +92,6 @@ export const useTimelinePagination = <T extends { id: number }>({
   };
 
   const getPrevPage = async () => {
-    console.log('get prev');
     if (!newPages[0]) {
       if (!pages[0]) {
         getNextPage();
