@@ -39,6 +39,7 @@ export const useCursorPagination = <T extends { id: number }>({
   params?: {};
 }) => {
   const key = useValue(`${apiKey}:${objectToStringKey(params)}`);
+  const isFirstFetchSuccess = useValue(false);
   const [pages, setPages] = useCursorPaginationData<
     AxiosResponse<Paginated<T>>
   >(key.get);
@@ -55,7 +56,11 @@ export const useCursorPagination = <T extends { id: number }>({
   useEffect(() => {
     //페이지가 존재시 패치 안함
     if (pages.length !== 0) return;
-    getter(params).then((r) => setPages([r]));
+    getter(params)
+      .then((r) => setPages([r]))
+      .then(() => {
+        if (!isFirstFetchSuccess.get) isFirstFetchSuccess.set(true);
+      });
   }, [key.get]);
 
   const fetchNext = () => {
@@ -68,5 +73,5 @@ export const useCursorPagination = <T extends { id: number }>({
     () => filterDuplicate(pages.map((r) => r.data.results).flatMap((r) => r)),
     [pages]
   );
-  return { data, fetchNext };
+  return { data, fetchNext, isFirstFetchSuccess };
 };

@@ -6,7 +6,7 @@ import { Stack, Typography } from '@mui/material';
 export const ProfileFollowInfo: React.FC<{ profile: User }> = ({ profile }) => {
   return (
     <Stack direction='row' spacing={2}>
-      <NextLink href={paths.userfollowings(profile.username)} $>
+      <NextLink href={paths.userfollowings(profile.username)} withunderline>
         <Typography
           variant='subtitle2'
           fontWeight={700}
@@ -24,7 +24,7 @@ export const ProfileFollowInfo: React.FC<{ profile: User }> = ({ profile }) => {
           팔로우 중
         </Typography>
       </NextLink>
-      <NextLink href={paths.userfollowers(profile.username)} $>
+      <NextLink href={paths.userfollowers(profile.username)} withunderline>
         <Typography
           variant='subtitle2'
           fontWeight={700}

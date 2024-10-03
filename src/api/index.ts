@@ -1,3 +1,4 @@
+import { Messages } from './chats';
 import { client } from './client';
 import { Misc } from './misc';
 import { Notifications } from './notifications';
@@ -13,6 +14,7 @@ const API = {
   Posts,
   Relations,
   Notifications,
+  Messages,
 };
 
 export default API;

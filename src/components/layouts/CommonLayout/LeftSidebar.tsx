@@ -7,6 +7,8 @@ import {
   Bookmark,
   BookmarkBorder,
   Create,
+  Email,
+  EmailOutlined,
   ExitToApp,
   Home,
   HomeOutlined,
@@ -121,6 +123,13 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
               verbose='Notification'
               active={Notifications}
               deactive={NotificationsOutlined}
+              isMd={isMd}
+            />
+            <NavBarItem
+              url='/messages'
+              verbose='Messages'
+              active={Email}
+              deactive={EmailOutlined}
               isMd={isMd}
             />
             <NavBarItem

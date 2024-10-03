@@ -1,6 +1,6 @@
 import API from '#/api';
 import { ImageType } from '#/api/commons/types';
-import { RegisteredUser } from '#/api/users/types';
+import { RegisteredUser, User } from '#/api/users/types';
 import TextInput from '#/components/inputs/TextInput';
 import NextLink from '#/components/NextLink';
 import { ScrollPreventedBackdrop } from '#/components/utils/ScrollPreventedBackdrop';
@@ -15,7 +15,7 @@ import {
   getImageSize,
   resizeImageWithMinimum,
 } from '#/utils/images/getBase64';
-import { AddAPhoto, CalendarMonth, Close } from '@mui/icons-material';
+import { AddAPhoto, CalendarMonth, Close, Email } from '@mui/icons-material';
 import {
   Avatar,
   Box,
@@ -23,6 +23,7 @@ import {
   IconButton,
   Stack,
   styled,
+  Tooltip,
   Typography,
   useTheme,
 } from '@mui/material';
@@ -30,6 +31,7 @@ import moment from 'moment';
 import React from 'react';
 import { ChangeEventHandler, createRef, useEffect, useRef } from 'react';
 import { ProfileFollowInfo } from './ProfileFollowInfo';
+import { useRouter } from '#/hooks/useCRouter';
 
 const HiddenInput = styled('input')({
   display: 'none',
@@ -374,6 +376,7 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
 const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
   profile: _profile,
 }) => {
+  const router = useRouter();
   const [profile, user, { isMyProfile, setProfile, setMyProfile }] =
     useUserProfile(_profile);
   const profileEditorOpen = useValue(false);
@@ -395,6 +398,13 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
         .then(setProfile);
     });
   };
+  const onDirectMessage = (me: User) => {
+    API.Messages.message
+      .create({ users: [me.id, profile.id], is_direct_message: true })
+      .then((r) => r.data)
+      .then((r) => router.push(paths.groupMessage(r.id)));
+  };
+
   if (!profile.is_registered) return <></>;
   return (
     <Box>
@@ -404,13 +414,35 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
         <img
           src={profile.header_image.large || profile.header_image.url}
           alt=''
-          style={{ width: '100%', aspectRatio: 3, objectFit: 'cover' }}
+          style={{
+            width: '100%',
+            aspectRatio: 3,
+            objectFit: 'cover',
+            padding: 0,
+          }}
         />
       ) : (
-        <Box sx={{ width: '100%', aspectRatio: 3, bgcolor: 'text.disabled' }} />
+        <Box
+          sx={{
+            width: '100%',
+            aspectRatio: 3,
+            bgcolor: 'text.disabled',
+            p: 0,
+            mb: 0.5,
+          }}
+        />
       )}
       {/**프로필 이미지 칸 */}
-      <Box display='flex' flexDirection='row' position='relative' pb={3}>
+      <Stack
+        direction='row'
+        flexDirection='row'
+        alignItems='center'
+        position='relative'
+        spacing={1}
+        pb={3}
+        px={0.5}
+      >
+        <Box />
         <Box
           sx={{
             height: isSmall ? '150%' : '200%',
@@ -440,7 +472,24 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
           </Box>
         </Box>
         <Box flex={1} />
-        <Box pt={1} pr={1.5}>
+        {user ? (
+          <Box>
+            <Tooltip title={`Direct Message with ${profile.nickname}`}>
+              <IconButton
+                sx={{
+                  borderColor: 'textPrimary',
+                  borderWidth: 1,
+                  borderStyle: 'solid',
+                }}
+                onClick={() => onDirectMessage(user)}
+                // size='small'
+              >
+                <Email />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        ) : undefined}
+        <Box>
           {isMyProfile ? (
             <Button
               variant='outlined'
@@ -462,7 +511,7 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
             </Button>
           )}
         </Box>
-      </Box>
+      </Stack>
       {/**프로필 정보 칸 */}
       <Stack px={2}>
         <Typography variant='h5' fontWeight='bold'>
