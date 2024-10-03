@@ -1,23 +1,17 @@
-import useValue from '#/hooks/useValue';
-import TabContext from '@mui/lab/TabContext';
-import TabList from '@mui/lab/TabList';
-import TabPanel from '@mui/lab/TabPanel';
-import { Avatar, Box, Divider, Tab, useTheme } from '@mui/material';
+import { Avatar, Box, Divider, useTheme } from '@mui/material';
 
 import DraftEditor, { DraftOnPost } from '#/PostWriter/DraftEditor';
 import API from '#/api';
-import { ImageType } from '#/api/commons/types';
+import { CommonTab } from '#/components/layouts/CommonTab';
 import { PostTimeline } from '#/components/timelines';
+import { usePostWriteService } from '#/hooks/posts/usePostWriteService';
+import { useKeyScrollPosition } from '#/hooks/useKeepScrollPosition';
 import { useLoginWindow } from '#/hooks/useLoginWindow';
 import useMediaSize from '#/hooks/useMediaSize';
 import useUser from '#/hooks/useUser';
-import { Block } from '#/utils/textEditor/blockTypes';
 import { SyntheticEvent, useRef } from 'react';
-import { usePostWriteService } from '#/hooks/posts/usePostWriteService';
 import { atom, useRecoilState } from 'recoil';
 import { recoilPersist } from 'recoil-persist';
-import { useKeyScrollPosition } from '#/hooks/useKeepScrollPosition';
-import { CommonTab } from '#/components/layouts/CommonTab';
 import React from 'react';
 
 const { persistAtom } = recoilPersist();
@@ -101,7 +95,7 @@ const Home = () => {
                 pt={2}
                 px={isMd ? 2 : 1}
                 display='flex'
-                flexDirection='column'
+                flexDirection='row'
                 width='100%'
               >
                 <Avatar
