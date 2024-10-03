@@ -1,16 +1,10 @@
 import API from '#/api';
-import { RegisteredUser, User } from '#/api/users/types';
+import { RegisteredUser } from '#/api/users/types';
 import { CommonTab } from '#/components/layouts/CommonTab';
 import { PostTimeline } from '#/components/timelines';
 import { MediaTimeline } from '#/components/timelines/MediaTimeline';
 import { useKeyScrollPosition } from '#/hooks/useKeepScrollPosition';
-import useValue from '#/hooks/useValue';
-import { glassmorphism } from '#/styles';
-import TabContext from '@mui/lab/TabContext';
-import TabList from '@mui/lab/TabList';
-import TabPanel from '@mui/lab/TabPanel';
-import { Box, CircularProgress, Divider, Tab, useTheme } from '@mui/material';
-import { ReactNode, Suspense, useMemo } from 'react';
+import { Box } from '@mui/material';
 
 const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
   const articleKey = `timeline/${profile.username}`;
@@ -62,19 +56,23 @@ const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
           <PostTimeline
             getter={API.Posts.post.getUserTimeline(profile.username)}
             type={articleKey}
+            key={articleKey}
           />,
           <PostTimeline
             getter={API.Posts.post.getUserRepliesItems(profile.username)}
             type={replyKey}
+            key={replyKey}
             showParent
           />,
           <MediaTimeline
             getter={API.Posts.post.getUserMediaItems(profile.username)}
             type={mediaKey}
+            key={mediaKey}
           />,
           <PostTimeline
             getter={API.Posts.post.getFavoriteItems(profile.username)}
             type={favoriteKey}
+            key={favoriteKey}
           />,
         ]}
       />

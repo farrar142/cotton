@@ -28,7 +28,9 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
   group,
   user: profile,
 }) => {
+  console.log('user from page', profile);
   const [user] = useUserProfile(profile);
+  console.log('fetched user', user);
   const theme = useTheme();
   const { isSmall, isMd } = useMediaSize();
   const fetchBlock = useRef<HTMLElement>();
@@ -91,10 +93,15 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
   //웹소켓 메세지 리스너
   useEffect(() => {
     const ws = new WS<Message>(`/ws/message_groups/${group.id}/`);
-    ws.onopen = (e) => {};
+    ws.onopen = (e) => {
+      console.log('opened');
+    };
     ws.parseMessage((e) => {
       incomingMessages.set((p) => [...p, e]);
     });
+    ws.onclose = () => {
+      console.log('onclosed');
+    };
   }, []);
 
   const combinedMessages = useMemo(() => {
@@ -158,7 +165,7 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
 
     lastScrollHeight.current = c.scrollHeight;
   }, [data]);
-  console.log(user, profile);
+
   return (
     <Stack direction='row' minHeight='100vh' height='100vh'>
       <Box
