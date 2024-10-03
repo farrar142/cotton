@@ -12,7 +12,6 @@ const MessageGroupPage: ExtendedNextPage<{
   user?: User;
 }> = ({ group, user }) => {
   if (!user) throw Error;
-  console.log('user from server', user);
   return <MessageViewer user={user} group={group} />;
 };
 

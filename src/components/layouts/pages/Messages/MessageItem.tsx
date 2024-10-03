@@ -11,9 +11,7 @@ export const MessgeItem: React.FC<{ messages: MergedMessage; me: User }> = ({
   messages,
   me,
 }) => {
-  console.log('me in item', me);
   const [user] = useFetchedProfile(messages.user);
-  console.log('target user', user);
   const lastMessage = messages.messages[messages.messages.length - 1];
   const radius = 5;
   const isMyMessage = user?.id === me.id;

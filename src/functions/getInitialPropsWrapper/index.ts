@@ -27,6 +27,7 @@ const getInitialPropsWrapper = <P extends {}>(
       client.setContext(context);
       const { access, refresh } = nookies.get(context);
       const user = access || refresh ? await getUser() : undefined;
+      console.log(user?.id);
       const tokens =
         client.tempTokens || access ? { access, refresh } : undefined;
       const { pre = [], post = [] } = middleware;
