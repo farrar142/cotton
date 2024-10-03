@@ -18,4 +18,18 @@ const useDebouncedEffect = <T>(
   }, [callback, delay]);
 };
 
+export const useDebouncedFunction = () => {
+  const memory = useRef<NodeJS.Timeout>(setTimeout(() => {}, 0));
+
+  const caller = (func: () => void, delayMiliseconds: number) => {
+    clearTimeout(memory.current);
+    memory.current = setTimeout(() => {
+      func();
+      clearTimeout(memory.current);
+    }, delayMiliseconds);
+  };
+
+  return caller;
+};
+
 export default useDebouncedEffect;

@@ -1,6 +1,10 @@
 import { useEffect, useRef } from 'react';
 
-export const useObserver = () => {
+export const useObserver = (options?: {
+  threshold?: number;
+  rootMargin?: string;
+}) => {
+  const { threshold = 1, rootMargin = '500px' } = options || {};
   const onIntersection = useRef(() => {});
   const onNotIntersection = useRef(() => {});
   const createObserver = () => {
@@ -15,7 +19,7 @@ export const useObserver = () => {
           }
         });
       },
-      { threshold: 1, rootMargin: '500px' }
+      { threshold, rootMargin }
     );
   };
   const observer = useRef<IntersectionObserver | undefined>(createObserver());

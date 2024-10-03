@@ -472,7 +472,7 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
           </Box>
         </Box>
         <Box flex={1} />
-        {user ? (
+        {user && !isMyProfile ? (
           <Box>
             <Tooltip title={`Direct Message with ${profile.nickname}`}>
               <IconButton

@@ -1,7 +1,13 @@
 import { Paginated } from '#/api/general';
 import { filterDuplicate } from '#/utils/arrays';
 import { AxiosResponse } from 'axios';
-import { Dispatch, SetStateAction, useEffect, useMemo } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+} from 'react';
 import useValue from '../useValue';
 import { atomFamily, useRecoilState } from 'recoil';
 
@@ -63,15 +69,22 @@ export const useCursorPagination = <T extends { id: number }>({
       });
   }, [key.get]);
 
-  const fetchNext = () => {
+  const fetchNext = useCallback(() => {
     if (pages.length === 0) return;
     const cursor = getCursor(pages[pages.length - 1].data.next);
     if (cursor === null) return;
     getter(params, { cursor }).then((r) => setPages((p) => [...p, r]));
-  };
+  }, [pages]);
+
   const data = useMemo(
     () => filterDuplicate(pages.map((r) => r.data.results).flatMap((r) => r)),
     [pages]
   );
-  return { data, fetchNext, isFirstFetchSuccess };
+  const hasNextPage = useMemo(() => {
+    if (pages.length === 0) return false;
+    const lastPage = pages[pages.length - 1];
+    const cursor = getCursor(lastPage.data.next);
+    return Boolean(cursor);
+  }, [pages]);
+  return { data, fetchNext, hasNextPage, isFirstFetchSuccess };
 };
