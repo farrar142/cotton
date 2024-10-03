@@ -10,9 +10,9 @@ import { LoginRequired } from '#/functions/getInitialPropsWrapper/middleware';
 const MessageGroupPage: ExtendedNextPage<{
   group: MessageGroup;
   user?: User;
-}> = ({ group, user: profile }) => {
-  if (!profile) throw Error;
-  return <MessageViewer user={profile} group={group} />;
+}> = ({ group, user }) => {
+  if (!user) throw Error;
+  return <MessageViewer user={user} group={group} />;
 };
 
 MessageGroupPage.getInitialProps = getInitialPropsWrapper<{

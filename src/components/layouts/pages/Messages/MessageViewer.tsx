@@ -38,7 +38,7 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
   const { data, isFirstFetchSuccess, fetchNext, hasNextPage } =
     useCursorPagination({
       getter: API.Messages.message.getMessages(group.id),
-      apiKey: `messages:${group.id}`,
+      apiKey: `${user.username}:messages:${group.id}`,
     });
   const incomingMessages = useValue<Message[]>([]);
   const typedMessage = useValue<Message[]>([]);

@@ -10,10 +10,15 @@ export type MessageGroup = {
   id: number;
   is_direct_message: boolean;
   attendants: User[];
-  latest_message?: string;
-  latest_message_user?: number;
-  latest_message_created_at?: string;
-};
+} & (
+  | {
+      latest_message: string;
+      latest_message_user: number;
+      latest_message_nickname: string;
+      latest_message_created_at: string;
+    }
+  | { latest_message: undefined }
+);
 
 export type Message = {
   id: number;
