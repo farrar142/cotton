@@ -49,7 +49,6 @@ export const useTimelinePagination = <T extends { id: number }>({
 
   useEffect(() => {
     if (pages.length !== 0) return;
-    console.log('call?', key);
     //데이터가 없을 시 생길때까지 계속 패치
     const interval = setInterval(
       () =>

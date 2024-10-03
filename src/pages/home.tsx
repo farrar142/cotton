@@ -83,10 +83,12 @@ const Home = () => {
         ]}
         panels={[
           <PostTimeline
+            key='global'
             getter={API.Posts.post.getGlobalTimeline}
             type='global'
           />,
           <PostTimeline
+            key='followings'
             getter={API.Posts.post.getFollowingTimeline}
             type='followings'
             fetchNew={fetchNew}

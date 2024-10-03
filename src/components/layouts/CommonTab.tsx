@@ -4,6 +4,7 @@ import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel, { TabPanelProps } from '@mui/lab/TabPanel';
 import { Tab } from '@mui/material';
+import React from 'react';
 import { MouseEventHandler, ReactNode, useMemo } from 'react';
 
 type TabProp = {
@@ -58,11 +59,11 @@ export const CommonTab: React.FC<{
           tabValue.set(value);
         }}
       >
-        {normalized.map(({ label, value, onClick }) => (
+        {normalized.map(({ label, value, onClick }, index) => (
           <Tab
             value={value}
             label={label}
-            key={label}
+            key={`${index}:${label}`}
             sx={(theme) => ({
               flex: 1,
               minWidth: `${100 / normalized.length}%`,
@@ -72,9 +73,13 @@ export const CommonTab: React.FC<{
           />
         ))}
       </TabList>
-      {keypanels.map(({ label, children }) => (
-        <TabPanel {...pannelProps} value={label.value} key={label.value}>
-          {sharedTopSlot}
+      {keypanels.map(({ label, children }, index) => (
+        <TabPanel
+          {...pannelProps}
+          value={label.value}
+          key={`${index}:${label.value}`}
+        >
+          <React.Fragment key='additionalProps'>{sharedTopSlot}</React.Fragment>
           {children}
         </TabPanel>
       ))}

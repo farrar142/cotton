@@ -1,4 +1,5 @@
 import { useRouter } from '#/hooks/useCRouter';
+import React from 'react';
 import { useEffect } from 'react';
 
 const IndexPage = () => {
