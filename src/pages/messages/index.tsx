@@ -76,7 +76,7 @@ const MessageGroupItem: React.FC<{ group: MessageGroup; me: User }> = ({
   group,
   me,
 }) => {
-  if (!group.latest_message) return <></>;
+  // if (!group.latest_message) return <></>;
   if (group.is_direct_message) return <DirectMessage group={group} me={me} />;
   return <></>;
 };
