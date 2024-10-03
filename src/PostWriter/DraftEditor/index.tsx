@@ -142,6 +142,7 @@ const DraftEditor: React.FC<
       theme: mentionsStyles,
       mentionPrefix: '@',
       supportWhitespace: true,
+      //@ts-ignore
       mentionComponent: MentionComponent,
     });
 

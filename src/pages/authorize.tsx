@@ -1,6 +1,7 @@
 import API from '#/api';
 import getInitialPropsWrapper from '#/functions/getInitialPropsWrapper';
 import { useRouter } from '#/hooks/useCRouter';
+import useUser from '#/hooks/useUser';
 import { useSnackbar } from 'notistack';
 // import { useNoti } from '#/hooks/useNoti';
 import { useEffect } from 'react';
@@ -10,11 +11,15 @@ const AuthorizationPage: ExtendedNextPage<{ code_key: string }> = ({
 }) => {
   const noti = useSnackbar();
   const router = useRouter();
+  const [user, setUser] = useUser();
   useEffect(() => {
     if (code_key) {
       API.Auth.register_email({ code_key })
         .then(({ data }) => data)
         .then(API.client.instance.setTokens)
+        .then(() => API.Users.me())
+        .then((r) => r.data)
+        .then(setUser)
         .then(() =>
           noti.enqueueSnackbar('인증되었습니다.', { variant: 'success' })
         )

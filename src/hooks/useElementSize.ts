@@ -1,5 +1,9 @@
-import { ElementSize } from '#/components/editors/ImpaintEditor/types';
 import { RefObject, useRef, useEffect } from 'react';
+export type ElementSize = {
+  width: number;
+  height: number;
+  aspectRatio: number;
+};
 
 export const useElementSize = <T extends HTMLElement>(ref: RefObject<T>) => {
   const sizeRef = useRef<ElementSize>({
