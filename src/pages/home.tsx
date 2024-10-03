@@ -104,7 +104,7 @@ const Home = () => {
                 />
                 <DraftEditor onPost={onPost} additionalWidth={-48} />
               </Box>
-              <Divider sx={{ mb: 1, width: '100%' }} flexItem />
+              <Divider sx={{ mt: 1, width: '100%' }} flexItem />
             </>
           )
         }
