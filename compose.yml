@@ -1,0 +1,16 @@
+services:
+  module:
+    build:
+      dockerfile: build.dockerfile
+      context: .
+    container_name: cotton-builder
+    image: cotton-builder
+  deploy:
+    build:
+      dockerfile: deploy.dockerfile
+      context: .
+    container_name: cotton-deploy
+    ports:
+     - ${PORT:-3000}:3000
+    depends_on:
+      - build
