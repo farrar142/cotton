@@ -1,5 +1,5 @@
 services:
-  module:
+  build:
     build:
       dockerfile: build.dockerfile
       context: .
