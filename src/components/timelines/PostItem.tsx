@@ -326,7 +326,7 @@ const PostHeader: React.FC<{ post: Post; profile: User }> = ({
           <Typography
             fontWeight='bold'
             variant='h6'
-            color='textSecondary'
+            color='textPrimary'
             sx={(theme) => ({
               ':hover': {
                 textDecorationLine: 'underline',
@@ -383,7 +383,7 @@ const PostDetailHeader: React.FC<{ post: Post; profile: User }> = ({
               fontWeight='bold'
               variant='h6'
               lineHeight={1.4}
-              color='textSecondary'
+              color='textPrimary'
               sx={(theme) => ({
                 ':hover': {
                   textDecorationLine: 'underline',
