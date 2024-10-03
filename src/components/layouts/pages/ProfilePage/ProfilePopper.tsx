@@ -62,6 +62,9 @@ export const ProfilePopper: React.FC<{
   return (
     <>
       <Box
+        display='flex'
+        alignItems='center'
+        justifyContent='center'
         component={component}
         onMouseEnter={() => onMouseEnter.set(true)}
         onMouseLeave={() => {

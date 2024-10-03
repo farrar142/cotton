@@ -345,7 +345,7 @@ const PostHeader: React.FC<{ post: Post; profile: User }> = ({
             @{profile.username}
           </Typography>
         </ProfilePopper>
-        <Typography>·</Typography>
+        <Typography color='textDisabled'>·</Typography>
         <Typography
           variant='caption'
           sx={(theme) => ({ color: theme.palette.text.secondary })}
