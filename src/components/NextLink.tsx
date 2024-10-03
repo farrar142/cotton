@@ -17,7 +17,7 @@ const CustomLink = styled(MLink)<{ withunderline?: 'false' | 'true' }>(
       verticalAlign: 'center',
       textDecoration: 'none',
     },
-    withunderline
+    withunderline !== 'false'
       ? {
           ':hover': {
             textDecoration: 'underline',
