@@ -3,22 +3,21 @@ import { Post } from '#/api/posts';
 import useValue from '#/hooks/useValue';
 import { filterDuplicate } from '#/utils/arrays';
 import { AxiosResponse } from 'axios';
-import { Dispatch, SetStateAction, useEffect, useMemo } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef } from 'react';
 import { atomFamily, useRecoilState } from 'recoil';
 
-const apiResponseAtom = atomFamily<
-  AxiosResponse<TimeLinePaginated<{ id: number }>>[],
-  string
->({
-  key: 'apiResponseAto',
-  default: [],
-});
+const apiResponseAtom = atomFamily<TimeLinePaginated<{ id: number }>[], string>(
+  {
+    key: 'apiResponseAto',
+    default: [],
+  }
+);
 
 const useApiResponse = <T extends { id: number }>(
   key: string
 ): [
-  AxiosResponse<TimeLinePaginated<T>>[],
-  Dispatch<SetStateAction<AxiosResponse<TimeLinePaginated<T>>[]>>
+  TimeLinePaginated<T>[],
+  Dispatch<SetStateAction<TimeLinePaginated<T>[]>>
   //@ts-ignore
 ] => useRecoilState(apiResponseAtom(key));
 
@@ -39,6 +38,7 @@ export const useTimelinePagination = <T extends { id: number }>({
       .flatMap((r) => r.join('='))
       .join(':')}`;
   const key = useValue(createKey());
+  const pagesRef = useRef<TimeLinePaginated<T>[]>([]);
   const [pages, setPages] = useApiResponse<T>(key.get);
   const [newPages, setNewPages] = useApiResponse<T>(`new:${key.get}`);
 
@@ -54,7 +54,7 @@ export const useTimelinePagination = <T extends { id: number }>({
       () =>
         func(params).then((r) => {
           if (r.data.results.length !== 0) {
-            setPages((p) => [...p, r]);
+            setPages((p) => [...p, r.data]);
             return clearInterval(interval);
           }
         }),
@@ -62,7 +62,7 @@ export const useTimelinePagination = <T extends { id: number }>({
     );
     func(params).then((r) => {
       if (r.data.results.length !== 0) {
-        setPages((p) => [...p, r]);
+        setPages((p) => [...p, r.data]);
         return clearInterval(interval);
       }
     });
@@ -72,21 +72,21 @@ export const useTimelinePagination = <T extends { id: number }>({
   const getNextPage = () => {
     const lastPage = pages[pages.length - 1];
     if (!lastPage) return;
-    if (!lastPage.data.next_offset) return;
-    const next_offset = lastPage.data.next_offset;
+    if (!lastPage.next_offset) return;
+    const next_offset = lastPage.next_offset;
     func(params, { offset: next_offset }).then((r) =>
-      setPages((p) => [...p, r])
+      setPages((p) => [...p, r.data])
     );
   };
 
-  const patchPrevByLastPage = (page: AxiosResponse<TimeLinePaginated<any>>) => {
-    if (!page.data.current_offset) return;
+  const patchPrevByLastPage = (page: TimeLinePaginated<any>) => {
+    if (!page.current_offset) return;
     return func(params, {
-      offset: page.data.current_offset,
+      offset: page.current_offset,
       direction: 'prev',
     }).then((r) => {
       if (r.data.results.length === 0) return;
-      setNewPages((p) => [r, ...p]);
+      setNewPages((p) => [r.data, ...p]);
     });
   };
 
@@ -109,18 +109,18 @@ export const useTimelinePagination = <T extends { id: number }>({
     };
   }, [newPages, pages]);
 
+  useEffect(() => {
+    pagesRef.current = pages;
+  }, [pages]);
+
   const data = useMemo<T[]>(
     () =>
-      filterDuplicate(
-        pages.map(({ data: { results } }) => results).flatMap((r) => r)
-      ),
+      filterDuplicate(pages.map(({ results }) => results).flatMap((r) => r)),
     [pages]
   );
   const newData = useMemo<T[]>(
     () =>
-      filterDuplicate(
-        newPages.map(({ data: { results } }) => results).flatMap((r) => r)
-      ),
+      filterDuplicate(newPages.map(({ results }) => results).flatMap((r) => r)),
     [newPages]
   );
 
@@ -130,5 +130,13 @@ export const useTimelinePagination = <T extends { id: number }>({
     setNewPages([]);
   };
 
-  return { data, newData, mergeDatas, getNextPage, getPrevPage };
+  return {
+    data,
+    setPages,
+    newData,
+    mergeDatas,
+    getNextPage,
+    getPrevPage,
+    pagesRef,
+  };
 };

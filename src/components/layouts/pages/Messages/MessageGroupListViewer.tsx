@@ -1,5 +1,5 @@
 import API from '#/api';
-import { MessageGroup } from '#/api/chats';
+import { Message, MessageGroup } from '#/api/chats';
 import { User } from '#/api/users/types';
 import TextInput from '#/components/inputs/TextInput';
 import NextLink from '#/components/NextLink';
@@ -12,11 +12,19 @@ import { glassmorphism } from '#/styles';
 import { formatDateBasedOnYear } from '#/utils/formats/formatDateBasedOnYear';
 import { Search } from '@mui/icons-material';
 import { Avatar, Box, InputAdornment, Stack, Typography } from '@mui/material';
-import React, { useMemo } from 'react';
-import { useMessageGroupItem } from './MessageGroupAtom';
+import React, { useEffect, useMemo } from 'react';
+import {
+  MessageGroupWithInCommingMessages,
+  useIncomingMessage,
+  useMessageGroupItem,
+  useMessageGroupList,
+} from './MessageGroupAtom';
+import { useTimelinePagination } from '#/components/timelines/usePostPagination';
+import { WS } from '#/utils/websockets';
+import moment from 'moment';
 
 const DirectMessageSimpleViewer: React.FC<{
-  group: MessageGroup;
+  group: MessageGroupWithInCommingMessages;
   me: User;
   isSelected: boolean;
 }> = ({ group, me, isSelected }) => {
@@ -24,12 +32,23 @@ const DirectMessageSimpleViewer: React.FC<{
     () => group.attendants.filter((user) => user.id !== me.id)[0],
     [group]
   );
-  const lastMessageDate = useMemo(
-    () =>
+  const lastMessageDate = useMemo(() => {
+    if (group.inComingMessages.length !== 0) {
+      return formatDateBasedOnYear(
+        group.inComingMessages[group.inComingMessages.length - 1].created_at
+      );
+    }
+    return (
       group.latest_message &&
-      formatDateBasedOnYear(group.latest_message_created_at),
-    [group.latest_message]
-  );
+      formatDateBasedOnYear(group.latest_message_created_at)
+    );
+  }, [group.latest_message, group.inComingMessages]);
+  const lastMessage = useMemo(() => {
+    if (group.inComingMessages.length !== 0) {
+      return group.inComingMessages[group.inComingMessages.length - 1].message;
+    }
+    return group.latest_message;
+  }, [group.latest_message, group.inComingMessages]);
   return (
     <NextLink
       href={paths.groupMessage(group.id)}
@@ -68,7 +87,7 @@ const DirectMessageSimpleViewer: React.FC<{
             )}
           </Stack>
           <Typography color='textDisabled'>
-            <Typography component='span'>{group.latest_message}</Typography>
+            <Typography component='span'>{lastMessage}</Typography>
           </Typography>
         </Stack>
       </Stack>
@@ -100,11 +119,69 @@ export const MessageGroupListViewer: React.FC<{
 }> = ({ me, currentGroup }) => {
   const [profile] = useUserProfile(me);
   const search = useValue('');
-  const pagination = useCursorPagination({
-    getter: API.Messages.message.getItems,
+  const [_, setInComingMessage] = useIncomingMessage();
+  const pagination = useTimelinePagination({
+    func: API.Messages.message.getItems,
     apiKey: `${profile.username}:message_groups`,
   });
-  const [_, setScroll] = useKeyScrollPosition();
+  const [__, setScroll] = useKeyScrollPosition();
+  const { groupList, handleGroupList } = useMessageGroupList();
+  // useEffect(() => {
+  //   if (pagination.newData.length === 0) return;
+  //   pagination.mergeDatas();
+  // }, [pagination.newData]);
+
+  useEffect(() => {
+    const ws = new WS<Message>(`/ws/message_users/${me.id}/`);
+    ws.onopen = () => {};
+    ws.parseMessage((message) => {
+      const flattened = pagination.pagesRef.current
+        .map((r) => r.results)
+        .flatMap((r) => r);
+      const matched = flattened.filter((group) => group.id === message.group);
+      if (matched.length === 0) {
+        API.Messages.message
+          .getItem(message.group)
+          .then((r) => r.data)
+          .then((group) => {
+            if (!group.latest_message) return;
+            pagination.setPages((p) => [
+              {
+                offset_field: 'latest_message_created_at',
+                results: [group],
+                current_offset: group.latest_message_created_at,
+                next_offset: group.latest_message_created_at,
+              },
+              ...p,
+            ]);
+          });
+      } else {
+        setInComingMessage((p) => message);
+      }
+    });
+    return () => ws.close();
+  }, []);
+
+  useEffect(() => {
+    handleGroupList(pagination.data);
+  }, [pagination.data]);
+
+  const sortedGroupList = useMemo(() => {
+    const getSortKey = (group: MessageGroupWithInCommingMessages) => {
+      if (group.inComingMessages.length !== 0)
+        return group.inComingMessages[group.inComingMessages.length - 1]
+          .created_at;
+      return (
+        group.latest_message_created_at || new Date('1970-01-01').toISOString()
+      );
+    };
+    return [...groupList].sort((a, b) => {
+      const akey = getSortKey(a);
+      const bkey = getSortKey(b);
+      return moment(bkey).diff(akey);
+    });
+  }, [groupList]);
+
   return (
     <Box maxWidth='100%'>
       <Box
@@ -142,7 +219,7 @@ export const MessageGroupListViewer: React.FC<{
         />
       </Box>
       <Stack spacing={2}>
-        {pagination.data.map((group) => {
+        {sortedGroupList.map((group) => {
           const isSelected = group.id == currentGroup?.id;
           return (
             <MessageGroupItem

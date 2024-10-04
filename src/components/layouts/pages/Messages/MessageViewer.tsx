@@ -26,10 +26,10 @@ import { MergedMessage } from './types';
 import { useMessageGroupItem } from './MessageGroupAtom';
 
 export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
-  group,
+  group: _group,
   user: profile,
 }) => {
-  const { onLastMessageUpdated } = useMessageGroupItem(group);
+  const { group } = useMessageGroupItem(_group);
   const [user] = useUserProfile(profile);
   const theme = useTheme();
   const { isSmall, isMd } = useMediaSize();
@@ -42,7 +42,7 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
       getter: API.Messages.message.getMessages(group.id),
       apiKey: `${user.username}:messages:${group.id}`,
     });
-  const incomingMessages = useValue<Message[]>([]);
+
   const typedMessage = useValue<Message[]>([]);
   const isNewMessage = useValue(false);
 
@@ -71,6 +71,7 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
       {
         id: -1,
         identifier,
+        group: group.id,
         created_at: moment().toISOString(),
         message: message.get,
         user: user.id,
@@ -90,18 +91,10 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
     return () => observer.unobserve(block);
   }, [fetchNext]);
 
-  //웹소켓 메세지 리스너
-  useEffect(() => {
-    const ws = new WS<Message>(`/ws/message_groups/${group.id}/`);
-    ws.parseMessage((e) => {
-      incomingMessages.set((p) => [...p, e]);
-    });
-  }, []);
-
   const { merged: combinedMessages, sorted } = useMemo(() => {
     const messages = [
       ...[...data].reverse(),
-      ...incomingMessages.get,
+      ...group.inComingMessages,
       ...typedMessage.get,
     ];
     const filtered = filterDuplicate(messages, (e) => e.identifier);
@@ -128,14 +121,14 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
       }
     });
     return { merged, sorted };
-  }, [data, incomingMessages.get, typedMessage.get]);
+  }, [data, group.inComingMessages, typedMessage.get]);
 
   useEffect(() => {
-    if (incomingMessages.get.length === 0 && typedMessage.get.length === 0)
+    if (group.inComingMessages.length === 0 && typedMessage.get.length === 0)
       return;
     if (isScrollDown()) setTimeout(scrollToDown, 100);
     else isNewMessage.set(true);
-  }, [incomingMessages.get, typedMessage.get]);
+  }, [group.inComingMessages, typedMessage.get]);
 
   useEffect(() => {
     if (!isNewMessage.get || !chatBoxRef.current) return;
@@ -159,12 +152,6 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
 
     lastScrollHeight.current = c.scrollHeight;
   }, [data]);
-
-  useEffect(() => {
-    if (sorted.length === 0) return;
-    const lastMessage = sorted[sorted.length - 1];
-    onLastMessageUpdated(lastMessage);
-  }, [sorted]);
 
   return (
     <Stack direction='row' minHeight='100vh' height='100vh' maxWidth='100%'>

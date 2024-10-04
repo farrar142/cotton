@@ -1,4 +1,4 @@
-import { GenericAPI, Paginated } from '../general';
+import { GenericAPI, Paginated, TimeLinePaginated } from '../general';
 import { User } from '../users/types';
 
 export type MessageGroupUpsert = {
@@ -17,11 +17,12 @@ export type MessageGroup = {
       latest_message_nickname: string;
       latest_message_created_at: string;
     }
-  | { latest_message: undefined }
+  | { latest_message: undefined; latest_message_created_at: undefined }
 );
 
 export type Message = {
   id: number;
+  group: number;
   user: number;
   nickname: string;
   created_at: string;
@@ -29,7 +30,12 @@ export type Message = {
   identifier: string;
 };
 
-class MessageAPIGenerator extends GenericAPI<MessageGroup, MessageGroupUpsert> {
+class MessageAPIGenerator extends GenericAPI<
+  MessageGroup,
+  MessageGroupUpsert,
+  {},
+  TimeLinePaginated<MessageGroup>
+> {
   create = (data: { users: number[]; is_direct_message: boolean }) => {
     const endpoint = this.getEndpoint('/create/');
     return this.client.post<MessageGroup>(endpoint, data);
