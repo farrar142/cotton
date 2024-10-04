@@ -33,7 +33,7 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
   const { isSmall, isMd } = useMediaSize();
   const fetchBlock = useRef<HTMLElement>();
   const chatBoxRef = useRef<HTMLDivElement | null>(null);
-  const observer = useObserver({ rootMargin: '2000px', threshold: 1 });
+  const observer = useObserver({ rootMargin: '0px', threshold: 1 });
   const message = useValue('');
   const { data, isFirstFetchSuccess, fetchNext, hasNextPage } =
     useCursorPagination({
@@ -158,16 +158,21 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
   }, [data]);
 
   return (
-    <Stack direction='row' minHeight='100vh' height='100vh'>
+    <Stack direction='row' minHeight='100vh' height='100vh' maxWidth='100%'>
       <Box
-        minWidth={isMd ? undefined : theme.breakpoints.values.sm}
+        // minWidth={isMd ? undefined : theme.breakpoints.values.sm}
         width='100%'
         height='100%'
         display='flex'
         flexDirection='column'
         component='form'
         onSubmit={onMessageSend}
-        sx={{ borderColor: 'divider', borderWidth: 1, borderStyle: 'solid' }}
+        sx={{
+          borderColor: 'divider',
+          borderWidth: 1,
+          borderStyle: 'solid',
+          borderBottomWidth: 0,
+        }}
       >
         <Stack
           flex={1}
@@ -180,14 +185,12 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
         >
           <Box flex={1} />
           {hasNextPage && (
-            <Box
-              ref={fetchBlock}
-              height={200}
-              display='flex'
-              justifyContent='center'
-            >
-              <CircularProgress />
-            </Box>
+            <>
+              <Box display='flex' justifyContent='center'>
+                <CircularProgress />
+              </Box>
+              <Box ref={fetchBlock} height={200}></Box>
+            </>
           )}
           {combinedMessages.map((m) => (
             <MessgeItem key={m.identifier} messages={m} me={user} />
