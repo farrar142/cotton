@@ -99,7 +99,7 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
     ];
     const filtered = filterDuplicate(messages, (e) => e.identifier);
     const sorted = filtered.sort((a, b) =>
-      moment(b.created_at).diff(b.created_at)
+      moment(a.created_at).diff(b.created_at)
     );
     const merged: MergedMessage[] = [];
     sorted.forEach((message) => {
