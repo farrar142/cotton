@@ -50,6 +50,7 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
     useCursorPagination({
       getter: API.Messages.message.getMessages(group.id),
       apiKey: `${user.username}:messages:${group.id}`,
+      params: { page_size: 20 },
     });
 
   const typedMessage = useValue<Message[]>([]);

@@ -86,6 +86,7 @@ const ExternalTokenHandler: React.FC<CustomAppProps['pageProps']> = (
   return <></>;
 };
 const UserHandler: React.FC<CustomAppProps['pageProps']> = (pageProps) => {
+  console.log(pageProps);
   //@ts-ignore
   const [user, setUser] = useUser(pageProps?.user);
   useEffect(() => {
@@ -124,7 +125,7 @@ function App({ Component, pageProps }: CustomAppProps) {
     <React.Fragment>
       <MessageListenerComponent />
       <ExternalTokenHandler {...pageProps} />
-      <UserHandler />
+      <UserHandler {...pageProps} />
       <Head>
         {Meta}
         <meta

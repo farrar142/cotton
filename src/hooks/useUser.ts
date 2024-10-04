@@ -45,16 +45,22 @@ const useTokenWatcher = () => {
   }, [user]);
 };
 
+//클라이언트사이드에서만 이용되어야됨. 중복요청방지
+const fetchingMap = new Map<number, boolean>();
+
 export const useFetchedProfile = (
   profileId: number | string,
   prefetch: boolean = false
 ) => {
+  profileId = parseInt(`${profileId}`);
   const [profile, setProfile] = useRecoilState(
     //@ts-ignore
     userSelector(parseInt(profileId))
   );
   const fetchUser = () => {
     if (profile) return;
+    if (fetchingMap.get(profileId) === true) return;
+    fetchingMap.set(profileId, true);
     API.Users.user(profileId)
       .then((r) => r.data)
       .then(setProfile);
@@ -92,7 +98,7 @@ export const useUserProfile = (profile: User) => {
     { isMyProfile: isMe, setProfile: setUser, setMyProfile: setMe },
   ] as const;
 };
-
+//로그인한 사람의 정보를 사용 할때 써야됨
 const useUser = (user?: User) => {
   const router = useRouter();
   const [_user, setUser] = useRecoilState(userAtom(undefined));
@@ -106,7 +112,7 @@ const useUser = (user?: User) => {
     setUser(null);
     router.reload();
   };
-  return [_user, setUser, signout] as const;
+  return [_user || user, setUser, signout] as const;
 };
 
 export default useUser;
