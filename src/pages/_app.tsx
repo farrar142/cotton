@@ -26,6 +26,7 @@ import { useMentionColor } from '#/hooks/useMentionColor';
 import useUser from '#/hooks/useUser';
 import API from '#/api';
 import CommonLayout from '#/components/layouts/CommonLayout';
+import { MessageListenerComponent } from '#/components/layouts/pages/Messages/MessageListenerComponent';
 
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false;
 
@@ -121,6 +122,7 @@ function App({ Component, pageProps }: CustomAppProps) {
   }, [Component.getLayout]);
   return (
     <React.Fragment>
+      <MessageListenerComponent />
       <ExternalTokenHandler {...pageProps} />
       <UserHandler />
       <Head>

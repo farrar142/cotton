@@ -6,18 +6,16 @@ import { Posts } from './posts';
 import { Relations } from './relations';
 import { Auth, Users } from './users';
 
-class API {
-  Auth = Auth;
-  Users = Users;
-  Misc = Misc;
-  Posts = Posts;
-  Relations = Relations;
-  Notifications = Notifications;
-  Messages = Messages;
-  client = client;
-
-  constructor() {}
-}
+const API = {
+  Auth: Auth,
+  Users: Users,
+  Misc: Misc,
+  Posts: Posts,
+  Relations: Relations,
+  Notifications: Notifications,
+  Messages: Messages,
+  client: client,
+};
 
 // const API = {
 //   client,
@@ -30,4 +28,4 @@ class API {
 //   Messages,
 // };
 
-export default new API();
+export default API;

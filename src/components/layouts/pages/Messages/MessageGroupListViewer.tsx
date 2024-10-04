@@ -119,7 +119,6 @@ export const MessageGroupListViewer: React.FC<{
 }> = ({ me, currentGroup }) => {
   const [profile] = useUserProfile(me);
   const search = useValue('');
-  const [_, setInComingMessage] = useIncomingMessage();
   const pagination = useTimelinePagination({
     func: API.Messages.message.getItems,
     apiKey: `${profile.username}:message_groups`,
@@ -130,29 +129,6 @@ export const MessageGroupListViewer: React.FC<{
   //   if (pagination.newData.length === 0) return;
   //   pagination.mergeDatas();
   // }, [pagination.newData]);
-
-  useEffect(() => {
-    const ws = new WS<Message>(`/ws/message_users/${me.id}/`);
-    ws.onopen = () => {};
-    ws.parseMessage((message) => {
-      const flattened = pagination.pagesRef.current
-        .map((r) => r.results)
-        .flatMap((r) => r);
-      const matched = flattened.filter((group) => group.id === message.group);
-      if (matched.length === 0) {
-        API.Messages.message
-          .getItem(message.group)
-          .then((r) => r.data)
-          .then((group) => {
-            if (!group.latest_message) return;
-            handleGroupList([group]);
-          });
-      } else {
-        setInComingMessage((p) => message);
-      }
-    });
-    return () => ws.close();
-  }, []);
 
   useEffect(() => {
     handleGroupList(pagination.data);

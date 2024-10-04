@@ -1,6 +1,6 @@
 import { Message, MessageGroup } from '#/api/chats';
 import { User } from '#/api/users/types';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   atom,
   atomFamily,
@@ -21,6 +21,7 @@ const messageGroupListAtom = atom<MessageGroupWithInCommingMessages[]>({
 
 export const useMessageGroupList = () => {
   const [groupList, setGroupList] = useRecoilState(messageGroupListAtom);
+  const groupListRef = useRef<MessageGroupWithInCommingMessages[]>([]);
 
   const handleGroupList = (newGroups: MessageGroup[]) => {
     setGroupList((p) => {
@@ -32,7 +33,11 @@ export const useMessageGroupList = () => {
       return [...p, ...notAdded];
     });
   };
-  return { groupList, handleGroupList };
+
+  useEffect(() => {
+    groupListRef.current = groupList;
+  }, [groupList]);
+  return { groupList, handleGroupList, groupListRef };
 };
 
 const messageGroupAtom = selectorFamily<
