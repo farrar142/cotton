@@ -1,9 +1,9 @@
 import API from '#/api';
-import { Message, MessageGroup } from '#/api/chats';
+import { MessageGroup } from '#/api/chats';
 import { User } from '#/api/users/types';
 import TextInput from '#/components/inputs/TextInput';
 import NextLink from '#/components/NextLink';
-import { useCursorPagination } from '#/hooks/paginations/useCursorPagination';
+import { useTimelinePagination } from '#/components/timelines/usePostPagination';
 import { useKeyScrollPosition } from '#/hooks/useKeepScrollPosition';
 import { useUserProfile } from '#/hooks/useUser';
 import useValue from '#/hooks/useValue';
@@ -12,16 +12,13 @@ import { glassmorphism } from '#/styles';
 import { formatDateBasedOnYear } from '#/utils/formats/formatDateBasedOnYear';
 import { Search } from '@mui/icons-material';
 import { Avatar, Box, InputAdornment, Stack, Typography } from '@mui/material';
+import moment from 'moment';
 import React, { useEffect, useMemo } from 'react';
 import {
   MessageGroupWithInCommingMessages,
-  useIncomingMessage,
   useMessageGroupItem,
   useMessageGroupList,
 } from './MessageGroupAtom';
-import { useTimelinePagination } from '#/components/timelines/usePostPagination';
-import { WS } from '#/utils/websockets';
-import moment from 'moment';
 
 const DirectMessageSimpleViewer: React.FC<{
   group: MessageGroupWithInCommingMessages;
@@ -122,6 +119,7 @@ export const MessageGroupListViewer: React.FC<{
   const pagination = useTimelinePagination({
     func: API.Messages.message.getItems,
     apiKey: `${profile.username}:message_groups`,
+    disablePrevfetch: true,
   });
   const [__, setScroll] = useKeyScrollPosition();
   const { groupList, handleGroupList } = useMessageGroupList();
