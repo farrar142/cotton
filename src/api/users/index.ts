@@ -1,4 +1,3 @@
-import { AxiosRequestConfig } from 'axios';
 import { client } from '../client';
 import { Paginated } from '../general';
 import { User, UserUpsert } from './types';

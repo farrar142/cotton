@@ -1,20 +1,36 @@
 import { Messages } from './chats';
-import { client } from './client';
+import { AxiosWrapper, client } from './client';
 import { Misc } from './misc';
 import { Notifications } from './notifications';
 import { Posts } from './posts';
 import { Relations } from './relations';
 import { Auth, Users } from './users';
 
-const API = {
-  client,
-  Auth,
-  Users,
-  Misc,
-  Posts,
-  Relations,
-  Notifications,
-  Messages,
-};
+class API {
+  Auth = Auth;
+  Users = Users;
+  Misc = Misc;
+  Posts = Posts;
+  Relations = Relations;
+  Notifications = Notifications;
+  Messages = Messages;
 
-export default API;
+  constructor() {}
+
+  get client() {
+    return new AxiosWrapper().client;
+  }
+}
+
+// const API = {
+//   client,
+//   Auth,
+//   Users,
+//   Misc,
+//   Posts,
+//   Relations,
+//   Notifications,
+//   Messages,
+// };
+
+export default new API();

@@ -125,7 +125,7 @@ export class AxiosWrapper {
     throw error;
   };
   //injections
-  setContext = (ctx: NextPageContext) => {
+  setContext = (ctx?: NextPageContext) => {
     this.context = ctx;
   };
 }
