@@ -25,6 +25,7 @@ export const useTimelinePagination = <T extends { id: number }>({
   func,
   apiKey,
   params = {},
+  disablePrevfetch = false,
 }: {
   func: (
     params?: {},
@@ -32,6 +33,7 @@ export const useTimelinePagination = <T extends { id: number }>({
   ) => Promise<AxiosResponse<TimeLinePaginated<T>>>;
   apiKey: string;
   params?: {};
+  disablePrevfetch?: boolean;
 }) => {
   const createKey = () =>
     `${apiKey}:${Object.entries(params)
@@ -103,11 +105,12 @@ export const useTimelinePagination = <T extends { id: number }>({
   };
 
   useEffect(() => {
+    if (disablePrevfetch) return;
     const interval = setInterval(getPrevPage, 10000);
     return () => {
       clearInterval(interval);
     };
-  }, [newPages, pages]);
+  }, [newPages, pages, disablePrevfetch]);
 
   useEffect(() => {
     pagesRef.current = pages;
