@@ -24,6 +24,7 @@ const getInitialPropsWrapper = <P extends {}>(
   ): Promise<Awaited<P> & ExtendedParams> =>
     new Promise(async (res, rej) => {
       const client = API.client.instance;
+      client.setContext(undefined);
       client.setContext(context);
       const { access, refresh } = nookies.get(context);
       const user = access || refresh ? await getUser() : undefined;
@@ -52,6 +53,8 @@ const getInitialPropsWrapper = <P extends {}>(
           //@ts-ignore
           return res({ error: true, statusCode: 500 });
         }
+      } finally {
+        client.setContext(undefined);
       }
     });
 };
