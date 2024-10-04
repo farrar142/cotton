@@ -145,15 +145,7 @@ export const MessageGroupListViewer: React.FC<{
           .then((r) => r.data)
           .then((group) => {
             if (!group.latest_message) return;
-            pagination.setPages((p) => [
-              {
-                offset_field: 'latest_message_created_at',
-                results: [group],
-                current_offset: group.latest_message_created_at,
-                next_offset: group.latest_message_created_at,
-              },
-              ...p,
-            ]);
+            handleGroupList([group]);
           });
       } else {
         setInComingMessage((p) => message);
