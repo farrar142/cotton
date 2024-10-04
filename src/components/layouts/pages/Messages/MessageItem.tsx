@@ -11,17 +11,18 @@ export const MessgeItem: React.FC<{ messages: MergedMessage; me: User }> = ({
   messages,
   me,
 }) => {
-  const [user] = useFetchedProfile(messages.user);
+  const [user] = useFetchedProfile(messages.user, true);
   const lastMessage = messages.messages[messages.messages.length - 1];
   const radius = 5;
   const isMyMessage = user?.id === me.id;
+  if (!user) return <></>;
   return (
     <Stack direction={isMyMessage ? 'row-reverse' : 'row'} spacing={1} pb={2}>
       {isMyMessage ? (
         <></>
       ) : (
         <Box display='flex' alignItems='flex-end'>
-          <NextLink href={paths.mypage(user?.username || '')}>
+          <NextLink href={paths.mypage(user.username || '')}>
             <Avatar
               src={user?.profile_image?.small || user?.profile_image?.url}
             />
