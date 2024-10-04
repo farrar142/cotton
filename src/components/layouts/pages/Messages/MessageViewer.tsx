@@ -23,11 +23,13 @@ import {
 } from '@mui/material';
 import { MessgeItem } from './MessageItem';
 import { MergedMessage } from './types';
+import { useMessageGroupItem } from './MessageGroupAtom';
 
 export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
   group,
   user: profile,
 }) => {
+  const { onLastMessageUpdated } = useMessageGroupItem(group);
   const [user] = useUserProfile(profile);
   const theme = useTheme();
   const { isSmall, isMd } = useMediaSize();
@@ -72,6 +74,7 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
         created_at: moment().toISOString(),
         message: message.get,
         user: user.id,
+        nickname: profile.nickname,
       },
     ]);
     message.set('');
@@ -95,7 +98,7 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
     });
   }, []);
 
-  const combinedMessages = useMemo(() => {
+  const { merged: combinedMessages, sorted } = useMemo(() => {
     const messages = [
       ...[...data].reverse(),
       ...incomingMessages.get,
@@ -124,7 +127,7 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
         });
       }
     });
-    return merged;
+    return { merged, sorted };
   }, [data, incomingMessages.get, typedMessage.get]);
 
   useEffect(() => {
@@ -156,6 +159,12 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
 
     lastScrollHeight.current = c.scrollHeight;
   }, [data]);
+
+  useEffect(() => {
+    if (sorted.length === 0) return;
+    const lastMessage = sorted[sorted.length - 1];
+    onLastMessageUpdated(lastMessage);
+  }, [sorted]);
 
   return (
     <Stack direction='row' minHeight='100vh' height='100vh' maxWidth='100%'>

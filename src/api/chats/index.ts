@@ -23,6 +23,7 @@ export type MessageGroup = {
 export type Message = {
   id: number;
   user: number;
+  nickname: string;
   created_at: string;
   message: string;
   identifier: string;

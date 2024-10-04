@@ -13,11 +13,13 @@ import { formatDateBasedOnYear } from '#/utils/formats/formatDateBasedOnYear';
 import { Search } from '@mui/icons-material';
 import { Avatar, Box, InputAdornment, Stack, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
+import { useMessageGroupItem } from './MessageGroupAtom';
 
 const DirectMessageSimpleViewer: React.FC<{
   group: MessageGroup;
   me: User;
-}> = ({ group, me }) => {
+  isSelected: boolean;
+}> = ({ group, me, isSelected }) => {
   const otherUser = useMemo(
     () => group.attendants.filter((user) => user.id !== me.id)[0],
     [group]
@@ -29,7 +31,10 @@ const DirectMessageSimpleViewer: React.FC<{
     [group.latest_message]
   );
   return (
-    <NextLink href={paths.groupMessage(group.id)}>
+    <NextLink
+      href={paths.groupMessage(group.id)}
+      bgcolor={(theme) => (isSelected ? theme.palette.action.hover : undefined)}
+    >
       <Stack
         direction='row'
         spacing={1}
@@ -71,17 +76,28 @@ const DirectMessageSimpleViewer: React.FC<{
   );
 };
 
-const MessageGroupItem: React.FC<{ group: MessageGroup; me: User }> = ({
-  group,
-  me,
-}) => {
+const MessageGroupItem: React.FC<{
+  group: MessageGroup;
+  me: User;
+  isSelected: boolean;
+}> = ({ group, me, isSelected }) => {
+  const atomGroup = useMessageGroupItem(group);
   // if (!group.latest_message) return <></>;
   if (group.is_direct_message)
-    return <DirectMessageSimpleViewer group={group} me={me} />;
+    return (
+      <DirectMessageSimpleViewer
+        group={atomGroup.group}
+        me={me}
+        isSelected={isSelected}
+      />
+    );
   return <></>;
 };
 
-export const MessageGroupListViewer: React.FC<{ me: User }> = ({ me }) => {
+export const MessageGroupListViewer: React.FC<{
+  me: User;
+  currentGroup?: MessageGroup;
+}> = ({ me, currentGroup }) => {
   const [profile] = useUserProfile(me);
   const search = useValue('');
   const pagination = useCursorPagination({
@@ -127,7 +143,15 @@ export const MessageGroupListViewer: React.FC<{ me: User }> = ({ me }) => {
       </Box>
       <Stack spacing={2}>
         {pagination.data.map((group) => {
-          return <MessageGroupItem key={group.id} group={group} me={profile} />;
+          const isSelected = group.id == currentGroup?.id;
+          return (
+            <MessageGroupItem
+              key={group.id}
+              group={group}
+              me={profile}
+              isSelected={isSelected}
+            />
+          );
         })}
       </Stack>
     </Box>
