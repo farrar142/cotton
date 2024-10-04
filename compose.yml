@@ -5,6 +5,7 @@ services:
       context: .
     container_name: cotton-builder
     image: cotton-builder
+    entrypoint: tail -f /dev/null
   deploy:
     build:
       dockerfile: deploy.dockerfile
