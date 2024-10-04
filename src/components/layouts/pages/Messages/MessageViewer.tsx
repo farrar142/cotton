@@ -25,6 +25,15 @@ import { MessgeItem } from './MessageItem';
 import { MergedMessage } from './types';
 import { useMessageGroupItem } from './MessageGroupAtom';
 
+const getYearToMinuteString = (isostring: string) =>
+  moment(isostring).format('YYYY-MM-DD-hh-mm');
+const createDefaultMergedMessage = (message: Message) => ({
+  user: message.user,
+  messages: [message],
+  identifier: message.identifier,
+  minuteString: getYearToMinuteString(message.created_at),
+});
+
 export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
   group: _group,
   user: profile,
@@ -103,21 +112,18 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
     );
     const merged: MergedMessage[] = [];
     sorted.forEach((message) => {
-      if (merged.length === 0)
-        merged.push({
-          user: message.user,
-          messages: [],
-          identifier: message.identifier,
-        });
+      if (merged.length === 0) {
+        merged.push(createDefaultMergedMessage(message));
+        return;
+      }
       const lastMessage = merged[merged.length - 1];
-      if (lastMessage.user === message.user) {
+      if (
+        lastMessage.user === message.user &&
+        lastMessage.minuteString === getYearToMinuteString(message.created_at)
+      ) {
         lastMessage.messages.push(message);
       } else {
-        merged.push({
-          user: message.user,
-          messages: [message],
-          identifier: message.identifier,
-        });
+        merged.push(createDefaultMergedMessage(message));
       }
     });
     return { merged, sorted };
