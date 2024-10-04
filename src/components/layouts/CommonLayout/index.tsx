@@ -1,5 +1,13 @@
 import useValue from '#/hooks/useValue';
-import { Avatar, Box, IconButton, styled, useTheme } from '@mui/material';
+import {
+  Avatar,
+  Box,
+  IconButton,
+  styled,
+  SxProps,
+  Theme,
+  useTheme,
+} from '@mui/material';
 
 import NextLink from '#/components/NextLink';
 import { useRouter } from '#/hooks/useCRouter';
@@ -17,7 +25,8 @@ import LeftSidebar from './LeftSidebar';
 const CommonLayout: React.FC<{
   children?: React.ReactNode;
   openLoginWindow?: React.MutableRefObject<() => void>;
-}> = ({ children }) => {
+  disabledRightPanel?: boolean;
+}> = ({ children, disabledRightPanel = false }) => {
   const [_, setOpenLoginWindow] = useLoginWindow();
   const theme = useTheme();
   const loginBackDrop = useValue(false);
@@ -30,23 +39,38 @@ const CommonLayout: React.FC<{
   }, []);
 
   const SideFlexBox = useMemo(
-    () => styled(Box)({ flex: 1, minWidth: isSmall ? 0 : isMd ? 80 : 120 }),
+    () =>
+      styled(Box)({
+        width: '100%',
+        minWidth: isSmall ? 0 : isMd ? 80 : 120,
+      }),
     [isMd, isSmall]
   );
+  const DynamicPanel: SxProps<Theme> = ({ breakpoints: { values } }) => ({
+    maxWidth: {
+      xs: 0,
+      sm: values.xs / 3,
+      md: values.xs / 2,
+      lg: values.xs,
+      xl: values.xs * 1.5,
+    },
+  });
 
   return (
     <Box
       display='flex'
+      width='100%'
+      minWidth='100%'
       sx={{
         '>div:nth-of-type(2)': {
-          maxWidth: isMd
-            ? theme.breakpoints.values.md
-            : theme.breakpoints.values.sm,
+          // maxWidth: isMd
+          //   ? theme.breakpoints.values.md
+          //   : theme.breakpoints.values.sm,
           width: '100%',
         },
       }}
     >
-      <SideFlexBox>
+      <SideFlexBox sx={DynamicPanel}>
         <Box
           sx={[
             isSmall
@@ -85,7 +109,7 @@ const CommonLayout: React.FC<{
           onClose={() => loginBackDrop.set(false)}
         />
       </SideFlexBox>
-      <Box position='relative'>
+      <Box position='relative' flex={1}>
         <SmallSizeHeader
           handleLoginBackdrop={handleLoginBackdrop}
           isSmall={isSmall}
@@ -93,6 +117,7 @@ const CommonLayout: React.FC<{
         <Box
           position='relative'
           maxWidth={isSmall ? '100vw' : undefined}
+          width='100%'
           minHeight='100vh'
           sx={{
             '>*': { pb: 10 },
@@ -104,7 +129,7 @@ const CommonLayout: React.FC<{
           {children}
         </Box>
       </Box>
-      <SideFlexBox display={isMd ? 'none' : 'block'}>
+      <SideFlexBox display={isMd ? 'none' : 'block'} sx={DynamicPanel}>
         <Box position='sticky' top={0}></Box>
       </SideFlexBox>
       <ElevatedPostWriter />
