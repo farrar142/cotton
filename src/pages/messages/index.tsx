@@ -140,6 +140,6 @@ const MessagesPage: ExtendedNextPage = ({ user }) => {
 };
 
 MessagesPage.getInitialProps = getInitialPropsWrapper(async () => {}, {
-  pre: [LoginRequired],
+  // pre: [LoginRequired],
 });
 export default MessagesPage;

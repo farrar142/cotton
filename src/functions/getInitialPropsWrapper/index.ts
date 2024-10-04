@@ -31,6 +31,7 @@ const getInitialPropsWrapper = <P extends {}>(
       const { pre = [], post = [] } = middleware || {};
       const preMiddlewarerChecks = pre.map((fc) => fc({ user, tokens }));
       if (preMiddlewarerChecks.some((p) => Boolean(p))) {
+        client.setContext(undefined);
         //@ts-ignore
         return res(preMiddlewarerChecks.filter((p) => p !== false)[0]);
       }
