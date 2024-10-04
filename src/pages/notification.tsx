@@ -163,8 +163,11 @@ const NotificationsPage: ExtendedNextPage = ({ user }) => {
   );
 };
 
-NotificationsPage.getInitialProps = getInitialPropsWrapper(async () => {}, {
-  pre: [LoginRequired],
-});
+NotificationsPage.getInitialProps = getInitialPropsWrapper(
+  async () => {},
+  () => ({
+    pre: [LoginRequired],
+  })
+);
 
 export default NotificationsPage;
