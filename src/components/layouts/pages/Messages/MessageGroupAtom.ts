@@ -14,11 +14,13 @@ export type MessageGroupWithInCommingMessages = MessageGroup & {
   inComingMessages: Message[];
 };
 
+//메시지 그룹을 전역에서 컨트롤 할수 있도록 설정된 아톰
 const messageGroupListAtom = atom<MessageGroupWithInCommingMessages[]>({
   key: 'messageGroupListAtom',
   default: [],
 });
 
+//rest api를 통하여 들어온 새로운 메시지그룹과, 기존의 메시지그룹간의 병합을 담당하는 훅
 export const useMessageGroupList = () => {
   const [groupList, setGroupList] = useRecoilState(messageGroupListAtom);
   const groupListRef = useRef<MessageGroupWithInCommingMessages[]>([]);
@@ -39,8 +41,8 @@ export const useMessageGroupList = () => {
   }, [groupList]);
   return { groupList, handleGroupList, groupListRef };
 };
-
-const messageGroupAtom = selectorFamily<
+//메시지 그룹아톰에서 특정한 그룹을 가져오는 셀렉터
+const messageGroupAtomSelector = selectorFamily<
   MessageGroupWithInCommingMessages | undefined,
   number
 >({
@@ -67,40 +69,9 @@ const messageGroupAtom = selectorFamily<
       }
     },
 });
-
-// const messageGroupAtom = atomFamily<
-//   MessageGroupWithInCommingMessages | undefined,
-//   number
-// >({
-//   key: 'messageGroupAtom',
-//   default: (key: number) => undefined,
-// });
-
-const inComingMessagesAtom = atom<Message | null>({
-  key: 'inComingMessageAtom',
-  default: null,
-});
-
-const inComingMessageAtomSelector = selector<Message | null>({
-  key: 'inCominMessageAtomSelector',
-  get: ({ get }) => get(inComingMessagesAtom),
-  set: ({ set, get }, newValue) => {
-    if (newValue instanceof DefaultValue) return;
-    if (!newValue) return;
-    const groupValue = get(messageGroupAtom(newValue.group));
-    if (!groupValue) return;
-    set(messageGroupAtom(newValue.group), {
-      ...groupValue,
-      inComingMessages: [...groupValue.inComingMessages, newValue],
-    });
-  },
-});
-
-export const useIncomingMessage = () =>
-  useRecoilState(inComingMessageAtomSelector);
-
+//개별 메시지 그룹을 사용하는 훅
 export const useMessageGroupItem = (group: MessageGroup) => {
-  const [getter, setter] = useRecoilState(messageGroupAtom(group.id));
+  const [getter, setter] = useRecoilState(messageGroupAtomSelector(group.id));
 
   useEffect(() => {
     if (getter) return;
@@ -129,3 +100,27 @@ export const useMessageGroupItem = (group: MessageGroup) => {
     onLastMessageUpdated,
   };
 };
+
+//웹소켓을 통하여 들어오는 메세지들을 메시지그룹 아톰에 분배
+const inComingMessagesAtom = atom<Message | null>({
+  key: 'inComingMessageAtom',
+  default: null,
+});
+
+const inComingMessageAtomSelector = selector<Message | null>({
+  key: 'inCominMessageAtomSelector',
+  get: ({ get }) => get(inComingMessagesAtom),
+  set: ({ set, get }, newValue) => {
+    if (newValue instanceof DefaultValue) return;
+    if (!newValue) return;
+    const groupValue = get(messageGroupAtomSelector(newValue.group));
+    if (!groupValue) return;
+    set(messageGroupAtomSelector(newValue.group), {
+      ...groupValue,
+      inComingMessages: [...groupValue.inComingMessages, newValue],
+    });
+  },
+});
+
+export const useIncomingMessage = () =>
+  useRecoilState(inComingMessageAtomSelector);
