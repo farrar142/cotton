@@ -14,12 +14,9 @@ class API {
   Relations = Relations;
   Notifications = Notifications;
   Messages = Messages;
+  client = client;
 
   constructor() {}
-
-  get client() {
-    return new AxiosWrapper().client;
-  }
 }
 
 // const API = {
