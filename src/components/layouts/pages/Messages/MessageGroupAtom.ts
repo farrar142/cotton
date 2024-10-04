@@ -23,12 +23,14 @@ export const useMessageGroupList = () => {
   const [groupList, setGroupList] = useRecoilState(messageGroupListAtom);
 
   const handleGroupList = (newGroups: MessageGroup[]) => {
-    const notAdded: MessageGroupWithInCommingMessages[] = [];
-    newGroups.forEach((newGroup) => {
-      const exist = groupList.find((item) => item.id === newGroup.id);
-      if (!exist) notAdded.push({ ...newGroup, inComingMessages: [] });
+    setGroupList((p) => {
+      const notAdded: MessageGroupWithInCommingMessages[] = [];
+      newGroups.forEach((newGroup) => {
+        const exist = p.find((item) => item.id === newGroup.id);
+        if (!exist) notAdded.push({ ...newGroup, inComingMessages: [] });
+      });
+      return [...p, ...notAdded];
     });
-    setGroupList((p) => [...p, ...notAdded]);
   };
   return { groupList, handleGroupList };
 };
