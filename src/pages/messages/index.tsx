@@ -3,8 +3,7 @@ import { MessageGroup } from '#/api/chats';
 import { User } from '#/api/users/types';
 import TextInput from '#/components/inputs/TextInput';
 import NextLink from '#/components/NextLink';
-import getInitialPropsWrapper from '#/functions/getInitialPropsWrapper';
-import { LoginRequired } from '#/functions/getInitialPropsWrapper/middleware';
+import { getLoginRequiredInitialPropsWrapper } from '#/functions/getInitialPropsWrapper';
 import { useCursorPagination } from '#/hooks/paginations/useCursorPagination';
 import { useKeyScrollPosition } from '#/hooks/useKeepScrollPosition';
 import { useUserProfile } from '#/hooks/useUser';
@@ -139,10 +138,7 @@ const MessagesPage: ExtendedNextPage = ({ user }) => {
   );
 };
 
-MessagesPage.getInitialProps = getInitialPropsWrapper(
-  async () => {},
-  () => ({
-    pre: [LoginRequired],
-  })
+MessagesPage.getInitialProps = getLoginRequiredInitialPropsWrapper(
+  async () => {}
 );
 export default MessagesPage;

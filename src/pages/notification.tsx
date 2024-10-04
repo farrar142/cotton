@@ -3,7 +3,9 @@ import { NotificationType } from '#/api/notifications';
 import NextLink from '#/components/NextLink';
 import { PostItem } from '#/components/timelines/PostItem';
 import { useTimelinePagination } from '#/components/timelines/usePostPagination';
-import getInitialPropsWrapper from '#/functions/getInitialPropsWrapper';
+import getInitialPropsWrapper, {
+  getLoginRequiredInitialPropsWrapper,
+} from '#/functions/getInitialPropsWrapper';
 import { LoginRequired } from '#/functions/getInitialPropsWrapper/middleware';
 import { usePostData } from '#/hooks/posts/usePostData';
 import {
@@ -163,11 +165,8 @@ const NotificationsPage: ExtendedNextPage = ({ user }) => {
   );
 };
 
-NotificationsPage.getInitialProps = getInitialPropsWrapper(
-  async () => {},
-  () => ({
-    pre: [LoginRequired],
-  })
+NotificationsPage.getInitialProps = getLoginRequiredInitialPropsWrapper(
+  async () => {}
 );
 
 export default NotificationsPage;
