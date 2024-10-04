@@ -4,25 +4,23 @@ import { NextPageContext } from 'next';
 import nookies from 'nookies';
 import { AuthMiddleWare, ExtendedParams, GetInitialPropsFunc } from './types';
 
-const getUser = () => {
-  return new Promise<User | undefined>((res, rej) =>
-    API.Users.me()
-      .then(({ data }) => res(data))
-      .catch(() => res(undefined))
-  );
-};
-
 const getInitialPropsWrapper = <P extends {}>(
   func: GetInitialPropsFunc<P>,
-  middleware: { pre?: AuthMiddleWare<P>[]; post?: AuthMiddleWare<P>[] } = {
-    pre: [],
-    post: [],
-  }
+  middleware:
+    | { pre?: AuthMiddleWare<P>[]; post?: AuthMiddleWare<P>[] }
+    | undefined = undefined
 ) => {
   return async (
     context: NextPageContext
   ): Promise<Awaited<P> & ExtendedParams> =>
     new Promise(async (res, rej) => {
+      const getUser = () => {
+        return new Promise<User | undefined>((res, rej) =>
+          API.Users.me()
+            .then(({ data }) => res(data))
+            .catch(() => res(undefined))
+        );
+      };
       const client = API.client.instance;
       client.setContext(undefined);
       client.setContext(context);
@@ -30,7 +28,7 @@ const getInitialPropsWrapper = <P extends {}>(
       const user = access || refresh ? await getUser() : undefined;
       const tokens =
         client.tempTokens || access ? { access, refresh } : undefined;
-      const { pre = [], post = [] } = middleware;
+      const { pre = [], post = [] } = middleware || {};
       const preMiddlewarerChecks = pre.map((fc) => fc({ user, tokens }));
       if (preMiddlewarerChecks.some((p) => Boolean(p))) {
         //@ts-ignore
