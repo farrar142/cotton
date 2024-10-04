@@ -27,10 +27,10 @@ MessageGroupPage.getInitialProps = getInitialPropsWrapper<{
         .then((group) => res({ group }))
         .catch(() => rej({ error: true, statusCode: 404 }));
     });
-  }
-  // {
-  //   pre: [LoginRequired],
-  // }
+  },
+  () => ({
+    pre: [LoginRequired],
+  })
 );
 
 export default MessageGroupPage;

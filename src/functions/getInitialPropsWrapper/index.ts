@@ -7,7 +7,7 @@ import { AuthMiddleWare, ExtendedParams, GetInitialPropsFunc } from './types';
 const getInitialPropsWrapper = <P extends {}>(
   func: GetInitialPropsFunc<P>,
   middleware:
-    | { pre?: AuthMiddleWare<P>[]; post?: AuthMiddleWare<P>[] }
+    | (() => { pre?: AuthMiddleWare<P>[]; post?: AuthMiddleWare<P>[] })
     | undefined = undefined
 ) => {
   return async (
@@ -28,7 +28,7 @@ const getInitialPropsWrapper = <P extends {}>(
       const user = access || refresh ? await getUser() : undefined;
       const tokens =
         client.tempTokens || access ? { access, refresh } : undefined;
-      const { pre = [], post = [] } = middleware || {};
+      const { pre = [], post = [] } = middleware!!() || {};
       const preMiddlewarerChecks = pre.map((fc) => fc({ user, tokens }));
       if (preMiddlewarerChecks.some((p) => Boolean(p))) {
         client.setContext(undefined);
