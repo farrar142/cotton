@@ -79,8 +79,11 @@ const useValue = <T>(defaultValue: T) => {
     //@ts-ignore
     set(Number(value));
   };
+  const wrap = (value: SetStateAction<T>) => () => {
+    set(value);
+  };
 
-  return { get, set, onTextChange, onNumberChange };
+  return { get, set, onTextChange, onNumberChange, wrap };
 };
 
 export const useRefValue = <T>(defaultValue: T) => {
@@ -109,6 +112,6 @@ export const useRefValue = <T>(defaultValue: T) => {
 };
 
 export type UseRecordedValue<T> = ReturnType<typeof useRecordedValue<T>>;
-export type UseValue<T> = ReturnType<typeof useValue<T>>;
+export type UseValue<T> = Omit<ReturnType<typeof useValue<T>>, 'wrap'>;
 export type UseRefValue<T> = ReturnType<typeof useRefValue<T>>;
 export default useValue;
