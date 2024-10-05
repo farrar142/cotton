@@ -25,7 +25,7 @@ export const ImageViewer: React.FC<{ post: Post }> = ({ post }) => {
       onClick={(e) => e.stopPropagation()}
     >
       {images.length === 1 && (
-        <Box sx={{ width: '100%', height: '100%', maxHeight: 400 }}>
+        <Box sx={{ width: '100%', height: '100%' }}>
           <ImageItem
             image={images[0]}
             width='100%'
