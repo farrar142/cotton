@@ -11,7 +11,8 @@ import { useUserProfile } from '#/hooks/useUser';
 export const SimpleProfileItem: React.FC<{
   profile: User;
   onClick?: MouseEventHandler;
-}> = ({ profile: _profile, onClick }) => {
+  isFocused?: boolean;
+}> = ({ profile: _profile, onClick, isFocused }) => {
   const [profile, user, { isMyProfile, setProfile, setMyProfile }] =
     useUserProfile(_profile);
   const { done, wrapper } = usePromiseState();
@@ -45,6 +46,7 @@ export const SimpleProfileItem: React.FC<{
           ':hover': {
             bgcolor: theme.palette.action.hover,
           },
+          bgcolor: isFocused ? theme.palette.action.focus : undefined,
         })}
         width='100%'
       >

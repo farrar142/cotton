@@ -71,7 +71,7 @@ export const NotificationItem: React.FC<{
     check(notification);
   }, [notification.is_checked]);
   if (post)
-    return <PostItem post={post} showParent={false} disableLatestRepost />;
+    return <PostItem post={post} showParent={true} disableLatestRepost />;
   else if (notification.favorited_post)
     return (
       <NotificationDisplayItem

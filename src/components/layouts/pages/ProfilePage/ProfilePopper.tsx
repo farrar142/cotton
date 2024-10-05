@@ -12,7 +12,8 @@ export const ProfilePopper: React.FC<{
   profileId: number | string;
   children: ReactNode;
   component?: React.ElementType;
-}> = ({ profileId, children, component = 'span' }) => {
+  isFlex?: boolean;
+}> = ({ profileId, children, component = 'span', isFlex = true }) => {
   const id = useId();
   const [profile, fetchUser] = useFetchedProfile(profileId);
   const anchorRef = useRef<HTMLElement>();
@@ -62,15 +63,21 @@ export const ProfilePopper: React.FC<{
   return (
     <>
       <Box
-        display='flex'
-        alignItems='center'
-        justifyContent='center'
         component={component}
         onMouseEnter={() => onMouseEnter.set(true)}
         onMouseLeave={() => {
           onMouseEnter.set(false);
         }}
         ref={anchorRef}
+        sx={
+          isFlex
+            ? {
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }
+            : {}
+        }
       >
         {children}
       </Box>

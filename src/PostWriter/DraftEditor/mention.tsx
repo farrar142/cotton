@@ -62,7 +62,7 @@ export const MentionEntry: React.FC<EntryComponentProps> = (props) => {
       sx={{ minWidth: '300px', width: '100%' }}
     >
       {/**@ts-ignore */}
-      <SimpleProfileItem profile={mention} />
+      <SimpleProfileItem profile={mention} isFocused={isFocused} />
     </Box>
   );
 };
@@ -79,7 +79,7 @@ export const MentionComponent: React.FC<{
   const theme = useTheme();
 
   return (
-    <ProfilePopper profileId={e.mention.id || 0}>
+    <ProfilePopper profileId={e.mention.id || 0} isFlex={false}>
       <span>
         <StyledSpan
           // className={e.className}
