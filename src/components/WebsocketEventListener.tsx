@@ -2,7 +2,7 @@ import API from '#/api';
 import { Message } from '#/api/chats';
 import useUser from '#/hooks/useUser';
 import { WS } from '#/utils/websockets';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   useInComingMessages,
   useMessageGroupList,
@@ -10,6 +10,8 @@ import {
 import { User } from '#/api/users/types';
 import { useInComingNotificationList } from './layouts/pages/Notifications/NotificationAtom';
 import { NotificationType } from '#/api/notifications';
+import useValue from '#/hooks/useValue';
+import { Button } from '@mui/material';
 
 type WSMessageEvent = {
   type: 'message';
@@ -55,6 +57,8 @@ const useNotificationEventListener = (user: User) => {
 export const WebsocketEventListener: React.FC<{ user: User }> = ({ user }) => {
   const { onMessageReceived } = useMessageEventListener(user);
   const { onNotificationReceived } = useNotificationEventListener(user);
+  const watingReconnect = useValue(false);
+  const waiting = useRef(1000);
 
   useEffect(() => {
     if (!user) return;
@@ -65,7 +69,18 @@ export const WebsocketEventListener: React.FC<{ user: User }> = ({ user }) => {
       else if (event.type === 'notification')
         onNotificationReceived(event.notification);
     });
-    return () => ws.close();
-  }, [user?.id]);
+    ws.onclose = () => {
+      setTimeout(() => {
+        watingReconnect.set((p) => !p);
+        if (waiting.current <= 10000) {
+          waiting.current += 1000;
+        }
+      }, waiting.current);
+    };
+    return () => {
+      ws.onclose = () => {};
+      ws.close();
+    };
+  }, [user?.id, watingReconnect.get]);
   return <></>;
 };
