@@ -23,7 +23,10 @@ import {
 } from '@mui/material';
 import { MessgeItem } from './MessageItem';
 import { MergedMessage } from './types';
-import { useMessageGroupItem } from './MessageGroupAtom';
+import {
+  useMessageGroupItem,
+  useUnreadedMessagesCount,
+} from './MessageGroupAtom';
 
 const getYearToMinuteString = (isostring: string) =>
   moment(isostring).format('YYYY-MM-DD-hh-mm');
@@ -86,6 +89,7 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
         message: message.get,
         user: user.id,
         nickname: profile.nickname,
+        has_checked: true,
       },
     ]);
     message.set('');
@@ -131,6 +135,7 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
   }, [data, group.inComingMessages, typedMessage.get]);
 
   useEffect(() => {
+    //새 메세지가 올 때, 화면 아래쪽에 있을시 자동으로 스크롤 다운
     if (group.inComingMessages.length === 0 && typedMessage.get.length === 0)
       return;
     if (isScrollDown()) setTimeout(scrollToDown, 100);
@@ -138,6 +143,7 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
   }, [group.inComingMessages, typedMessage.get]);
 
   useEffect(() => {
+    //새 메세지 확인버튼을 띄우는 로직
     if (!isNewMessage.get || !chatBoxRef.current) return;
     const isNewMessageButtonShowCheck = () => {
       if (!isScrollDown()) return;
@@ -150,6 +156,7 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
 
   const lastScrollHeight = useRef(0);
   useEffect(() => {
+    //이전 메세지 로딩시 스크롤 유지
     const c = chatBoxRef.current;
     if (!c) return;
     c.scroll({
@@ -159,6 +166,17 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
 
     lastScrollHeight.current = c.scrollHeight;
   }, [data]);
+
+  const { resetCount } = useUnreadedMessagesCount();
+  useEffect(() => {
+    //메세지 확인 관련
+    const timeout = setTimeout(
+      () => API.Messages.message.checkMessages(group.id).then(resetCount),
+      // .then(() => checkAllMessagesAsReaded()),
+      1000
+    );
+    return () => clearTimeout(timeout);
+  }, [group.inComingMessages.length]);
 
   return (
     <Stack direction='row' minHeight='100vh' height='100vh' maxWidth='100%'>

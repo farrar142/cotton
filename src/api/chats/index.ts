@@ -1,4 +1,9 @@
-import { GenericAPI, Paginated, TimeLinePaginated } from '../general';
+import {
+  GenericAPI,
+  Paginated,
+  SimpleResponse,
+  TimeLinePaginated,
+} from '../general';
 import { User } from '../users/types';
 
 export type MessageGroupUpsert = {
@@ -10,6 +15,8 @@ export type MessageGroup = {
   id: number;
   is_direct_message: boolean;
   attendants: User[];
+  inComingMessages?: Message[];
+  unreaded_messages: number;
 } & (
   | {
       latest_message: string;
@@ -28,6 +35,7 @@ export type Message = {
   created_at: string;
   message: string;
   identifier: string;
+  has_checked: boolean;
 };
 
 class MessageAPIGenerator extends GenericAPI<
@@ -50,6 +58,14 @@ class MessageAPIGenerator extends GenericAPI<
   getMessages = (id: number | string) => {
     const endpoint = this.getEndpoint(`/${id}/messages/`);
     return this.getItemsRequest<Message, {}, Paginated<Message>>(endpoint);
+  };
+  checkMessages = (groupId: number | string) => {
+    const endpoint = this.getEndpoint(`/${groupId}/check_as_readed/`);
+    return this.client.post<SimpleResponse>(endpoint);
+  };
+  getHasUnreadedMessages = () => {
+    const endpoint = this.getEndpoint(`/has_unreaded_messages/`);
+    return this.client.get<{ count: number }>(endpoint);
   };
 }
 

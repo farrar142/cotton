@@ -22,6 +22,7 @@ import {
   SvgIconComponent,
 } from '@mui/icons-material';
 import {
+  Badge,
   Box,
   Button,
   IconButton,
@@ -31,7 +32,13 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
+import {
+  useInComingMessages,
+  useUnreadedMessagesCount,
+} from '../pages/Messages/MessageGroupAtom';
+import API from '#/api';
+import useValue from '#/hooks/useValue';
 
 const NavBarItem: React.FC<{
   url: string;
@@ -39,7 +46,8 @@ const NavBarItem: React.FC<{
   active: SvgIconComponent;
   deactive: SvgIconComponent;
   isMd: boolean;
-}> = ({ url, active, deactive, verbose, isMd }) => {
+  badge?: number;
+}> = ({ url, active, deactive, verbose, isMd, badge }) => {
   const theme = useTheme();
   const router = useRouter();
   const isCurrentUrl = useMemo(() => {
@@ -47,6 +55,15 @@ const NavBarItem: React.FC<{
   }, [router.asPath, url]);
   const Active = active;
   const Deactive = deactive;
+  const icon = useMemo(
+    () =>
+      isCurrentUrl ? (
+        <Active fontSize='large' />
+      ) : (
+        <Deactive fontSize='large' />
+      ),
+    [isCurrentUrl]
+  );
   return (
     <NextLink
       href={url}
@@ -64,10 +81,16 @@ const NavBarItem: React.FC<{
         color={isCurrentUrl ? 'primary.main' : 'info.main'}
       >
         <IconButton size='small' color='inherit'>
-          {isCurrentUrl ? (
-            <Active fontSize='large' />
+          {badge ? (
+            <Badge
+              badgeContent={badge}
+              variant={badge === 1 ? 'dot' : undefined}
+              color='primary'
+            >
+              {icon}
+            </Badge>
           ) : (
-            <Deactive fontSize='large' />
+            icon
           )}
         </IconButton>
         {!isMd ? <Typography>{verbose}</Typography> : <></>}
@@ -85,6 +108,7 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
   const isMd = useMediaQuery(theme.breakpoints.down('md'));
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
   const [isWrite, setIsWrite] = usePostWrite();
+  const unreaded = useUnreadedMessagesCount();
   return (
     <Box
       position='relative'
@@ -131,6 +155,7 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
               active={Email}
               deactive={EmailOutlined}
               isMd={isMd}
+              badge={unreaded.count}
             />
             <NavBarItem
               url={paths.mypage(user.username)}

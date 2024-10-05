@@ -1,6 +1,10 @@
+import API from '#/api';
 import { Message, MessageGroup } from '#/api/chats';
 import { User } from '#/api/users/types';
-import { useEffect, useRef } from 'react';
+import useUser from '#/hooks/useUser';
+import useValue from '#/hooks/useValue';
+import { filterDuplicate } from '#/utils/arrays';
+import { useEffect, useMemo, useRef } from 'react';
 import {
   atom,
   atomFamily,
@@ -25,12 +29,18 @@ export const useMessageGroupList = () => {
   const [groupList, setGroupList] = useRecoilState(messageGroupListAtom);
   const groupListRef = useRef<MessageGroupWithInCommingMessages[]>([]);
 
-  const handleGroupList = (newGroups: MessageGroup[]) => {
+  const handleGroupList = (
+    newGroups: (MessageGroup | MessageGroupWithInCommingMessages)[]
+  ) => {
     setGroupList((p) => {
       const notAdded: MessageGroupWithInCommingMessages[] = [];
       newGroups.forEach((newGroup) => {
         const exist = p.find((item) => item.id === newGroup.id);
-        if (!exist) notAdded.push({ ...newGroup, inComingMessages: [] });
+        if (!exist)
+          notAdded.push({
+            ...newGroup,
+            inComingMessages: newGroup.inComingMessages || [],
+          });
       });
       return [...p, ...notAdded];
     });
@@ -78,15 +88,15 @@ export const useMessageGroupItem = (group: MessageGroup) => {
     setter({ ...group, inComingMessages: [] });
   }, [group]);
 
-  const onLastMessageUpdated = (message: Message) => {
+  const checkAllMessagesAsReaded = () => {
     setter((p) => {
       if (!p) return undefined;
       return {
         ...p,
-        latest_message: message.message,
-        latest_message_created_at: message.created_at,
-        latest_message_nickname: message.nickname,
-        latest_message_user: message.user,
+        inComingMessages: p.inComingMessages.map((m) => ({
+          ...m,
+          has_checked: true,
+        })),
       };
     });
   };
@@ -97,30 +107,76 @@ export const useMessageGroupItem = (group: MessageGroup) => {
       ...group,
     }) as MessageGroupWithInCommingMessages,
     setGroup: setter,
-    onLastMessageUpdated,
   };
 };
 
 //웹소켓을 통하여 들어오는 메세지들을 메시지그룹 아톰에 분배
-const inComingMessagesAtom = atom<Message | null>({
-  key: 'inComingMessageAtom',
-  default: null,
-});
 
-const inComingMessageAtomSelector = selector<Message | null>({
-  key: 'inCominMessageAtomSelector',
-  get: ({ get }) => get(inComingMessagesAtom),
+const inComingMessagesAtomSelector = selector<Message[]>({
+  key: 'inComingMessageAtomSelector',
+  get: ({ get }) => {
+    const groups = get(messageGroupListAtom);
+    const inComingMessges = groups
+      .map((group) => group.inComingMessages)
+      .flatMap((r) => r);
+
+    return inComingMessges;
+  },
   set: ({ set, get }, newValue) => {
     if (newValue instanceof DefaultValue) return;
     if (!newValue) return;
-    const groupValue = get(messageGroupAtomSelector(newValue.group));
-    if (!groupValue) return;
-    set(messageGroupAtomSelector(newValue.group), {
-      ...groupValue,
-      inComingMessages: [...groupValue.inComingMessages, newValue],
-    });
+    for (const message of newValue) {
+      const groupValue = get(messageGroupAtomSelector(message.group));
+      if (!groupValue) return;
+      //기존값이 뒤에와서 중복되는 경우에 새로들어온 값이 덮어쓰기를 해야됨
+      const filtered = filterDuplicate(
+        [message, ...groupValue.inComingMessages],
+        (item) => item.identifier
+      );
+      set(messageGroupAtomSelector(message.group), {
+        ...groupValue,
+        inComingMessages: filtered,
+      });
+    }
   },
 });
 
-export const useIncomingMessage = () =>
-  useRecoilState(inComingMessageAtomSelector);
+export const useInComingMessages = () => {
+  const [mesages, setMessages] = useRecoilState(inComingMessagesAtomSelector);
+
+  const checkAsReaded = () => {
+    setMessages((p) => p.map((m) => ({ ...m, has_checked: true })));
+  };
+
+  return [mesages, setMessages, checkAsReaded] as const;
+};
+
+const newMessagesCount = atom({ key: 'newMessagesCount', default: 0 });
+const countLoaded = atom({ key: 'countLoaded', default: false });
+export const useUnreadedMessagesCount = () => {
+  const [loaded, setLoaded] = useRecoilState(countLoaded);
+  const [count, setCount] = useRecoilState(newMessagesCount);
+  const [inComingMessages, _, checkAsReaded] = useInComingMessages();
+
+  const [user, setUser] = useUser();
+
+  useEffect(() => {
+    if (loaded) return;
+    if (!user?.id) return;
+    setLoaded(true);
+    console.log('reset', user);
+    API.Messages.message
+      .getHasUnreadedMessages()
+      .then((r) => r.data.count)
+      .then(setCount)
+      .then(checkAsReaded);
+  }, [user?.id, loaded]);
+
+  const unreadedIncomings = useMemo(() => {
+    return inComingMessages.filter((m) => !m.has_checked);
+  }, [inComingMessages]);
+
+  const resetCount = () => setLoaded(false);
+  console.log(count, unreadedIncomings);
+  return { count: count + unreadedIncomings.length, resetCount };
+};

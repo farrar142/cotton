@@ -1,7 +1,7 @@
 export const filterDuplicate = <
   T extends { id: number },
   K extends keyof T,
-  V extends T[K] extends string | number ? string | number : never
+  V extends T[K] extends string | number | boolean ? string | number : never
 >(
   items: T[], //@ts-ignore
   get: (item: T) => V = (item) => item.id
