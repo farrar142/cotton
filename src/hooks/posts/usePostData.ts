@@ -34,12 +34,17 @@ const relatedPostItemSelector = selectorFamily<Post | null, number | undefined>(
   }
 );
 
+//중복패치 방지 clientside에서만 사용되어야됨
+const fetchedPost = new Map<number, boolean>();
+
 export const usePostData = (id: number | undefined) => {
   const [getter, setter] = useRecoilState(relatedPostItemSelector(id));
 
   useEffect(() => {
     if (!id) return;
     if (getter) return;
+    if (fetchedPost.get(id)) return;
+    fetchedPost.set(id, true);
     API.Posts.post
       .getItem(id)
       .then((r) => r.data)
