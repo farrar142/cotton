@@ -39,6 +39,8 @@ import {
 } from '../pages/Messages/MessageGroupAtom';
 import API from '#/api';
 import useValue from '#/hooks/useValue';
+import { User } from '#/api/users/types';
+import useMediaSize from '#/hooks/useMediaSize';
 
 const NavBarItem: React.FC<{
   url: string;
@@ -99,16 +101,27 @@ const NavBarItem: React.FC<{
   );
 };
 
+const NotificationNavBar: React.FC<{ user: User }> = ({ user }) => {
+  const { isMd, isSmall } = useMediaSize();
+  const unreaded = useUnreadedMessagesCount(user);
+  return (
+    <NavBarItem
+      url='/messages'
+      verbose='Messages'
+      active={Email}
+      deactive={EmailOutlined}
+      isMd={isMd}
+      badge={unreaded.count}
+    />
+  );
+};
+
 const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
   openLoginWindow,
 }) => {
-  const router = useRouter();
   const [user, _, signout] = useUser();
-  const theme = useTheme();
-  const isMd = useMediaQuery(theme.breakpoints.down('md'));
-  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
+  const { isMd, isSmall } = useMediaSize();
   const [isWrite, setIsWrite] = usePostWrite();
-  const unreaded = useUnreadedMessagesCount();
   return (
     <Box
       position='relative'
@@ -149,14 +162,15 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
               deactive={NotificationsOutlined}
               isMd={isMd}
             />
-            <NavBarItem
+            <NotificationNavBar user={user} />
+            {/* <NavBarItem
               url='/messages'
               verbose='Messages'
               active={Email}
               deactive={EmailOutlined}
               isMd={isMd}
               badge={unreaded.count}
-            />
+            /> */}
             <NavBarItem
               url={paths.mypage(user.username)}
               verbose='Profile'

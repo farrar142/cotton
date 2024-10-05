@@ -111,9 +111,10 @@ function App({ Component, pageProps }: CustomAppProps) {
   const Layout = useMemo(() => {
     return Component.getLayout ? Component.getLayout : CommonLayout;
   }, [Component.getLayout]);
+  const [user] = useUser();
   return (
     <React.Fragment>
-      <WebsocketEventListener />
+      {user ? <WebsocketEventListener user={user} /> : <></>}
       <ExternalTokenHandler {...pageProps} />
       <UserHandler {...pageProps} />
       <Head>

@@ -7,6 +7,7 @@ import {
   useInComingMessages,
   useMessageGroupList,
 } from './layouts/pages/Messages/MessageGroupAtom';
+import { User } from '#/api/users/types';
 
 type WSMessageEvent = {
   type: 'message';
@@ -18,11 +19,11 @@ type WSNotificationEvent = {
 };
 type WSEvent = WSMessageEvent | WSNotificationEvent;
 
-const useMessageEventListener = () => {
-  const [user] = useUser();
-  const [_, setInComingMessage] = useInComingMessages();
+const useMessageEventListener = (user: User) => {
+  const [_, setInComingMessage] = useInComingMessages(user);
 
-  const { groupList, handleGroupList, groupListRef } = useMessageGroupList();
+  const { groupList, handleGroupList, groupListRef } =
+    useMessageGroupList(user);
 
   const onMessageReceived = (message: Message) => {
     const flattened = groupListRef.current;
@@ -42,9 +43,8 @@ const useMessageEventListener = () => {
   return { onMessageReceived };
 };
 
-export const WebsocketEventListener: React.FC = () => {
-  const [user] = useUser();
-  const { onMessageReceived } = useMessageEventListener();
+export const WebsocketEventListener: React.FC<{ user: User }> = ({ user }) => {
+  const { onMessageReceived } = useMessageEventListener(user);
   useEffect(() => {
     if (!user) return;
     const ws = new WS<WSEvent>(`/ws/users/${user.id}/`);

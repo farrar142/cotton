@@ -97,7 +97,7 @@ const MessageGroupItem: React.FC<{
   me: User;
   isSelected: boolean;
 }> = ({ group, me, isSelected }) => {
-  const atomGroup = useMessageGroupItem(group);
+  const atomGroup = useMessageGroupItem(group, me);
   // if (!group.latest_message) return <></>;
   if (group.is_direct_message)
     return (
@@ -122,7 +122,7 @@ export const MessageGroupListViewer: React.FC<{
     disablePrevfetch: true,
   });
   const [__, setScroll] = useKeyScrollPosition();
-  const { groupList, handleGroupList } = useMessageGroupList();
+  const { groupList, handleGroupList } = useMessageGroupList(me);
   // useEffect(() => {
   //   if (pagination.newData.length === 0) return;
   //   pagination.mergeDatas();
