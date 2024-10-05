@@ -10,8 +10,21 @@ import useValue from '#/hooks/useValue';
 import paths from '#/paths';
 import { glassmorphism } from '#/styles';
 import { formatDateBasedOnYear } from '#/utils/formats/formatDateBasedOnYear';
-import { Search } from '@mui/icons-material';
-import { Avatar, Box, InputAdornment, Stack, Typography } from '@mui/material';
+import { Add, Close, Email, EmailOutlined, Search } from '@mui/icons-material';
+import {
+  Avatar,
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  Divider,
+  IconButton,
+  InputAdornment,
+  Paper,
+  Stack,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import moment from 'moment';
 import React, { useEffect, useMemo } from 'react';
 import {
@@ -19,6 +32,9 @@ import {
   useMessageGroupItem,
   useMessageGroupList,
 } from './MessageGroupAtom';
+import { UserSearchComponent } from '../../users/UserSearchComponent';
+import { usePromiseState } from '#/hooks/usePromiseState';
+import { useRouter } from '#/hooks/useCRouter';
 
 const DirectMessageSimpleViewer: React.FC<{
   group: MessageGroupWithInCommingMessages;
@@ -123,10 +139,7 @@ export const MessageGroupListViewer: React.FC<{
   });
   const [__, setScroll] = useKeyScrollPosition();
   const { groupList, handleGroupList } = useMessageGroupList(me);
-  // useEffect(() => {
-  //   if (pagination.newData.length === 0) return;
-  //   pagination.mergeDatas();
-  // }, [pagination.newData]);
+  const showCreateMessageGroups = useValue(false);
 
   useEffect(() => {
     handleGroupList(pagination.data);
@@ -147,22 +160,57 @@ export const MessageGroupListViewer: React.FC<{
       return moment(bkey).diff(akey);
     });
   }, [groupList]);
-
+  const plusIconSize = 15;
   return (
     <Box maxWidth='100%'>
       <Box
         position='sticky'
+        display='flex'
         top={0}
         p={1}
         sx={(theme) => ({
           ...glassmorphism(theme),
           zIndex: 10,
-          cursor: 'pointer',
-          ':hover': { bgcolor: theme.palette.action.hover },
         })}
-        onClick={() => setScroll({ key: 'page:messages', value: 0 })}
       >
-        <Typography variant='h5'>Messages</Typography>
+        <Typography
+          variant='h5'
+          sx={(theme) => ({
+            cursor: 'pointer',
+          })}
+          onClick={() => setScroll({ key: 'page:messages', value: 0 })}
+        >
+          Messages
+        </Typography>
+        <Box flex={1} />
+        <IconButton
+          sx={{ position: 'relative' }}
+          onClick={showCreateMessageGroups.wrap((p) => !p)}
+        >
+          <EmailOutlined />
+          <Box
+            sx={(theme) => ({
+              borderRadius: 10,
+              position: 'absolute',
+              bottom: '12%',
+              right: '7%',
+              width: plusIconSize,
+              height: plusIconSize,
+              bgcolor: theme.palette.background.default,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 5,
+            })}
+          >
+            <Add
+              sx={{
+                width: plusIconSize,
+                height: plusIconSize,
+              }}
+            />
+          </Box>
+        </IconButton>
       </Box>
       <Box p={1}>
         <TextInput
@@ -197,6 +245,122 @@ export const MessageGroupListViewer: React.FC<{
           );
         })}
       </Stack>
+      <GroupMessageAddComponent
+        me={me}
+        open={showCreateMessageGroups.get}
+        onClose={showCreateMessageGroups.wrap((v) => false)}
+      />
     </Box>
+  );
+};
+
+const GroupMessageAddComponent: React.FC<{
+  open: boolean;
+  onClose: () => void;
+  me: User;
+}> = ({ open, onClose, me }) => {
+  const router = useRouter();
+  const search = useValue('');
+  const selectedUsers = useValue<User[]>([]);
+  const { done, wrapper } = usePromiseState();
+
+  const onCreate = wrapper(() => {
+    const isDirectMessage = selectedUsers.get.length === 1;
+
+    return API.Messages.message
+      .create({
+        users: [
+          ...selectedUsers.get.map((u) => u.id).filter((id) => id !== me.id),
+          me.id,
+        ],
+        is_direct_message: isDirectMessage,
+      })
+      .then((r) => r.data)
+      .then((g) => router.push(paths.groupMessage(g.id)));
+  });
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      sx={glassmorphism}
+      PaperProps={{
+        sx: (theme) => ({ ...glassmorphism(theme), borderRadius: 5, py: 2 }),
+        variant: 'outlined',
+      }}
+    >
+      <Stack
+        width='100%'
+        maxWidth={(theme) => theme.breakpoints.values.xs * 1.5}
+        minHeight={(theme) => theme.breakpoints.values.sm}
+      >
+        <Stack direction='row' alignItems='center' px={1}>
+          <IconButton onClick={onClose}>
+            <Close />
+          </IconButton>
+          <Typography variant='h6'>New Message</Typography>
+          <Box flex={1} />
+          <Button
+            variant='contained'
+            size='small'
+            sx={{ mr: 1 }}
+            disabled={selectedUsers.get.length === 0 || !done}
+            onClick={onCreate}
+          >
+            Create
+          </Button>
+        </Stack>
+        <Box px={2} pb={1}>
+          <TextInput
+            label='Search User'
+            name='username'
+            value={search.get}
+            onChange={search.onTextChange}
+            size='small'
+            variant='standard'
+            fullWidth
+            slotProps={{ input: { disableUnderline: true } }}
+          />
+        </Box>
+        <Divider />
+        <Box
+          display='inline-block'
+          flexDirection='row'
+          minHeight={48}
+          alignItems='center'
+          maxWidth='100%'
+          pt={1}
+          px={1}
+        >
+          {selectedUsers.get.map((user) => (
+            <Chip
+              key={user.id}
+              label={user.nickname}
+              avatar={
+                <Avatar
+                  src={user.profile_image?.small || user.profile_image?.url}
+                />
+              }
+              sx={{ mb: 1, mr: 1 }}
+              onDelete={() =>
+                selectedUsers.set((p) => p.filter((u) => u.id !== user.id))
+              }
+            />
+          ))}
+        </Box>
+        <Divider />
+        <UserSearchComponent
+          search={search.get}
+          itemStyle={(theme) => ({ px: 1, py: 0.5 })}
+          onClick={(user) => {
+            selectedUsers.set((p) => {
+              if (p.find((u) => u.id == user.id)) {
+                return p.filter((u) => u.id !== user.id);
+              }
+              return [...p, user];
+            });
+          }}
+        />
+      </Stack>
+    </Dialog>
   );
 };

@@ -5,13 +5,15 @@ import { useCursorPagination } from '#/hooks/paginations/useCursorPagination';
 import { useRouter } from '#/hooks/useCRouter';
 import { useObserver } from '#/hooks/useObserver';
 import paths from '#/paths';
-import { Stack, Box } from '@mui/material';
+import { Stack, Box, SxProps, Theme } from '@mui/material';
 import { useRef, useEffect } from 'react';
+import { SystemStyleObject } from '@mui/system/styleFunctionSx';
 
 export const UserSearchComponent: React.FC<{
   search: string;
   onClick?: (user: User) => void;
-}> = ({ search, onClick }) => {
+  itemStyle?: (theme: Theme) => SystemStyleObject<Theme>;
+}> = ({ search, onClick, itemStyle }) => {
   const router = useRouter();
   const fetchBlockRef = useRef<HTMLElement>();
   const observer = useObserver();
@@ -33,6 +35,7 @@ export const UserSearchComponent: React.FC<{
     <Stack spacing={1}>
       {users.map((user) => (
         <SimpleProfileItem
+          containerStyle={itemStyle}
           key={user.id}
           profile={user}
           onClick={() => onClick && onClick(user)}

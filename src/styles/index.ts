@@ -47,6 +47,13 @@ const customTheme = createTheme({
         },
       },
     },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+        },
+      },
+    },
   },
 });
 const threeDigitTranslate = (hex: string) => {

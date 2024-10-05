@@ -1,18 +1,30 @@
 import { User } from '#/api/users/types';
 import { Person } from '@mui/icons-material';
-import { Box, Stack, Avatar, Typography, Button } from '@mui/material';
-import { MouseEventHandler } from 'react';
+import {
+  Box,
+  Stack,
+  Avatar,
+  Typography,
+  Button,
+  SxProps,
+  Theme,
+  styled,
+} from '@mui/material';
+import { SystemStyleObject } from '@mui/system/styleFunctionSx';
+import { MouseEventHandler, ReactNode, useMemo } from 'react';
 import NextLink from './NextLink';
 import paths from '#/paths';
 import API from '#/api';
 import { usePromiseState } from '#/hooks/usePromiseState';
 import { useUserProfile } from '#/hooks/useUser';
+import React from 'react';
 
 export const SimpleProfileItem: React.FC<{
   profile: User;
   onClick?: MouseEventHandler;
   isFocused?: boolean;
-}> = ({ profile: _profile, onClick, isFocused }) => {
+  containerStyle?: (theme: Theme) => SystemStyleObject<Theme>;
+}> = ({ profile: _profile, onClick, isFocused, containerStyle }) => {
   const [profile, user, { isMyProfile, setProfile, setMyProfile }] =
     useUserProfile(_profile);
   const { done, wrapper } = usePromiseState();
@@ -33,31 +45,51 @@ export const SimpleProfileItem: React.FC<{
         .then(setProfile);
     });
   };
+  const Link = useMemo(() => {
+    if (onClick) {
+      const Wrapper: React.FC<{
+        children: ReactNode;
+        href: string;
+        flex?: number;
+      }> = ({ children, flex }) => {
+        return <Box flex={flex}>{children}</Box>;
+      };
+      return Wrapper;
+    }
+    return NextLink;
+  }, [Boolean(onClick)]);
   return (
-    <Box display='relative'>
+    <Box
+      display='relative'
+      sx={[
+        (theme) => (containerStyle ? containerStyle(theme) : {}),
+        (theme) => ({
+          cursor: 'pointer',
+          ':hover': {
+            bgcolor: theme.palette.action.hover,
+          },
+          bgcolor: isFocused ? theme.palette.action.focus : undefined,
+        }),
+      ]}
+    >
       <Stack
         key={profile.id}
         direction='row'
         spacing={1}
         onClick={onClick}
-        sx={(theme) => ({
-          cursor: 'pointer',
+        sx={{
           p: 1,
-          ':hover': {
-            bgcolor: theme.palette.action.hover,
-          },
-          bgcolor: isFocused ? theme.palette.action.focus : undefined,
-        })}
+        }}
         width='100%'
       >
-        <NextLink href={paths.mypage(profile.username)}>
+        <Link href={paths.mypage(profile.username)}>
           <Box display='flex' alignItems='center' justifyContent='center'>
             <Avatar
               src={profile.profile_image?.medium || profile.profile_image?.url}
             />
           </Box>
-        </NextLink>
-        <NextLink href={paths.mypage(profile.username)} flex={1}>
+        </Link>
+        <Link href={paths.mypage(profile.username)} flex={1}>
           <Stack spacing={-0.5}>
             <Typography color='textPrimary'>{profile.nickname}</Typography>
             <Typography color='textDisabled'>@{profile.username}</Typography>
@@ -72,7 +104,7 @@ export const SimpleProfileItem: React.FC<{
               </Typography>
             )}
           </Stack>
-        </NextLink>
+        </Link>
         {!isMyProfile && (
           <Box display='flex' alignItems='center'>
             <Button
