@@ -1,13 +1,9 @@
 import API from '#/api';
 import { Message, MessageGroup } from '#/api/chats';
-import { User } from '#/api/users/types';
 import useUser from '#/hooks/useUser';
-import useValue from '#/hooks/useValue';
-import { filterDuplicate } from '#/utils/arrays';
 import { useEffect, useMemo, useRef } from 'react';
 import {
   atom,
-  atomFamily,
   DefaultValue,
   selector,
   selectorFamily,

@@ -21,14 +21,14 @@ const MessageGroupPage: ExtendedNextPage<{
   user?: User;
 }> = ({ group, user }) => {
   if (!user) throw Error;
-  const { isMd } = useMediaSize();
+  const { isMd, isSmall } = useMediaSize();
   return (
     <Box
       display='flex'
       flexDirection='row'
       width='100%'
       justifyContent='space-evenly'
-      pb={0}
+      pb={isSmall ? 60 : 0}
       paddingBottom={0}
     >
       {!isMd && (

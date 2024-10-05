@@ -1,32 +1,21 @@
+import API from '#/api';
 import { User } from '#/api/users/types';
+import CommonLayout from '#/components/layouts/CommonLayout';
+import { WebsocketEventListener } from '#/components/WebsocketEventListener';
+import { useMentionColor } from '#/hooks/useMentionColor';
+import useUser from '#/hooks/useUser';
 import customTheme, { useDarkMode } from '#/styles';
 import '#/styles/globals.css';
-import {
-  Box,
-  Container,
-  createTheme,
-  CssBaseline,
-  decomposeColor,
-  hexToRgb,
-  recomposeColor,
-  ThemeProvider,
-  useTheme,
-} from '@mui/material';
+import { Box, createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import { AppCacheProvider } from '@mui/material-nextjs/v13-pagesRouter';
 import type { AppProps } from 'next/app';
 import Error from 'next/error';
 import Head from 'next/head';
 import nookies from 'nookies';
-import { ReactElement, ReactNode, useEffect, useMemo } from 'react';
-import { RecoilEnv, RecoilRoot } from 'recoil';
 import { SnackbarProvider } from 'notistack';
+import React, { useEffect, useMemo } from 'react';
+import { RecoilEnv, RecoilRoot } from 'recoil';
 import NotAuthenticated from './401';
-import React from 'react';
-import { useMentionColor } from '#/hooks/useMentionColor';
-import useUser from '#/hooks/useUser';
-import API from '#/api';
-import CommonLayout from '#/components/layouts/CommonLayout';
-import { MessageListenerComponent } from '#/components/layouts/pages/Messages/MessageListenerComponent';
 
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false;
 
@@ -124,7 +113,7 @@ function App({ Component, pageProps }: CustomAppProps) {
   }, [Component.getLayout]);
   return (
     <React.Fragment>
-      <MessageListenerComponent />
+      <WebsocketEventListener />
       <ExternalTokenHandler {...pageProps} />
       <UserHandler {...pageProps} />
       <Head>
