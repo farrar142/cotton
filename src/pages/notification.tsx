@@ -1,4 +1,5 @@
 import API from '#/api';
+import { useNotificationList } from '#/components/layouts/pages/Notifications/NotificationAtom';
 import { NotificationItem } from '#/components/layouts/pages/Notifications/NotificationItem';
 import { useTimelinePagination } from '#/components/timelines/usePostPagination';
 import { getLoginRequiredInitialPropsWrapper } from '#/functions/getInitialPropsWrapper';
@@ -20,6 +21,7 @@ const NotificationsPage: ExtendedNextPage = ({ user }) => {
     func: API.Notifications.notification.getItems,
     params: {},
     apiKey: `${user.username}`,
+    disablePrevfetch: true,
   });
   const patchNextBlock = useRef<HTMLDivElement>();
   const observer = useObserver();
@@ -30,6 +32,14 @@ const NotificationsPage: ExtendedNextPage = ({ user }) => {
     observer.onIntersection(getNextPage);
     return () => observer.unobserve(block);
   }, [data]);
+
+  const [notificationList, ___, handleNotifications] =
+    useNotificationList(user);
+
+  useEffect(() => {
+    handleNotifications(data);
+  }, [data]);
+
   return (
     <Box>
       <Box
@@ -55,8 +65,8 @@ const NotificationsPage: ExtendedNextPage = ({ user }) => {
             <Divider />
           </>
         )}
-        {data.map((noti) => (
-          <NotificationItem notification={noti} key={noti.id} />
+        {notificationList.map((noti) => (
+          <NotificationItem notification={noti} key={noti.id} user={user} />
         ))}
         <Box ref={patchNextBlock} />
       </Stack>

@@ -41,10 +41,9 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
   group: _group,
   user: profile,
 }) => {
-  const { group } = useMessageGroupItem(_group);
   const [user] = useUserProfile(profile);
-  const theme = useTheme();
-  const { isSmall, isMd } = useMediaSize();
+  const { group } = useMessageGroupItem(_group, user);
+
   const fetchBlock = useRef<HTMLElement>();
   const chatBoxRef = useRef<HTMLDivElement | null>(null);
   const observer = useObserver({ rootMargin: '0px', threshold: 1 });
@@ -167,7 +166,7 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
     lastScrollHeight.current = c.scrollHeight;
   }, [data]);
 
-  const { resetCount } = useUnreadedMessagesCount();
+  const { resetCount } = useUnreadedMessagesCount(user);
   useEffect(() => {
     //메세지 확인 관련
     const timeout = setTimeout(

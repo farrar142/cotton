@@ -41,6 +41,7 @@ import API from '#/api';
 import useValue from '#/hooks/useValue';
 import { User } from '#/api/users/types';
 import useMediaSize from '#/hooks/useMediaSize';
+import { useUnCheckedNotification } from '../pages/Notifications/NotificationAtom';
 
 const NavBarItem: React.FC<{
   url: string;
@@ -101,7 +102,7 @@ const NavBarItem: React.FC<{
   );
 };
 
-const NotificationNavBar: React.FC<{ user: User }> = ({ user }) => {
+const MessageNavItem: React.FC<{ user: User }> = ({ user }) => {
   const { isMd, isSmall } = useMediaSize();
   const unreaded = useUnreadedMessagesCount(user);
   return (
@@ -112,6 +113,20 @@ const NotificationNavBar: React.FC<{ user: User }> = ({ user }) => {
       deactive={EmailOutlined}
       isMd={isMd}
       badge={unreaded.count}
+    />
+  );
+};
+const NotificationNavItem: React.FC<{ user: User }> = ({ user }) => {
+  const { isMd, isSmall } = useMediaSize();
+  const { count } = useUnCheckedNotification(user);
+  return (
+    <NavBarItem
+      url='/notification'
+      verbose='Notification'
+      active={Notifications}
+      deactive={NotificationsOutlined}
+      isMd={isMd}
+      badge={count}
     />
   );
 };
@@ -155,22 +170,8 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
         />
         {user && (
           <React.Fragment>
-            <NavBarItem
-              url='/notification'
-              verbose='Notification'
-              active={Notifications}
-              deactive={NotificationsOutlined}
-              isMd={isMd}
-            />
-            <NotificationNavBar user={user} />
-            {/* <NavBarItem
-              url='/messages'
-              verbose='Messages'
-              active={Email}
-              deactive={EmailOutlined}
-              isMd={isMd}
-              badge={unreaded.count}
-            /> */}
+            <NotificationNavItem user={user} />
+            <MessageNavItem user={user} />
             <NavBarItem
               url={paths.mypage(user.username)}
               verbose='Profile'

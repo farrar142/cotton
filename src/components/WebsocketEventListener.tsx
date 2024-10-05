@@ -8,6 +8,8 @@ import {
   useMessageGroupList,
 } from './layouts/pages/Messages/MessageGroupAtom';
 import { User } from '#/api/users/types';
+import { useInComingNotificationList } from './layouts/pages/Notifications/NotificationAtom';
+import { NotificationType } from '#/api/notifications';
 
 type WSMessageEvent = {
   type: 'message';
@@ -15,7 +17,7 @@ type WSMessageEvent = {
 };
 type WSNotificationEvent = {
   type: 'notification';
-  notification: number;
+  notification: NotificationType;
 };
 type WSEvent = WSMessageEvent | WSNotificationEvent;
 
@@ -42,15 +44,26 @@ const useMessageEventListener = (user: User) => {
   };
   return { onMessageReceived };
 };
+const useNotificationEventListener = (user: User) => {
+  const [inComings, setInComings] = useInComingNotificationList(user);
+  const onNotificationReceived = (notification: NotificationType) => {
+    setInComings((p) => [...p, notification]);
+  };
+  return { onNotificationReceived };
+};
 
 export const WebsocketEventListener: React.FC<{ user: User }> = ({ user }) => {
   const { onMessageReceived } = useMessageEventListener(user);
+  const { onNotificationReceived } = useNotificationEventListener(user);
+
   useEffect(() => {
     if (!user) return;
     const ws = new WS<WSEvent>(`/ws/users/${user.id}/`);
     ws.onopen = () => {};
     ws.parseMessage((event) => {
       if (event.type === 'message') onMessageReceived(event.message);
+      else if (event.type === 'notification')
+        onNotificationReceived(event.notification);
     });
     return () => ws.close();
   }, [user?.id]);

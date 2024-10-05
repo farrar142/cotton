@@ -115,8 +115,6 @@ export const useMessageGroupItem = (group: MessageGroup, user: User) => {
     setter({ ...group, inComingMessages: [] });
   }, [group]);
 
-  const checkAllMessagesAsReaded = () => {};
-
   return {
     group: (getter || {
       inComingMessages: [],
@@ -139,7 +137,7 @@ export const useInComingMessages = (user: User) => {
 };
 
 const newMessagesCount = atom({ key: 'newMessagesCount', default: 0 });
-const countLoaded = atom({ key: 'countLoaded', default: false });
+const countLoaded = atom({ key: 'messageCountLoaded', default: false });
 
 export const useUnreadedMessagesCount = (user: User) => {
   const [loaded, setLoaded] = useRecoilState(countLoaded);
