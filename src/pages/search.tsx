@@ -3,6 +3,7 @@ import { Paginated } from '#/api/general';
 import { User } from '#/api/users/types';
 import { ClientOnlyHOC } from '#/components/ClientOnlyHOC';
 import TextInput from '#/components/inputs/TextInput';
+import { UserSearchComponent } from '#/components/layouts/users/UserSearchComponent';
 import { SimpleProfileItem } from '#/components/SimpleProfileComponent';
 import { PostTimeline } from '#/components/timelines';
 import { useCursorPagination } from '#/hooks/paginations/useCursorPagination';
@@ -44,41 +45,8 @@ const useSearchTabAtom = () => {
   const [get, set] = useRecoilState(searchTabAtom);
   return { get, set };
 };
-
-const UserSearchComponent: React.FC<{ search: string }> = ({ search }) => {
-  const router = useRouter();
-  const searchKey = useValue(search);
-  const fetchBlockRef = useRef<HTMLElement>();
-  const observer = useObserver();
-  const { data: users, fetchNext } = useCursorPagination({
-    getter: API.Users.users,
-    params: { search },
-    apiKey: 'userSearch',
-  });
-
-  useEffect(() => {
-    const block = fetchBlockRef.current;
-    if (!block) return;
-    observer.onIntersection(fetchNext);
-    observer.observe(block);
-    return () => observer.unobserve(block);
-  }, [searchKey.get, users]);
-
-  return (
-    <Stack spacing={1}>
-      {users.map((user) => (
-        <SimpleProfileItem
-          key={user.id}
-          profile={user}
-          onClick={() => router.push(paths.mypage(user.username))}
-        />
-      ))}
-      <Box ref={fetchBlockRef} />
-    </Stack>
-  );
-};
-
 const SearchPage: ExtendedNextPage = () => {
+  const router = useRouter();
   const theme = useTheme();
   const tabValue = useSearchTabAtom();
 
@@ -156,7 +124,12 @@ const SearchPage: ExtendedNextPage = () => {
             p: 0,
           }}
         >
-          {search.get && <UserSearchComponent search={search.get} />}
+          {search.get && (
+            <UserSearchComponent
+              search={search.get}
+              onClick={(user) => router.push(paths.mypage(user.username))}
+            />
+          )}
         </TabPanel>
       </TabContext>
     </Box>
