@@ -337,7 +337,7 @@ export const MessageGroupListViewer: React.FC<{
           }}
         />
       </Box>
-      <Stack spacing={2}>
+      <Stack spacing={0}>
         {sortedGroupList.map((group) => {
           const isSelected = group.id == currentGroup?.id;
           return (
