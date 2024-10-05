@@ -44,8 +44,9 @@ export class DraftContentParser {
   }
   parseBlock(text: string, entityRange: RawDraftEntityRange) {
     const entity = this.content.entityMap[entityRange.key];
-    if (entity.type === 'mention')
+    if (entity.type === 'mention') {
       return this.__parseMentionBlock(text, entityRange, entity);
+    }
     throw Error;
   }
   private __parseMentionBlock(
@@ -99,7 +100,10 @@ export class DraftContentParser {
       let entityKey = 0;
       const entityRanges: RawDraftEntityRange[] = [];
       for (const block of lines) {
-        const [charStart, charEnd] = [charCount, block.value.length];
+        const [charStart, charEnd] = [
+          charCount,
+          charCount + block.value.length,
+        ];
         charCount = charEnd;
         text += block.value;
         if (block.type === 'mention') {
@@ -118,7 +122,10 @@ export class DraftContentParser {
             type: 'mention',
             mutability: 'IMMUTABLE',
           };
+          entityKey += 1;
         }
+        text += ' ';
+        charCount += 1;
       }
       const key = `${index}`;
       const type = 'unstyled';
@@ -131,8 +138,6 @@ export class DraftContentParser {
         inlineStyleRanges: [],
       });
     }
-    // let entitiy: RawDraftContentState =
-
     return convertFromRaw({ blocks: rawBlocks, entityMap });
   };
 }
