@@ -16,6 +16,7 @@ export const MessageListenerComponent: React.FC = () => {
     const ws = new WS<Message>(`/ws/message_users/${user.id}/`);
     ws.onopen = () => {};
     ws.parseMessage((message) => {
+      console.log('on messages', message);
       const flattened = groupListRef.current;
       const matched = flattened.filter((group) => group.id === message.group);
       if (matched.length === 0) {
@@ -25,12 +26,10 @@ export const MessageListenerComponent: React.FC = () => {
           .then((r) => r.data)
           .then((group) => {
             if (!group.latest_message) return;
-            handleGroupList([{ ...group, inComingMessages: [message] }]);
+            handleGroupList([{ ...group }]);
           });
-      } else {
-        console.log('set incoming');
-        setInComingMessage([message]);
       }
+      setInComingMessage((p) => [...p, message]);
     });
     return () => ws.close();
   }, [user?.id]);

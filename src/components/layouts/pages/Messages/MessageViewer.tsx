@@ -140,7 +140,7 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
       return;
     if (isScrollDown()) setTimeout(scrollToDown, 100);
     else isNewMessage.set(true);
-  }, [group.inComingMessages, typedMessage.get]);
+  }, [group.inComingMessages.length, typedMessage.get]);
 
   useEffect(() => {
     //새 메세지 확인버튼을 띄우는 로직
