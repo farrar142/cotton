@@ -13,6 +13,7 @@ import { formatDateBasedOnYear } from '#/utils/formats/formatDateBasedOnYear';
 import { Add, Close, Email, EmailOutlined, Search } from '@mui/icons-material';
 import {
   Avatar,
+  Badge,
   Box,
   Button,
   Chip,
@@ -108,6 +109,104 @@ const DirectMessageSimpleViewer: React.FC<{
   );
 };
 
+const GroupMessageSimpleViewer: React.FC<{
+  group: MessageGroupWithInCommingMessages;
+  me: User;
+  isSelected: boolean;
+}> = ({ group, me, isSelected }) => {
+  const otherUser = useMemo(
+    () => group.attendants.filter((user) => user.id !== me.id)[0],
+    [group]
+  );
+  const lastMessageDate = useMemo(() => {
+    if (group.inComingMessages.length !== 0) {
+      return formatDateBasedOnYear(
+        group.inComingMessages[group.inComingMessages.length - 1].created_at
+      );
+    }
+    return (
+      group.latest_message &&
+      formatDateBasedOnYear(group.latest_message_created_at)
+    );
+  }, [group.latest_message, group.inComingMessages]);
+  const lastMessage = useMemo(() => {
+    if (group.inComingMessages.length !== 0) {
+      return group.inComingMessages[group.inComingMessages.length - 1].message;
+    }
+    return group.latest_message;
+  }, [group.latest_message, group.inComingMessages]);
+
+  const renderedAttendants = useMemo(() => {
+    if (group.attendants.length < 2) return group.attendants.length;
+    return (
+      <Box
+        sx={(theme) => ({
+          borderRadius: 10,
+          width: 20,
+          height: 20,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          bgcolor: theme.palette.action.disabled,
+        })}
+      >
+        <Typography fontSize={14}>+{group.attendants.length - 1}</Typography>
+      </Box>
+    );
+  }, [group.attendants.length]);
+  return (
+    <NextLink
+      href={paths.groupMessage(group.id)}
+      bgcolor={(theme) => (isSelected ? theme.palette.action.hover : undefined)}
+    >
+      <Stack
+        direction='row'
+        spacing={1}
+        p={1}
+        alignItems='center'
+        sx={(theme) => ({
+          ':hover': {
+            bgcolor: theme.palette.action.hover,
+          },
+        })}
+      >
+        <Badge
+          badgeContent={renderedAttendants}
+          overlap='circular'
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          // variant='dot'
+        >
+          <Avatar
+            src={otherUser.profile_image?.small || otherUser.profile_image?.url}
+          />
+        </Badge>
+        <Stack>
+          <Stack direction='row' spacing={1} alignItems='center'>
+            <Typography fontWeight='bold' variant='h6' color='textPrimary'>
+              {otherUser.nickname}
+            </Typography>
+            {lastMessageDate && (
+              <>
+                <Typography color='textPrimary'>·</Typography>
+                <Typography
+                  component='span'
+                  variant='subtitle2'
+                  color='textDisabled'
+                >
+                  {lastMessageDate}
+                </Typography>
+              </>
+            )}
+          </Stack>
+          <Typography color='textDisabled'>
+            <Typography component='span'>{lastMessage}</Typography>
+          </Typography>
+        </Stack>
+      </Stack>
+    </NextLink>
+  );
+};
+
 const MessageGroupItem: React.FC<{
   group: MessageGroup;
   me: User;
@@ -123,7 +222,13 @@ const MessageGroupItem: React.FC<{
         isSelected={isSelected}
       />
     );
-  return <></>;
+  return (
+    <GroupMessageSimpleViewer
+      group={atomGroup.group}
+      me={me}
+      isSelected={isSelected}
+    />
+  );
 };
 
 export const MessageGroupListViewer: React.FC<{
