@@ -80,6 +80,7 @@ const Home = () => {
             key='global'
             getter={API.Posts.post.getGlobalTimeline}
             type='global'
+            fetchNew={fetchNew}
           />,
           <PostTimeline
             key='followings'
