@@ -104,87 +104,12 @@ const Home = () => {
                 />
                 <DraftEditor onPost={onPost} additionalWidth={-48} />
               </Box>
-              <Divider sx={{ mt: 1, width: '100%' }} flexItem />
+              <Divider sx={{ my: 1, width: '100%' }} flexItem />
             </>
           )
         }
         pannelProps={{ sx: { p: 0 } }}
       />
-      {/* <TabContext value={user ? tabValue.get : '1'}>
-        <Box
-          sx={{
-            borderBottom: 1,
-            borderColor: 'divider',
-            position: 'sticky',
-            top: 0,
-            backdropFilter: 'blur(5px)',
-            zIndex: 2,
-          }}
-        >
-          <TabList
-            onChange={handleChange}
-            aria-label='lab API tabs example'
-            sx={{
-              button: { minWidth: '50%' },
-              borderLeftWidth: '0px',
-              borderRightWidth: '0px',
-              borderBottomWidth: '0px',
-              borderTopWidth: '0px',
-              borderStyle: 'solid',
-              borderColor: theme.palette.divider,
-            }}
-          >
-            <Tab
-              label='추천'
-              value='1'
-              onClick={(e) => {
-                if (e.currentTarget.tabIndex !== 0) return;
-                setScrollPosition({ key: 'global', value: 0 });
-              }}
-            />
-            <Tab
-              label='팔로우 중'
-              value='2'
-              onClick={(e) => {
-                if (e.currentTarget.tabIndex !== 0) return;
-                setScrollPosition({ key: 'followings', value: 0 });
-              }}
-            />
-          </TabList>
-        </Box>
-        <TabPanel
-          value='1'
-          sx={{
-            p: 0,
-          }}
-        >
-          <PostTimeline
-            getter={API.Posts.post.getGlobalTimeline}
-            type='global'
-          />
-        </TabPanel>
-        <TabPanel
-          value='2'
-          sx={{
-            p: 0,
-            pt: 2,
-          }}
-        >
-          <Box px={isMd ? 2 : 1} display='flex' flexDirection='row'>
-            <Avatar
-              sx={{ mr: 1 }}
-              src={user?.profile_image?.small || user?.profile_image?.url}
-            />
-            <DraftEditor onPost={onPost} additionalWidth={-48} />
-          </Box>
-          <Divider sx={{ mb: 1 }} />
-          <PostTimeline
-            getter={API.Posts.post.getFollowingTimeline}
-            type='followings'
-            fetchNew={fetchNew}
-          />
-        </TabPanel>
-      </TabContext> */}
     </Box>
   );
 };

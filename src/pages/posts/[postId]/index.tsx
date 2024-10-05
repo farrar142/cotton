@@ -47,4 +47,4 @@ PostDetailPage.getInitialProps = getInitialPropsWrapper(
     })
 );
 
-export default ClientOnlyHOC(PostDetailPage);
+export default PostDetailPage;
