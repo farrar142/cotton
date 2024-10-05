@@ -81,6 +81,7 @@ export const PostDetailItem: React.FC<{ post: Post }> = ({ post: _post }) => {
         getter={API.Posts.post.getReplies(post.id)}
         type={`${post.id}/replies`}
         disableLatestRepost
+        pollingWhenEmpty={false}
         fetchNew={fetchChild}
       />
     </Stack>

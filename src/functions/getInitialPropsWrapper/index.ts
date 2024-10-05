@@ -9,7 +9,7 @@ const getUser = () => {
   return new Promise<User | undefined>((res, rej) =>
     API.Users.me()
       .then(({ data }) => res(data))
-      .catch(() => res(undefined))
+      .catch((e) => e)
   );
 };
 

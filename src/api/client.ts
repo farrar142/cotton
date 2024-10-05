@@ -74,10 +74,7 @@ export class AxiosWrapper {
       return this.userNotFound(error);
     if (error.response?.data?.code === 'invalid_token')
       return this.invalidToken(error);
-    if (
-      error.response?.data?.code === 'token_not_valid' &&
-      error.response?.status === 401
-    ) {
+    if (error.response?.status === 401) {
       return this.tokenNotValid(error);
     }
     throw error;

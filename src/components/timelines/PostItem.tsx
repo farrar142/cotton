@@ -1,8 +1,13 @@
 import API from '#/api';
 import { Post } from '#/api/posts';
+import { User } from '#/api/users/types';
+import {
+  useCurrentPostData,
+  usePostData,
+  useSetPostData,
+} from '#/hooks/posts/usePostData';
 import { useRouter } from '#/hooks/useCRouter';
 import { useObserver } from '#/hooks/useObserver';
-import { usePostWrite } from '#/hooks/usePostWrite';
 import { useUserProfile } from '#/hooks/useUser';
 import paths from '#/paths';
 import DraftEditor from '#/PostWriter/DraftEditor';
@@ -19,24 +24,11 @@ import {
   useTheme,
 } from '@mui/material';
 import React, { MouseEventHandler, useEffect, useRef } from 'react';
-import {
-  atomFamily,
-  DefaultValue,
-  selectorFamily,
-  useRecoilState,
-  useSetRecoilState,
-} from 'recoil';
+import { ProfilePopper } from '../layouts/pages/ProfilePage/ProfilePopper';
 import NextLink from '../NextLink';
 import { ImageViewer } from './ImageViewer';
 import { PickBoolean, useOverrideAtom } from './postActionAtoms';
 import { PostItemToolbar } from './PostItemToolbar';
-import {
-  useCurrentPostData,
-  usePostData,
-  useSetPostData,
-} from '#/hooks/posts/usePostData';
-import { User } from '#/api/users/types';
-import { ProfilePopper } from '../layouts/pages/ProfilePage/ProfilePopper';
 
 const _PostItem: React.FC<{
   post: Post;

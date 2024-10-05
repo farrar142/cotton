@@ -26,6 +26,7 @@ export const useTimelinePagination = <T extends { id: number }>({
   apiKey,
   params = {},
   disablePrevfetch = false,
+  pollingWhenEmpty = true,
 }: {
   func: (
     params?: {},
@@ -34,6 +35,7 @@ export const useTimelinePagination = <T extends { id: number }>({
   apiKey: string;
   params?: {};
   disablePrevfetch?: boolean;
+  pollingWhenEmpty?: boolean;
 }) => {
   const createKey = () =>
     `${apiKey}:${Object.entries(params)
@@ -52,16 +54,15 @@ export const useTimelinePagination = <T extends { id: number }>({
   useEffect(() => {
     if (pages.length !== 0) return;
     //데이터가 없을 시 생길때까지 계속 패치
-    const interval = setInterval(
-      () =>
-        func(params).then((r) => {
-          if (r.data.results.length !== 0) {
-            setPages((p) => [...p, r.data]);
-            return clearInterval(interval);
-          }
-        }),
-      5000
-    );
+    const interval = setInterval(() => {
+      if (!pollingWhenEmpty) return;
+      func(params).then((r) => {
+        if (r.data.results.length !== 0) {
+          setPages((p) => [...p, r.data]);
+          return clearInterval(interval);
+        }
+      });
+    }, 5000);
     func(params).then((r) => {
       if (r.data.results.length !== 0) {
         setPages((p) => [...p, r.data]);

@@ -35,12 +35,14 @@ export const PostTimeline: React.FC<{
   disableLatestRepost?: boolean;
   params?: {};
   fetchNew?: MutableRefObject<() => void>;
+  pollingWhenEmpty?: boolean;
 }> = ({
   getter,
   type,
   keepScrollPosition = true,
   showParent = false,
   disableLatestRepost = false,
+  pollingWhenEmpty = true,
   params = {},
   fetchNew,
 }) => {
@@ -56,6 +58,7 @@ export const PostTimeline: React.FC<{
     func: getter,
     apiKey: type,
     params,
+    pollingWhenEmpty,
   });
 
   const observer = useObserver();

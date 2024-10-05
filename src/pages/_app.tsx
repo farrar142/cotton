@@ -86,16 +86,17 @@ const ExternalTokenHandler: React.FC<CustomAppProps['pageProps']> = (
   return <></>;
 };
 const UserHandler: React.FC<CustomAppProps['pageProps']> = (pageProps) => {
-  console.log(pageProps);
   //@ts-ignore
   const [user, setUser] = useUser(pageProps?.user);
   useEffect(() => {
     if (user) return;
-    const { access } = API.client.instance.getTokens();
-    if (!access) return;
-    API.Users.me().then(({ data }) => {
-      setUser(data);
-    });
+    const { access, refresh } = API.client.instance.getTokens();
+    if (!(access || refresh)) return;
+    API.Users.me()
+      .then(({ data }) => {
+        setUser(data);
+      })
+      .catch(() => {});
   }, []);
   return <></>;
 };
