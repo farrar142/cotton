@@ -1,6 +1,6 @@
 import API from '#/api';
 import { Message } from '#/api/chats';
-import useUser from '#/hooks/useUser';
+import useUser, { useAuthToken } from '#/hooks/useUser';
 import { WS } from '#/utils/websockets';
 import React, { useEffect, useRef } from 'react';
 import {
@@ -12,6 +12,7 @@ import { useInComingNotificationList } from './layouts/pages/Notifications/Notif
 import { NotificationType } from '#/api/notifications';
 import useValue from '#/hooks/useValue';
 import { Button } from '@mui/material';
+import { client } from '#/api/client';
 
 type WSMessageEvent = {
   type: 'message';
@@ -21,7 +22,11 @@ type WSNotificationEvent = {
   type: 'notification';
   notification: NotificationType;
 };
-type WSEvent = WSMessageEvent | WSNotificationEvent;
+type WSAuthorizationEvent = {
+  type: 'authorization';
+  result: false;
+};
+type WSEvent = WSMessageEvent | WSNotificationEvent | WSAuthorizationEvent;
 
 const useMessageEventListener = (user: User) => {
   const [_, setInComingMessage] = useInComingMessages(user);
@@ -57,17 +62,28 @@ const useNotificationEventListener = (user: User) => {
 export const WebsocketEventListener: React.FC<{ user: User }> = ({ user }) => {
   const { onMessageReceived } = useMessageEventListener(user);
   const { onNotificationReceived } = useNotificationEventListener(user);
+  const [token] = useAuthToken();
   const watingReconnect = useValue(false);
   const waiting = useRef(1000);
 
   useEffect(() => {
     if (!user) return;
+    if (!token.access) return;
     const ws = new WS<WSEvent>(`/ws/users/${user.id}/`);
-    ws.onopen = () => {};
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ access: `${token.access}` }));
+    };
     ws.parseMessage((event) => {
+      console.log(event);
       if (event.type === 'message') onMessageReceived(event.message);
       else if (event.type === 'notification')
         onNotificationReceived(event.notification);
+      else if (event.type === 'authorization') {
+        if (!event.result) {
+          ws.onclose = () => {};
+          ws.close();
+        }
+      }
     });
     ws.onclose = () => {
       setTimeout(() => {
@@ -81,6 +97,6 @@ export const WebsocketEventListener: React.FC<{ user: User }> = ({ user }) => {
       ws.onclose = () => {};
       ws.close();
     };
-  }, [user?.id, watingReconnect.get]);
+  }, [user?.id, watingReconnect.get, token.access]);
   return <></>;
 };

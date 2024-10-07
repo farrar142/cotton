@@ -3,7 +3,7 @@ import { User } from '#/api/users/types';
 import CommonLayout from '#/components/layouts/CommonLayout';
 import { WebsocketEventListener } from '#/components/WebsocketEventListener';
 import { useMentionColor } from '#/hooks/useMentionColor';
-import useUser from '#/hooks/useUser';
+import useUser, { useTokenWatcher } from '#/hooks/useUser';
 import customTheme, { useDarkMode } from '#/styles';
 import '#/styles/globals.css';
 import { Box, createTheme, CssBaseline, ThemeProvider } from '@mui/material';
@@ -66,6 +66,7 @@ function ProviderWrapper(props: CustomAppProps) {
 const ExternalTokenHandler: React.FC<CustomAppProps['pageProps']> = (
   pageProps
 ) => {
+  useTokenWatcher();
   useEffect(() => {
     if (pageProps.error) return;
     if (pageProps.tokens === undefined) return;

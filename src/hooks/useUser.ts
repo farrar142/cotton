@@ -1,15 +1,19 @@
 import API from '#/api';
 import { User } from '#/api/users/types';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import {
   atom,
   atomFamily,
   DefaultValue,
   selectorFamily,
   useRecoilState,
-  useRecoilValue,
 } from 'recoil';
 import { useRouter } from './useCRouter';
+
+const tokenAtom = atom<{ access: string; refresh: string }>({
+  key: 'tokenAtom',
+  default: { access: '', refresh: '' },
+});
 
 const userAtom = atomFamily<User | null, number | undefined>({
   key: 'userAtom',
@@ -31,18 +35,33 @@ const userSelector = selectorFamily<User | null, number>({
       set(userAtom(username), newValue);
     },
 });
-
-const useTokenWatcher = () => {
+export const useAuthToken = () => {
+  return useRecoilState(tokenAtom);
+};
+export const useTokenWatcher = () => {
   const [user, setUser] = useRecoilState(userAtom(undefined));
-
+  const [token, setToken] = useAuthToken();
+  // const userId = useRef<undefined | number>(undefined);
+  const userId = useMemo(() => user?.id, [user?.id]);
   useEffect(() => {
     if (!user) return;
+    console.log('hook called', user);
     const interval = setInterval(() => {
       const { access, refresh } = API.client.instance.getTokens();
-      if (!access) setUser(null);
+      setToken({ access, refresh });
+      if (!access) {
+        setUser(null);
+        setToken({ access: '', refresh: '' });
+      }
     }, 1000);
     return () => clearInterval(interval);
-  }, [user]);
+  }, [userId]);
+
+  useEffect(() => {
+    return () => {
+      console.log('un mounted');
+    };
+  }, []);
 };
 
 //클라이언트사이드에서만 이용되어야됨. 중복요청방지
@@ -75,7 +94,6 @@ export const useFetchedProfile = (
 export const useUserProfile = (profile: User) => {
   const [me, setMe] = useRecoilState(userAtom(undefined));
   const [user, setUser] = useRecoilState(userSelector(profile.id));
-  useTokenWatcher();
 
   useEffect(() => {
     if (user) return;
@@ -102,7 +120,6 @@ export const useUserProfile = (profile: User) => {
 const useUser = (user?: User) => {
   const router = useRouter();
   const [_user, setUser] = useRecoilState(userAtom(undefined));
-  useTokenWatcher();
   useEffect(() => {
     if (!user) return;
     setUser(user);
