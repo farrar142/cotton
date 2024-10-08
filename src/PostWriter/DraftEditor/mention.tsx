@@ -59,7 +59,7 @@ export const MentionEntry: React.FC<EntryComponentProps> = (props) => {
       onMouseUp={onMouseUp}
       onMouseEnter={onMouseEnter}
       onClick={onMouseDown}
-      sx={{ minWidth: '300px', width: _theme.breakpoints.values.sm }}
+      sx={{ minWidth: '300px', width: _theme.breakpoints.values.xs }}
     >
       {/**@ts-ignore */}
       <SimpleProfileItem profile={mention} isFocused={isFocused} />
