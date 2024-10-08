@@ -13,6 +13,7 @@ export type MessageGroupUpsert = {
 
 export type MessageGroup = {
   id: number;
+  title?: string;
   is_direct_message: boolean;
   attendants: User[];
   inComingMessages?: Message[];

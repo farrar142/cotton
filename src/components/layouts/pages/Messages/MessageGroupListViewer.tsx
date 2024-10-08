@@ -114,8 +114,8 @@ const GroupMessageSimpleViewer: React.FC<{
   me: User;
   isSelected: boolean;
 }> = ({ group, me, isSelected }) => {
-  const otherUser = useMemo(
-    () => group.attendants.filter((user) => user.id !== me.id)[0],
+  const otherUsers = useMemo(
+    () => group.attendants.filter((user) => user.id !== me.id),
     [group]
   );
   const lastMessageDate = useMemo(() => {
@@ -154,6 +154,11 @@ const GroupMessageSimpleViewer: React.FC<{
       </Box>
     );
   }, [group.attendants.length]);
+
+  const title = useMemo(() => {
+    if (group.title) return group.title;
+    return otherUsers.map((u) => u.nickname).join(',');
+  }, [otherUsers]);
   return (
     <NextLink
       href={paths.groupMessage(group.id)}
@@ -177,13 +182,16 @@ const GroupMessageSimpleViewer: React.FC<{
           // variant='dot'
         >
           <Avatar
-            src={otherUser.profile_image?.small || otherUser.profile_image?.url}
+            src={
+              otherUsers[0].profile_image?.small ||
+              otherUsers[0].profile_image?.url
+            }
           />
         </Badge>
         <Stack>
           <Stack direction='row' spacing={1} alignItems='center'>
             <Typography fontWeight='bold' variant='h6' color='textPrimary'>
-              {otherUser.nickname}
+              {title}
             </Typography>
             {lastMessageDate && (
               <>
