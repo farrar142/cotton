@@ -1,4 +1,4 @@
-import { Avatar, Box, Divider, useTheme } from '@mui/material';
+import { Avatar, Box, Button, Divider, useTheme } from '@mui/material';
 
 import DraftEditor, { DraftOnPost } from '#/PostWriter/DraftEditor';
 import API from '#/api';
@@ -13,6 +13,8 @@ import { SyntheticEvent, useRef } from 'react';
 import { atom, useRecoilState } from 'recoil';
 import { recoilPersist } from 'recoil-persist';
 import React from 'react';
+import { useRouter } from '#/hooks/useCRouter';
+import { URL } from 'url';
 
 const { persistAtom } = recoilPersist();
 // import PostWriter from '#/PostWriter';
@@ -51,7 +53,7 @@ const Home = () => {
       .onPost(text, blocks, images)
       .then(() => fetchNew.current());
   };
-
+  const router = useRouter();
   return (
     <Box sx={{}}>
       <CommonTab

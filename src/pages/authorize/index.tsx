@@ -39,10 +39,10 @@ const AuthorizationPage: ExtendedNextPage<{ code_key: string }> = ({
   return <div>{`${code_key}`}</div>;
 };
 
+//@ts-ignore
 AuthorizationPage.getInitialProps = getInitialPropsWrapper(
   async ({ query }) => {
-    const code_key = `${query.code_key}`;
-    return { code_key };
+    return { ...query };
   }
 );
 

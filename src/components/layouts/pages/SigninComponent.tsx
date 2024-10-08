@@ -19,6 +19,8 @@ import TextInput, { ErrorTypeMap } from '#/components/inputs/TextInput';
 import { client } from '#/api/client';
 import useUser from '#/hooks/useUser';
 import { useRouter } from '#/hooks/useCRouter';
+import KakaoLogin from '/public/kakao_login.png';
+import Image from 'next/image';
 
 const SigninComponent: React.FC<{ onClose: () => void; open?: boolean }> = ({
   open = true,
@@ -63,6 +65,25 @@ const SigninComponent: React.FC<{ onClose: () => void; open?: boolean }> = ({
   };
   const onSendEmail = () => {
     API.Auth.send_email(tokens.get).then(() => tabValue.set('4'));
+  };
+  const kakaoLoginUrl = () => {
+    const arg = {
+      host: 'https://kauth.kakao.com/oauth/authorize',
+      query: {
+        client_id: process.env.NEXT_PUBLIC_KAKAO_CLIENT_KEY,
+        scope: 'profile_nickname',
+        prompt: 'login,select_account',
+        redirect_uri: `${location.origin}/authorize/kakao`,
+        response_type: 'code',
+      },
+    };
+    const url =
+      arg.host +
+      '?' +
+      Object.entries(arg.query)
+        .map(([k, v]) => `${k}=${v}`)
+        .join('&');
+    return url;
   };
   return (
     <Dialog
@@ -124,6 +145,15 @@ const SigninComponent: React.FC<{ onClose: () => void; open?: boolean }> = ({
                 />
                 <Button variant='contained' fullWidth type='submit'>
                   Login
+                </Button>
+                <Button
+                  fullWidth
+                  sx={{ px: 0, py: 0 }}
+                  onClick={() => {
+                    location.href = kakaoLoginUrl();
+                  }}
+                >
+                  <img src={KakaoLogin.src} alt='' height={36.5} width='100%' />
                 </Button>
                 <Button
                   variant='outlined'

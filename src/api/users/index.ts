@@ -5,6 +5,11 @@ import { User, UserUpsert } from './types';
 type StringMap<Keys extends string[]> = Record<Keys[number], string>;
 
 export const Auth = {
+  kakaosignin: (params: StringMap<['code', 'redirect_uri']>) =>
+    client.post<StringMap<['access', 'refresh']>>(
+      '/auth/kakao/signin/',
+      params
+    ),
   signup: (params: StringMap<['email', 'username', 'password', 'password2']>) =>
     client.post<StringMap<['access', 'refresh']>>('/auth/signup/', params),
   signin: (params: StringMap<['email', 'password']>) =>

@@ -7,6 +7,7 @@ declare global {
     interface ProcessEnv {
       NEXT_PUBLIC_BACKEND_URL: string;
       NEXT_PUBLIC_BACKEND_HOST: string;
+      NEXT_PUBLIC_KAKAO_CLIENT_KEY: string;
     }
   }
   type ExtendedNextPage<
