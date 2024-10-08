@@ -27,7 +27,12 @@ import {
 } from './MessageGroupAtom';
 import { MessgeItem } from './MessageItem';
 import { MergedMessage } from './types';
-import { ArrowBack, InfoOutlined, Settings } from '@mui/icons-material';
+import {
+  ArrowBack,
+  ArrowDownward,
+  InfoOutlined,
+  Settings,
+} from '@mui/icons-material';
 import paths from '#/paths';
 import NextLink from '#/components/NextLink';
 import { glassmorphism } from '#/styles';
@@ -64,6 +69,7 @@ export const MessageViewer: React.FC<{
 
   const typedMessage = useValue<Message[]>([]);
   const isNewMessage = useValue(false);
+  const showDownButton = useValue(false);
 
   const isScrollDown = () => {
     if (!chatBoxRef.current) return false;
@@ -160,6 +166,18 @@ export const MessageViewer: React.FC<{
     return () => c.removeEventListener('scroll', isNewMessageButtonShowCheck);
   }, [isNewMessage.get]);
 
+  useEffect(() => {
+    //화면 맨아래로 버튼을 띄우는 로직
+    if (!chatBoxRef.current) return;
+    const isDownButtonShowCheck = () => {
+      if (isScrollDown()) return showDownButton.set(false);
+      showDownButton.set(true);
+    };
+    const c = chatBoxRef.current;
+    c.addEventListener('scroll', isDownButtonShowCheck);
+    return () => c.removeEventListener('scroll', isDownButtonShowCheck);
+  }, []);
+
   const lastScrollHeight = useRef(0);
   useEffect(() => {
     //이전 메세지 로딩시 스크롤 유지
@@ -246,6 +264,22 @@ export const MessageViewer: React.FC<{
         {combinedMessages.map((m) => (
           <MessgeItem key={m.identifier} messages={m} me={user} />
         ))}
+        {showDownButton.get && (
+          <Box
+            position='sticky'
+            bottom='5%'
+            display='flex'
+            justifyContent='center'
+            onClick={() => {
+              scrollToDown();
+              showDownButton.set(false);
+            }}
+          >
+            <IconButton>
+              <ArrowDownward />
+            </IconButton>
+          </Box>
+        )}
         {isNewMessage.get && (
           <Box
             position='sticky'
