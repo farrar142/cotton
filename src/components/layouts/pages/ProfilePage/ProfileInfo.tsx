@@ -40,11 +40,13 @@ const HiddenInput = styled('input')({
 
 const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
   const [user, setUser] = useUser();
+  const router = useRouter();
   const theme = useTheme();
   const isUploading = useValue(false);
   if (!user) return <></>;
   //텍스트 값
   const nickname = useValue(user.nickname);
+  const username = useValue(user.username);
   const bio = useValue(user.bio);
   //이미지 값
   const profileRef = createRef<HTMLInputElement>();
@@ -96,6 +98,7 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
       bio: bio.get,
       profile_image: newProfileImage.get,
       header_image: newHeaderImage.get,
+      username: username.get,
     };
     console.log(params);
     const filtered = Object.entries(params).filter(
@@ -111,6 +114,11 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
         if (newHeaderImage.get) headerImage.set(newHeaderImage.get);
         newProfileImage.set(undefined);
         headerImage.set(undefined);
+      })
+      .then(() => {
+        if (user.username !== username.get) {
+          router.push(paths.mypage(username.get));
+        }
       })
       .finally(() => {
         isUploading.set(false);
@@ -142,7 +150,7 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
                   <Close />
                 </IconButton>
                 <Box flex={1}>
-                  <Typography>프로필 수정</Typography>
+                  <Typography>Edit Profile</Typography>
                 </Box>
                 <Button
                   variant='contained'
@@ -150,7 +158,7 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
                   disabled={isUploading.get}
                   onClick={onPost}
                 >
-                  저장
+                  Save
                 </Button>
               </Stack>
               {/**헤더 이미지 */}
@@ -237,6 +245,12 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
                 size='small'
                 value={nickname.get}
                 onChange={nickname.onTextChange}
+              />
+              <TextInput
+                label={`Username @${username.get}`}
+                size='small'
+                value={username.get}
+                onChange={username.onTextChange}
               />
               <TextInput
                 label='Bio'
