@@ -201,7 +201,7 @@ const DraftEditor: React.FC<
         'div[role="listbox"]': {
           py: 0.5,
           minWidth: '300px',
-          width: '300px',
+          width: theme.breakpoints.values.xs,
           div: {
             cursor: 'pointer',
           },
