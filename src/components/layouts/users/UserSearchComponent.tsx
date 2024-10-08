@@ -11,15 +11,16 @@ import { SystemStyleObject } from '@mui/system/styleFunctionSx';
 
 export const UserSearchComponent: React.FC<{
   search: string;
+  user_id__isnot?: number;
   onClick?: (user: User) => void;
   itemStyle?: (theme: Theme) => SystemStyleObject<Theme>;
-}> = ({ search, onClick, itemStyle }) => {
+}> = ({ search, user_id__isnot, onClick, itemStyle }) => {
   const router = useRouter();
   const fetchBlockRef = useRef<HTMLElement>();
   const observer = useObserver();
   const { data: users, fetchNext } = useCursorPagination({
     getter: API.Users.users,
-    params: { search },
+    params: { search, user_id__isnot },
     apiKey: 'userSearch',
   });
 
