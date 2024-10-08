@@ -147,10 +147,10 @@ const DraftEditor: React.FC<
     });
 
     const { MentionSuggestions } = mentionPlugin;
-    mentionPlugin.decorators = [
-      ...(mentionPlugin.decorators || []),
-      textLimitDecorator(300),
-    ];
+    mentionPlugin.decorators = [...(mentionPlugin.decorators || [])];
+    if (!readOnly) {
+      mentionPlugin.decorators.push(textLimitDecorator(300));
+    }
     const imagePlugin = createImagePlugin();
     const plugins = [mentionPlugin, imagePlugin];
     return { plugins, MentionSuggestions };
