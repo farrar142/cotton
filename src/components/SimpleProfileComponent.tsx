@@ -92,17 +92,22 @@ export const SimpleProfileItem: React.FC<{
         <Link href={paths.mypage(profile.username)} flex={1}>
           <Stack spacing={-0.5}>
             <Typography color='textPrimary'>{profile.nickname}</Typography>
-            <Typography color='textDisabled'>@{profile.username}</Typography>
-            {profile.is_mutual_follow && (
-              <Typography
-                color='text.disabled'
-                display='flex'
-                alignItems='center'
-              >
-                <Person fontSize='small' />
-                나와 서로 팔로우하고 있습니다.
+            <Stack direction='row' spacing={1}>
+              <Typography color='textDisabled' component='span'>
+                @{profile.username}
               </Typography>
-            )}
+              {profile.is_mutual_follow && (
+                <Typography
+                  color='text.disabled'
+                  display='flex'
+                  alignItems='center'
+                  component='span'
+                >
+                  <Person fontSize='small' />
+                  나와 서로 팔로우하고 있습니다.
+                </Typography>
+              )}
+            </Stack>
           </Stack>
         </Link>
         {!isMyProfile && (

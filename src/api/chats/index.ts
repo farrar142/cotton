@@ -49,6 +49,10 @@ class MessageAPIGenerator extends GenericAPI<
     const endpoint = this.getEndpoint('/create/');
     return this.client.post<MessageGroup>(endpoint, data);
   };
+  changeTitle = (id: number | string, title: string) => {
+    const endpoint = this.getEndpoint(`/${id}/change_title/`);
+    return this.client.patch<SimpleResponse>(endpoint, { title });
+  };
   sendMessage = (id: number | string, message: string, identifier: string) => {
     const endpoint = this.getEndpoint(`/${id}/send_message/`);
     return this.client.post<{ is_success: boolean }>(endpoint, {

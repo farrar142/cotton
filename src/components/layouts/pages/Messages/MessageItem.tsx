@@ -17,7 +17,12 @@ export const MessgeItem: React.FC<{ messages: MergedMessage; me: User }> = ({
   const isMyMessage = user?.id === me.id;
   if (!user) return <></>;
   return (
-    <Stack direction={isMyMessage ? 'row-reverse' : 'row'} spacing={1} pb={2}>
+    <Stack
+      direction={isMyMessage ? 'row-reverse' : 'row'}
+      spacing={1}
+      pb={2}
+      px={1}
+    >
       {isMyMessage ? (
         <></>
       ) : (

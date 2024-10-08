@@ -69,11 +69,22 @@ export const useMessageGroupList = (user: User) => {
       return [...p, ...notAdded];
     });
   };
+  const replaceGroup = (newGroup: MessageGroup) => {
+    setOriginGroup((p) => {
+      if (p.find((g) => g.id === newGroup.id)) {
+        return p.map((pg) => {
+          if (pg.id === newGroup.id) return newGroup;
+          return pg;
+        });
+      }
+      return [...p, newGroup];
+    });
+  };
 
   useEffect(() => {
     groupListRef.current = groupList;
   }, [groupList]);
-  return { groupList, handleGroupList, groupListRef };
+  return { groupList, handleGroupList, replaceGroup, groupListRef };
 };
 //메시지 그룹아톰에서 특정한 그룹을 가져오는 셀렉터
 const messageGroupAtomSelector = selectorFamily<

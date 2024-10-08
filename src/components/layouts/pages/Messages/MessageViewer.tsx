@@ -1,32 +1,39 @@
+import API from '#/api';
 import { Message, MessageGroup } from '#/api/chats';
 import { User } from '#/api/users/types';
-import React, { FormEventHandler, useEffect, useMemo, useRef } from 'react';
-import moment from 'moment';
-import API from '#/api';
-import { v4 as uuid } from 'uuid';
 import TextInput from '#/components/inputs/TextInput';
 import { useCursorPagination } from '#/hooks/paginations/useCursorPagination';
 import { useDebouncedFunction } from '#/hooks/useDebouncedEffect';
-import useMediaSize from '#/hooks/useMediaSize';
 import { useObserver } from '#/hooks/useObserver';
 import { useUserProfile } from '#/hooks/useUser';
 import useValue from '#/hooks/useValue';
 import { filterDuplicate } from '#/utils/arrays';
-import { WS } from '#/utils/websockets';
 import {
-  Stack,
   Box,
-  CircularProgress,
   Button,
+  CircularProgress,
   Divider,
-  useTheme,
+  IconButton,
+  Stack,
+  Typography,
 } from '@mui/material';
-import { MessgeItem } from './MessageItem';
-import { MergedMessage } from './types';
+import moment from 'moment';
+import React, { FormEventHandler, useEffect, useMemo, useRef } from 'react';
+import { v4 as uuid } from 'uuid';
 import {
+  MessageGroupWithInCommingMessages,
   useMessageGroupItem,
   useUnreadedMessagesCount,
 } from './MessageGroupAtom';
+import { MessgeItem } from './MessageItem';
+import { MergedMessage } from './types';
+import { ArrowBack, InfoOutlined, Settings } from '@mui/icons-material';
+import paths from '#/paths';
+import NextLink from '#/components/NextLink';
+import { glassmorphism } from '#/styles';
+import { TabContext, TabPanel } from '@mui/lab';
+import { SimpleProfileItem } from '#/components/SimpleProfileComponent';
+import { usePromiseState } from '#/hooks/usePromiseState';
 
 const getYearToMinuteString = (isostring: string) =>
   moment(isostring).format('YYYY-MM-DD-hh-mm');
@@ -37,12 +44,12 @@ const createDefaultMergedMessage = (message: Message) => ({
   minuteString: getYearToMinuteString(message.created_at),
 });
 
-export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
-  group: _group,
-  user: profile,
-}) => {
+export const MessageViewer: React.FC<{
+  profile: User;
+  group: MessageGroupWithInCommingMessages;
+  onPanelChange: () => void;
+}> = ({ profile, group, onPanelChange }) => {
   const [user] = useUserProfile(profile);
-  const { group } = useMessageGroupItem(_group, user);
 
   const fetchBlock = useRef<HTMLElement>();
   const chatBoxRef = useRef<HTMLDivElement | null>(null);
@@ -178,74 +185,191 @@ export const MessageViewer: React.FC<{ group: MessageGroup; user: User }> = ({
   }, [group.inComingMessages.length]);
 
   return (
-    <Stack direction='row' minHeight='100vh' height='100vh' maxWidth='100%'>
-      <Box
-        // minWidth={isMd ? undefined : theme.breakpoints.values.sm}
-        width='100%'
-        height='100%'
-        display='flex'
-        flexDirection='column'
-        component='form'
-        onSubmit={onMessageSend}
-        sx={{
-          borderColor: 'divider',
-          borderWidth: 1,
-          borderStyle: 'solid',
-          borderBottomWidth: 0,
-        }}
+    <Box
+      // minWidth={isMd ? undefined : theme.breakpoints.values.sm}
+      width='100%'
+      height='100%'
+      display='flex'
+      flexDirection='column'
+      component='form'
+      onSubmit={onMessageSend}
+      sx={{
+        borderColor: 'divider',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderBottomWidth: 0,
+      }}
+    >
+      <Stack
+        flex={1}
+        spacing={1}
+        position='relative'
+        overflow='scroll'
+        className='hide-scrollbar'
+        ref={chatBoxRef}
       >
         <Stack
-          flex={1}
+          position='sticky'
+          top={0}
+          width='100%'
+          direction='row'
+          alignItems='center'
+          px={1}
           spacing={1}
-          position='relative'
-          overflow='scroll'
-          className='hide-scrollbar'
-          ref={chatBoxRef}
-          p={1}
+          sx={glassmorphism}
         >
-          <Box flex={1} />
-          {hasNextPage && (
-            <>
-              <Box display='flex' justifyContent='center'>
-                <CircularProgress />
-              </Box>
-              <Box ref={fetchBlock} height={200}></Box>
-            </>
-          )}
-          {combinedMessages.map((m) => (
-            <MessgeItem key={m.identifier} messages={m} me={user} />
-          ))}
-          {isNewMessage.get && (
-            <Box
-              position='sticky'
-              bottom='5%'
-              display='flex'
-              justifyContent='center'
-              onClick={() => {
-                scrollToDown();
-                isNewMessage.set(false);
+          <NextLink href={paths.groupMessages}>
+            <IconButton>
+              <ArrowBack />
+            </IconButton>
+          </NextLink>
+          <Typography flex={1}>
+            {group.title ||
+              group.attendants
+                .filter((u) => u.id !== user?.id)
+                .map((u) => u.nickname)
+                .join(', ')}
+          </Typography>
+          <IconButton onClick={onPanelChange}>
+            <InfoOutlined />
+          </IconButton>
+        </Stack>
+        <Box flex={1} />
+        {hasNextPage && (
+          <>
+            <Box display='flex' justifyContent='center'>
+              <CircularProgress />
+            </Box>
+            <Box ref={fetchBlock} height={200}></Box>
+          </>
+        )}
+        {combinedMessages.map((m) => (
+          <MessgeItem key={m.identifier} messages={m} me={user} />
+        ))}
+        {isNewMessage.get && (
+          <Box
+            position='sticky'
+            bottom='5%'
+            display='flex'
+            justifyContent='center'
+            onClick={() => {
+              scrollToDown();
+              isNewMessage.set(false);
+            }}
+          >
+            <Button
+              variant='contained'
+              sx={{
+                maxWidth: 128,
               }}
             >
-              <Button
-                variant='contained'
-                sx={{
-                  maxWidth: 128,
-                }}
-              >
-                새 메세지 보기
-              </Button>
-            </Box>
-          )}
-        </Stack>
-        <Divider />
+              새 메세지 보기
+            </Button>
+          </Box>
+        )}
+      </Stack>
+      <Divider />
+      <TextInput
+        label='새 쪽지 작성하기'
+        value={message.get}
+        onChange={message.onTextChange}
+        size='small'
+      />
+      <Button type='submit' sx={{ display: 'none', visibility: 'hidden' }} />
+    </Box>
+  );
+};
+
+export const MessageGroupInfoPanel: React.FC<{
+  group: MessageGroup;
+  profile: User;
+  onPanelChange: () => void;
+}> = ({ group, profile, onPanelChange }) => {
+  const title = useValue(group.title || '');
+  const { done, wrapper } = usePromiseState();
+  const onEditTitle = wrapper(async () => {
+    return API.Messages.message.changeTitle(group.id, title.get);
+  });
+  return (
+    <Stack spacing={1}>
+      <Stack
+        position='sticky'
+        top={0}
+        width='100%'
+        direction='row'
+        alignItems='center'
+      >
+        <IconButton onClick={onPanelChange}>
+          <ArrowBack />
+        </IconButton>
+        <Typography flex={1} variant='h5'>
+          Group Info
+        </Typography>
+      </Stack>
+      <Box px={2} display='flex' flexDirection='row' alignItems='center'>
         <TextInput
-          label='새 쪽지 작성하기'
-          value={message.get}
-          onChange={message.onTextChange}
+          value={title.get}
+          onChange={title.onTextChange}
+          placeholder={group.attendants
+            .filter((u) => u.id !== profile.id)
+            .map((u) => u.nickname)
+            .join(', ')}
           size='small'
+          variant='standard'
+          sx={{ flex: 1 }}
+          slotProps={{ input: { disableUnderline: true } }}
         />
-        <Button type='submit' sx={{ display: 'none', visibility: 'hidden' }} />
+        <Button disabled={!title.get || !done.get} onClick={onEditTitle}>
+          Edit
+        </Button>
       </Box>
+      <Divider />
+      <Stack p={1}>
+        <Typography px={1} pb={2} variant='h5'>
+          Participants
+        </Typography>
+        <Stack>
+          {group.attendants
+            .filter((u) => u.id !== profile.id)
+            .map((user) => (
+              <SimpleProfileItem profile={user} key={user.id} />
+            ))}
+        </Stack>
+      </Stack>
     </Stack>
+  );
+};
+
+export const MessageViewerContainer: React.FC<{
+  group: MessageGroup;
+  user: User;
+}> = ({ group: _group, user: profile }) => {
+  const { group } = useMessageGroupItem(_group, profile);
+  const tabValue = useValue('0');
+  return (
+    <Box minHeight='100vh' height='100vh' maxWidth='100%'>
+      <TabContext value={tabValue.get}>
+        <TabPanel
+          value='0'
+          sx={{ p: 0, minHeight: '100%', height: '100vh', maxWidth: '100%' }}
+        >
+          <MessageViewer
+            group={group}
+            profile={profile}
+            onPanelChange={() => tabValue.set('1')}
+          />
+        </TabPanel>
+        <TabPanel
+          value='1'
+          sx={{ p: 0, minHeight: '100%', height: '100vh', maxWidth: '100%' }}
+        >
+          <MessageGroupInfoPanel
+            group={group}
+            profile={profile}
+            onPanelChange={() => tabValue.set('0')}
+          />
+        </TabPanel>
+      </TabContext>
+    </Box>
   );
 };
