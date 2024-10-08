@@ -68,7 +68,7 @@ export const useTokenWatcher = () => {
 const fetchingMap = new Map<number, boolean>();
 
 export const useFetchedProfile = (
-  profileId: number | string,
+  profileId: number | string | undefined,
   prefetch: boolean = false
 ) => {
   profileId = parseInt(`${profileId}`);
@@ -85,6 +85,7 @@ export const useFetchedProfile = (
       .then(setProfile);
   };
   useEffect(() => {
+    if (profileId === undefined) return;
     if (!prefetch) return;
     fetchUser();
   }, [profileId, profile, prefetch]);
