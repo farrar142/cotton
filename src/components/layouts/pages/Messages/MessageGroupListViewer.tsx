@@ -422,16 +422,25 @@ const GroupMessageAddComponent: React.FC<{
             Create
           </Button>
         </Stack>
-        <Box px={2} pb={1}>
+        <Box px={2} py={1}>
           <TextInput
-            label='Search User'
+            placeholder='Search User'
             name='username'
             value={search.get}
             onChange={search.onTextChange}
             size='small'
             variant='standard'
             fullWidth
-            slotProps={{ input: { disableUnderline: true } }}
+            slotProps={{
+              input: {
+                disableUnderline: true,
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <Search />
+                  </InputAdornment>
+                ),
+              },
+            }}
           />
         </Box>
         <Divider />
@@ -463,6 +472,7 @@ const GroupMessageAddComponent: React.FC<{
         <Divider />
         <UserSearchComponent
           search={search.get}
+          id__isnot={me.id}
           itemStyle={(theme) => ({ px: 1, py: 0.5 })}
           onClick={(user) => {
             selectedUsers.set((p) => {
