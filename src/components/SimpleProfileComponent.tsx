@@ -96,18 +96,18 @@ export const SimpleProfileItem: React.FC<{
               <Typography color='textDisabled' component='span'>
                 @{profile.username}
               </Typography>
-              {profile.is_mutual_follow && (
-                <Typography
-                  color='text.disabled'
-                  display='flex'
-                  alignItems='center'
-                  component='span'
-                >
-                  <Person fontSize='small' />
-                  나와 서로 팔로우하고 있습니다.
-                </Typography>
-              )}
             </Stack>
+            {profile.is_mutual_follow && (
+              <Typography
+                color='text.disabled'
+                display='flex'
+                alignItems='center'
+                component='span'
+              >
+                <Person fontSize='small' />
+                나와 서로 팔로우하고 있습니다.
+              </Typography>
+            )}
           </Stack>
         </Link>
         {!isMyProfile && (
