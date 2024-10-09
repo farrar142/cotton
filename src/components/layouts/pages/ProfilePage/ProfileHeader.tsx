@@ -32,7 +32,7 @@ export const ProfileHeader: React.FC<{
         <Stack>
           <Typography variant='h6'>{profile.nickname}</Typography>
           <Typography variant='caption' color='textDisabled'>
-            {Intl.NumberFormat('ko-KR').format(postCount)} 게시물
+            {Intl.NumberFormat('ko-KR').format(postCount)} Posts
           </Typography>
         </Stack>
       </Stack>
