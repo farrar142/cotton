@@ -20,19 +20,17 @@ const AuthorizationPage: ExtendedNextPage<{ code_key: string }> = ({
         .then(() => API.Users.me())
         .then((r) => r.data)
         .then(setUser)
-        .then(() =>
-          noti.enqueueSnackbar('인증되었습니다.', { variant: 'success' })
-        )
+        .then(() => noti.enqueueSnackbar('Authorized.', { variant: 'success' }))
         .then(() => router.push('/'))
         .catch(({ response }) => {
           noti.enqueueSnackbar(response.data.detail.code_key[0], {
             variant: 'error',
           });
-          noti.enqueueSnackbar('인증에 실패하였습니다.', { variant: 'error' });
+          noti.enqueueSnackbar('Authorization Failed.', { variant: 'error' });
           router.push('/');
         });
     } else {
-      noti.enqueueSnackbar('유효하지 않은 요청입니다.', { variant: 'error' });
+      noti.enqueueSnackbar('Invalid Request.', { variant: 'error' });
       router.push('/');
     }
   }, [code_key]);

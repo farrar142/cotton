@@ -21,7 +21,7 @@ const AuthorizationPage: ExtendedNextPage<{ code: string }> = ({ code }) => {
       .then((r) => r.data)
       .then(setUser)
       .catch(() => {
-        noti.enqueueSnackbar('카카오 로그인에 실패했습니다', {
+        noti.enqueueSnackbar('Kakao Login Success', {
           variant: 'error',
         });
       })

@@ -3,14 +3,16 @@ import { PostItem } from '#/components/timelines/PostItem';
 import { ScrollPreventedBackdrop } from '#/components/utils/ScrollPreventedBackdrop';
 import { usePostWriteService } from '#/hooks/posts/usePostWriteService';
 import { useRouter } from '#/hooks/useCRouter';
+import { useNoti } from '#/hooks/useNoti';
 import { usePostWrite } from '#/hooks/usePostWrite';
 import DraftEditor from '#/PostWriter/DraftEditor';
 import { Block } from '#/utils/textEditor/blockTypes';
 import { Close } from '@mui/icons-material';
 import { Box, IconButton, Stack, Typography } from '@mui/material';
-
+import { useSnackbar } from 'notistack';
 export const ElevatedPostWriter = () => {
   const router = useRouter();
+  const noti = useSnackbar();
   const [isWrite, setIsWrite] = usePostWrite();
   const postWriteService = usePostWriteService();
   const onPost = (text: string, blocks: Block[][], images: ImageType[]) => {
@@ -18,7 +20,7 @@ export const ElevatedPostWriter = () => {
       .onPost(text, blocks, images, isWrite.parent, isWrite.quote)
       .then(onClose)
       .then(({ data }) => {
-        router.reload();
+        noti.enqueueSnackbar('Post Success', { variant: 'success' });
         return data;
       });
   };
