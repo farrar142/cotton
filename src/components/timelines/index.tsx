@@ -122,7 +122,7 @@ export const PostTimeline: React.FC<{
               ))}
             </AvatarGroup>
             <Typography pl={2} color='primary'>
-              {newData.length} 게시글 보기
+              Show {newData.length} Posts
             </Typography>
           </Stack>
           <Divider flexItem />

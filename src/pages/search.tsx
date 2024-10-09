@@ -100,8 +100,8 @@ const SearchPage: ExtendedNextPage = () => {
               borderColor: theme.palette.divider,
             }}
           >
-            <Tab label='게시글' value='1' />
-            <Tab label='유저' value='2' />
+            <Tab label='Posts' value='1' />
+            <Tab label='User' value='2' />
           </TabList>
         </Box>
         <TabPanel
