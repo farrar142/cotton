@@ -198,7 +198,7 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
                 </IconButton>
               ) : (
                 <Button variant='contained' fullWidth color='info'>
-                  게시하기
+                  Post
                 </Button>
               )}
             </Box>

@@ -59,7 +59,7 @@ const Home = () => {
       <CommonTab
         labels={[
           {
-            label: '추천',
+            label: 'Recommended',
             value: '추천',
             onClick: (e) => {
               if (e.currentTarget.tabIndex !== 0) return;
@@ -68,7 +68,7 @@ const Home = () => {
           },
           user
             ? {
-                label: '팔로우 중',
+                label: 'Following',
                 value: '팔로우 중',
                 onClick: (e) => {
                   if (e.currentTarget.tabIndex !== 0) return;

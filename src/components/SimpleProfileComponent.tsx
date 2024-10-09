@@ -103,9 +103,10 @@ export const SimpleProfileItem: React.FC<{
                 display='flex'
                 alignItems='center'
                 component='span'
+                variant='caption'
               >
                 <Person fontSize='small' />
-                나와 서로 팔로우하고 있습니다.
+                Following each other
               </Typography>
             )}
           </Stack>
@@ -119,7 +120,7 @@ export const SimpleProfileItem: React.FC<{
               disabled={done.get === false}
               onClick={wrapper(followUser)}
             >
-              {profile.is_following_to ? '언팔로우' : '팔로우'}
+              {profile.is_following_to ? 'Unfollow' : 'Follow'}
             </Button>
           </Box>
         )}

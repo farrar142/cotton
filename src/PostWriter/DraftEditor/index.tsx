@@ -223,7 +223,7 @@ const DraftEditor: React.FC<
           setEditorState(e);
           handleTextLength(e, textLength, maxLength);
         }}
-        placeholder={placeholder || '무슨 일이 일어나고 있나요?'}
+        placeholder={placeholder || 'What is happening?'}
         customStyleMap={styleMap}
         readOnly={readOnly}
       />

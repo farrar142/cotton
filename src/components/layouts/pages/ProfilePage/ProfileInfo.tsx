@@ -542,7 +542,7 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
         <Stack direction='row' spacing={1} alignItems='center' py={2}>
           <CalendarMonth color='disabled' fontSize='small' />
           <Typography color='textDisabled' variant='body2'>
-            가입일 : {moment(profile.registered_at).format('YYYY년 MM월')}
+            Registered at : {moment(profile.registered_at).format('YYYY:MM')}
           </Typography>
         </Stack>
 

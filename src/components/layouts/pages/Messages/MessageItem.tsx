@@ -74,10 +74,11 @@ export const MessgeItem: React.FC<{ messages: MergedMessage; me: User }> = ({
           })}
         </Stack>
         <Typography variant='subtitle2' color='textDisabled'>
-          {moment(lastMessage.created_at)
-            .format('YYYY년 MM월 DD일 A hh:mm')
-            .replace('PM', '오후')
-            .replace('AM', '오전')}
+          {
+            moment(lastMessage.created_at).format('YYYY-MM-DD A hh:mm')
+            // .replace('PM', '오후')
+            // .replace('AM', '오전')
+          }
         </Typography>
       </Stack>
     </Stack>

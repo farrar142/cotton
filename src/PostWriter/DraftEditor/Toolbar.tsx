@@ -157,7 +157,7 @@ const DraftEditorToolbar: React.FC<{
             textLength.get === 0
           }
         >
-          {onPosting.get ? <CircularProgress size={25} /> : '게시'}
+          {onPosting.get ? <CircularProgress size={25} /> : 'Post'}
         </Button>
       </Stack>
     </Box>

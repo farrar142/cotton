@@ -47,8 +47,8 @@ export const PostDetailItem: React.FC<{ post: Post }> = ({ post: _post }) => {
           <Stack px={2} spacing={1}>
             <Collapse in={replyClick.get}>
               <Stack direction='row' px={7} spacing={1}>
+                <Typography>reply to</Typography>
                 <Typography color='info'>@{post.user.nickname}</Typography>
-                <Typography>님에게 보내는 답글</Typography>
               </Stack>
             </Collapse>
             <Stack display='flex' direction='row' spacing={2}>

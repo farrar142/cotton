@@ -6,8 +6,8 @@ export const formatDateBasedOnYear = (isoString: string) => {
   const inputDate = moment(isoString);
 
   if (inputDate.year() === currentDate.year()) {
-    return inputDate.format('MM월 DD일');
+    return inputDate.format('DD, MMM');
   } else {
-    return inputDate.format('YYYY년 MM월 DD일');
+    return inputDate.format('DD, MMM, YYYY');
   }
 };

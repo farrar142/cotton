@@ -57,11 +57,11 @@ export const ElevatedPostWriter = () => {
                 disableDivider
               />
               <Stack direction='row' spacing={1} pl={2} alignItems='center'>
+                <Typography color='textDisabled' variant='subtitle2'>
+                  reply to
+                </Typography>
                 <Typography color='primary'>
                   @{isWrite.parent.user.username}
-                </Typography>
-                <Typography color='textDisabled' variant='subtitle2'>
-                  님에게 보내는 답글
                 </Typography>
               </Stack>
               <Typography></Typography>

@@ -273,15 +273,15 @@ const _PostItem: React.FC<{
           </NextLink> */}
           {!_showParent && parent ? (
             <Stack direction='row' spacing={1} alignItems='center'>
-              <MentionComponent mention={parent.user} className='' />
               <Typography
                 display='flex'
                 alignItems='center'
                 variant='caption'
                 color='textSecondary'
               >
-                님에게 보내는 답글
+                reply to
               </Typography>
+              <MentionComponent mention={parent.user} className='' />
             </Stack>
           ) : (
             <></>
