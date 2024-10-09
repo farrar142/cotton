@@ -74,7 +74,7 @@ export const ElevatedPostWriter = () => {
               maxLength={300}
               onPost={onPost}
               editorKey='elevatedEditor'
-              placeholder={isWrite.parent ? `답글 게시하기` : undefined}
+              placeholder={isWrite.parent ? `Post Reply` : undefined}
               quote={isWrite.quote}
             />
           </Box>

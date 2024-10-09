@@ -161,7 +161,7 @@ const _PostItem: React.FC<{
       {showMoreReplies && (
         <NextLink href={paths.postDetail(parent?.id || post.id)}>
           <Typography pl={smallPading + 6} color='primary'>
-            더 많은 답글 보기
+            Show More Replies
           </Typography>
         </NextLink>
       )}

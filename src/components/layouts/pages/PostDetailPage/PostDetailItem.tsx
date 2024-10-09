@@ -71,7 +71,7 @@ export const PostDetailItem: React.FC<{ post: Post }> = ({ post: _post }) => {
                   maxLength={300}
                   onPost={onReplyPost}
                   editorKey='replyPost'
-                  placeholder={`답글 게시하기`}
+                  placeholder={`Post Reply`}
                   showToolbar={replyClick.get}
                 />
               </Box>
