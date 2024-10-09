@@ -21,7 +21,7 @@ export const ProfileFollowInfo: React.FC<{ profile: User }> = ({ profile }) => {
           color='textDisabled'
           component='span'
         >
-          팔로우 중
+          Followings
         </Typography>
       </NextLink>
       <NextLink href={paths.userfollowers(profile.username)} withunderline>
@@ -39,7 +39,7 @@ export const ProfileFollowInfo: React.FC<{ profile: User }> = ({ profile }) => {
           color='textDisabled'
           component='span'
         >
-          팔로워
+          Followers
         </Typography>
       </NextLink>
     </Stack>

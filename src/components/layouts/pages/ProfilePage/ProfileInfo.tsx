@@ -511,7 +511,7 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
               onClick={() => profileEditorOpen.set(true)}
               sx={{ borderRadius: 15 }}
             >
-              프로필 수정
+              Edit Profile
             </Button>
           ) : (
             <Button
@@ -521,7 +521,7 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
               disabled={done.get === false}
               onClick={wrapper(followUser)}
             >
-              {profile.is_following_to ? '언팔로우' : '팔로우'}
+              {profile.is_following_to ? 'Unfollow' : 'Follow'}
             </Button>
           )}
         </Box>

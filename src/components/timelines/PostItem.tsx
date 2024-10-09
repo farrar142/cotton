@@ -187,7 +187,7 @@ const _PostItem: React.FC<{
                 },
               }}
             >
-              {post.relavant_repost?.nickname} 님이 높이 띄움
+              {post.relavant_repost?.nickname} Cottened
             </Typography>
           </Stack>
         </NextLink>

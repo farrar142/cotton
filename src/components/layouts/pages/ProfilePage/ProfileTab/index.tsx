@@ -24,28 +24,28 @@ const ProfileTab: React.FC<{ profile: RegisteredUser }> = ({ profile }) => {
         top={65}
         labels={[
           {
-            label: '게시물',
+            label: 'Posts',
             value: '게시물',
             onClick: (e) =>
               e.currentTarget.tabIndex === 0 &&
               setScroll({ key: articleKey, value: 0 }),
           },
           {
-            label: '답글',
+            label: 'Replies',
             value: '답글',
             onClick: (e) =>
               e.currentTarget.tabIndex === 0 &&
               setScroll({ key: replyKey, value: 0 }),
           },
           {
-            label: '미디어',
+            label: 'Medias',
             value: '미디어',
             onClick: (e) =>
               e.currentTarget.tabIndex === 0 &&
               setScroll({ key: mediaKey, value: 0 }),
           },
           {
-            label: '마음에들어요',
+            label: 'Favorites',
             value: '마음에들어요',
             onClick: (e) =>
               e.currentTarget.tabIndex === 0 &&
