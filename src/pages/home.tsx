@@ -95,7 +95,7 @@ const Home = () => {
           user && (
             <>
               <Box
-                pt={2}
+                py={2}
                 px={isMd ? 2 : 1}
                 display='flex'
                 flexDirection='row'
@@ -107,7 +107,7 @@ const Home = () => {
                 />
                 <DraftEditor onPost={onPost} additionalWidth={-48} />
               </Box>
-              <Divider sx={{ my: 1, width: '100%' }} flexItem />
+              <Divider sx={{ width: '100%' }} flexItem />
             </>
           )
         }

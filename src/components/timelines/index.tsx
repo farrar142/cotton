@@ -102,7 +102,6 @@ export const PostTimeline: React.FC<{
         <Stack
           alignItems='center'
           spacing={2}
-          pt={2}
           onClick={mergeDatas}
           sx={(theme) => ({
             width: '100%',
@@ -110,6 +109,7 @@ export const PostTimeline: React.FC<{
             ':hover': { bgcolor: theme.palette.action.hover },
           })}
         >
+          <Box></Box>
           <Stack
             spacing={1}
             direction='row'
