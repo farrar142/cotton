@@ -4,8 +4,10 @@ import { PostTimeline } from '#/components/timelines';
 import { PostItem } from '#/components/timelines/PostItem';
 import { useCurrentPostData } from '#/hooks/posts/usePostData';
 import { usePostWriteService } from '#/hooks/posts/usePostWriteService';
+import { useRouter } from '#/hooks/useCRouter';
 import useUser from '#/hooks/useUser';
 import useValue from '#/hooks/useValue';
+import paths from '#/paths';
 import DraftEditor, { DraftOnPost } from '#/PostWriter/DraftEditor';
 import {
   Stack,
@@ -19,6 +21,7 @@ import React, { useRef } from 'react';
 
 export const PostDetailItem: React.FC<{ post: Post }> = ({ post: _post }) => {
   const [user] = useUser();
+  const router = useRouter();
   const replyClick = useValue(false);
   const postWriteService = usePostWriteService();
   const [post, setPost] = useCurrentPostData(_post);
@@ -28,8 +31,10 @@ export const PostDetailItem: React.FC<{ post: Post }> = ({ post: _post }) => {
       API.Posts.post
         .getItem(post.id)
         .then((r) => r.data)
-        .then(setPost)
-        .then(fetchChild.current);
+        .then((p) => {
+          setPost(p);
+          router.push(paths.postDetail(e.data.id));
+        });
       return e;
     });
   };
