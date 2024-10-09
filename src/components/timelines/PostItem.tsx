@@ -23,12 +23,13 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import React, { MouseEventHandler, useEffect, useRef } from 'react';
+import React, { MouseEventHandler, useEffect, useRef, useState } from 'react';
 import { ProfilePopper } from '../layouts/pages/ProfilePage/ProfilePopper';
 import NextLink from '../NextLink';
 import { ImageViewer } from './ImageViewer';
 import { PickBoolean, useOverrideAtom } from './postActionAtoms';
 import { PostItemToolbar } from './PostItemToolbar';
+import useValue from '#/hooks/useValue';
 
 const _PostItem: React.FC<{
   post: Post;
@@ -308,6 +309,17 @@ const PostHeader: React.FC<{ post: Post; profile: User }> = ({
   post,
   profile,
 }) => {
+  const formattedTime = useValue(formatRelativeTime(post.created_at));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newTime = formatRelativeTime(post.created_at);
+      if (newTime !== formattedTime.get) {
+        formattedTime.set(newTime);
+      }
+    });
+    return () => clearInterval(interval);
+  }, []);
   return (
     <NextLink
       onClick={(e) => e.stopPropagation()}
@@ -342,7 +354,7 @@ const PostHeader: React.FC<{ post: Post; profile: User }> = ({
           variant='caption'
           sx={(theme) => ({ color: theme.palette.text.secondary })}
         >
-          {formatRelativeTime(post.created_at)}
+          {formattedTime.get}
         </Typography>
       </Stack>
     </NextLink>
