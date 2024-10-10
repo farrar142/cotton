@@ -117,8 +117,8 @@ export const PostTimeline: React.FC<{
             alignItems='center'
           >
             <AvatarGroup max={3}>
-              {newDataUsers.map(({ profile_image, nickname }) => (
-                <Avatar alt={nickname} src={profile_image?.small} />
+              {newDataUsers.map(({ profile_image, nickname, id }) => (
+                <Avatar key={id} alt={nickname} src={profile_image?.small} />
               ))}
             </AvatarGroup>
             <Typography pl={2} color='primary'>
