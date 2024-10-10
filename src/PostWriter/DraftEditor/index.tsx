@@ -13,6 +13,7 @@ import { DraftContentParser } from '#/utils/textEditor/draftParser';
 // import Editor from '@draft-js-plugins/editor';
 import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData } from '@draft-js-plugins/mention';
+import createHashtagPlugin from '@draft-js-plugins/hashtag';
 import { Box, Collapse, Divider, Stack, useTheme } from '@mui/material';
 import { convertFromRaw, convertToRaw, EditorState, Modifier } from 'draft-js';
 import mentionsStyles from './MentionsStyles.module.css';
@@ -24,6 +25,7 @@ import { textLimitDecorator } from './textLimitDecorator';
 
 import '@draft-js-plugins/mention/lib/plugin.css';
 import '@draft-js-plugins/image/lib/plugin.css';
+import '@draft-js-plugins/hashtag/lib/plugin.css';
 import 'draft-js/dist/Draft.css';
 import ImageEditor from './ImageEditor';
 import { ImageType } from '#/api/commons/types';
@@ -137,6 +139,8 @@ const DraftEditor: React.FC<
 
   //mentions
   const { plugins, MentionSuggestions } = useMemo(() => {
+    const imagePlugin = createImagePlugin();
+    const hashtagPlugin = createHashtagPlugin();
     const mentionPlugin = createMentionPlugin({
       entityMutability: 'IMMUTABLE',
       theme: mentionsStyles,
@@ -151,8 +155,7 @@ const DraftEditor: React.FC<
     if (!readOnly) {
       mentionPlugin.decorators.push(textLimitDecorator(300));
     }
-    const imagePlugin = createImagePlugin();
-    const plugins = [mentionPlugin, imagePlugin];
+    const plugins = [mentionPlugin, imagePlugin, hashtagPlugin];
     return { plugins, MentionSuggestions };
   }, []);
 
