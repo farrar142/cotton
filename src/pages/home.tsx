@@ -56,13 +56,6 @@ const Home = () => {
   const router = useRouter();
   return (
     <Box sx={{}}>
-      <button
-        onClick={() => {
-          throw Error('Generic Error Message');
-        }}
-      >
-        Generic Error Message
-      </button>
       <CommonTab
         labels={[
           {
