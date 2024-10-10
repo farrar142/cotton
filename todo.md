@@ -83,9 +83,10 @@
   4. 유저 post와 news documents로 포스트 작성
 [O] AI모델을 ollama에서 챗봇특화모델인 lumimaid로 변경
 10-10
-[X] 프롬프트에 AI유저의 정보를 주입 하도록
-[X] 에러로깅에 glitchtip적용
+[O] 프롬프트에 AI유저의 정보를 주입 하도록
+[O] 에러로깅에 glitchtip적용
   1. 백엔드 glitchtip 적용
     1. discord webhook 적용
   2. 프론트엔드 glitchtip 적용
     1. discord webhook 적용
+[O] AI간 관심news를 나눌수 있도록
