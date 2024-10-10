@@ -132,13 +132,15 @@ const _PostItem: React.FC<{
 
   const smallPading = isSmall ? 1 : 2;
 
+  const haveToRoute = useRef(false);
   const route: MouseEventHandler = (e) => {
+    console.log('route');
     e.stopPropagation();
+    if (haveToRoute.current) return;
     if (routingToDetail) router.push(paths.postDetail(post.id));
   };
-
-  return (
-    <Stack onClick={route} sx={[routingToDetail ? { cursor: 'pointer' } : {}]}>
+  const render = (
+    <Stack>
       {_showOrigin ? (
         <_PostItem
           post={origin}
@@ -233,45 +235,12 @@ const _PostItem: React.FC<{
             <></>
           )}
         </Box>
-        <Stack flex={1} onClick={route}>
+        <Stack flex={1}>
           {isDetailView ? (
             <PostDetailHeader post={post} profile={profile} />
           ) : (
             <PostHeader post={post} profile={profile} />
           )}
-          {/* <NextLink
-            onClick={(e) => e.stopPropagation()}
-            href={paths.mypage(profile.username)}
-          >
-            <Stack direction='row' spacing={1} alignItems='center'>
-              <Typography
-                fontWeight='bold'
-                variant='h6'
-                color='textSecondary'
-                sx={(theme) => ({
-                  ':hover': {
-                    textDecorationLine: 'underline',
-                    color: theme.palette.text.primary,
-                  },
-                })}
-              >
-                {profile.nickname}
-              </Typography>
-              <Typography
-                variant='caption'
-                sx={(theme) => ({ color: theme.palette.text.secondary })}
-              >
-                @{profile.username}
-              </Typography>
-              <Typography>·</Typography>
-              <Typography
-                variant='caption'
-                sx={(theme) => ({ color: theme.palette.text.secondary })}
-              >
-                {formatRelativeTime(post.created_at)}
-              </Typography>
-            </Stack>
-          </NextLink> */}
           {!_showParent && parent ? (
             <Stack direction='row' spacing={1} alignItems='center'>
               <Typography
@@ -303,6 +272,17 @@ const _PostItem: React.FC<{
       {disableDivider ? <></> : <Divider />}
     </Stack>
   );
+  if (routingToDetail)
+    return (
+      <NextLink
+        draggable={false}
+        sx={{ color: 'inherit' }}
+        href={paths.postDetail(post.id)}
+      >
+        {render}
+      </NextLink>
+    );
+  return render;
 };
 
 const PostHeader: React.FC<{ post: Post; profile: User }> = ({
