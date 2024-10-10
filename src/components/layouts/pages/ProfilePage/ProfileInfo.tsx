@@ -2,36 +2,39 @@ import API from '#/api';
 import { ImageType } from '#/api/commons/types';
 import { RegisteredUser, User } from '#/api/users/types';
 import TextInput from '#/components/inputs/TextInput';
-import NextLink from '#/components/NextLink';
 import { ScrollPreventedBackdrop } from '#/components/utils/ScrollPreventedBackdrop';
+import { useRouter } from '#/hooks/useCRouter';
 import useMediaSize from '#/hooks/useMediaSize';
 import { usePromiseState } from '#/hooks/usePromiseState';
 import useUser, { useUserProfile } from '#/hooks/useUser';
 import useValue, { UseValue } from '#/hooks/useValue';
 import paths from '#/paths';
 import { glassmorphism } from '#/styles';
+import { getBase64 } from '#/utils/images/getBase64';
 import {
-  getBase64,
-  getImageSize,
-  resizeImageWithMinimum,
-} from '#/utils/images/getBase64';
-import { AddAPhoto, CalendarMonth, Close, Email } from '@mui/icons-material';
+  AddAPhoto,
+  CalendarMonth,
+  Close,
+  Email,
+  Lock,
+} from '@mui/icons-material';
 import {
   Avatar,
   Box,
   Button,
+  FormControlLabel,
+  FormGroup,
   IconButton,
   Stack,
   styled,
+  Switch,
   Tooltip,
   Typography,
   useTheme,
 } from '@mui/material';
 import moment from 'moment';
-import React from 'react';
-import { ChangeEventHandler, createRef, useEffect, useRef } from 'react';
+import React, { ChangeEventHandler, createRef, useRef } from 'react';
 import { ProfileFollowInfo } from './ProfileFollowInfo';
-import { useRouter } from '#/hooks/useCRouter';
 
 const HiddenInput = styled('input')({
   display: 'none',
@@ -47,6 +50,7 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
   //텍스트 값
   const nickname = useValue(user.nickname);
   const username = useValue(user.username);
+  const is_protected = useValue(user.is_protected || false);
   const bio = useValue(user.bio);
   //이미지 값
   const profileRef = createRef<HTMLInputElement>();
@@ -99,8 +103,8 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
       profile_image: newProfileImage.get,
       header_image: newHeaderImage.get,
       username: username.get,
+      is_protected: is_protected.get,
     };
-    console.log(params);
     const filtered = Object.entries(params).filter(
       ([key, value]) => value !== undefined
     );
@@ -272,6 +276,15 @@ const ProfileEditor: React.FC<{ open: UseValue<boolean> }> = ({ open }) => {
                 ref={headerRef}
                 onChange={onImageChange(newHeaderImage, 3)}
               />
+              <FormGroup>
+                <FormControlLabel
+                  label={'Protect'}
+                  checked={is_protected.get}
+                  value={is_protected.get}
+                  onChange={(e, c) => is_protected.set(c)}
+                  control={<Switch />}
+                />
+              </FormGroup>
             </Stack>
           )}
           {/**미디어 에디터 완성안됨*/}
@@ -509,7 +522,7 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
               variant='outlined'
               color='inherit'
               onClick={() => profileEditorOpen.set(true)}
-              sx={{ borderRadius: 15 }}
+              sx={{ borderRadius: 15, m: 1 }}
             >
               Edit Profile
             </Button>
@@ -528,9 +541,17 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
       </Stack>
       {/**프로필 정보 칸 */}
       <Stack px={2}>
-        <Typography variant='h5' fontWeight='bold'>
-          {profile.nickname}
-        </Typography>
+        <Stack direction='row' alignItems='center'>
+          <Typography variant='h5' fontWeight='bold'>
+            {profile.nickname}
+          </Typography>
+
+          {profile.is_protected && (
+            <Tooltip title="It's protected accounts">
+              <Lock fontSize='small' />
+            </Tooltip>
+          )}
+        </Stack>
         <Typography variant='caption' color='textDisabled'>
           @{profile.username}
         </Typography>

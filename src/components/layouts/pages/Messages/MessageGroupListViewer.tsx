@@ -4,13 +4,15 @@ import { User } from '#/api/users/types';
 import TextInput from '#/components/inputs/TextInput';
 import NextLink from '#/components/NextLink';
 import { useTimelinePagination } from '#/components/timelines/usePostPagination';
+import { useRouter } from '#/hooks/useCRouter';
 import { useKeyScrollPosition } from '#/hooks/useKeepScrollPosition';
+import { usePromiseState } from '#/hooks/usePromiseState';
 import { useUserProfile } from '#/hooks/useUser';
 import useValue from '#/hooks/useValue';
 import paths from '#/paths';
 import { glassmorphism } from '#/styles';
 import { formatDateBasedOnYear } from '#/utils/formats/formatDateBasedOnYear';
-import { Add, Close, Email, EmailOutlined, Search } from '@mui/icons-material';
+import { Add, Close, EmailOutlined, Search } from '@mui/icons-material';
 import {
   Avatar,
   Badge,
@@ -21,21 +23,19 @@ import {
   Divider,
   IconButton,
   InputAdornment,
-  Paper,
   Stack,
   Typography,
-  useTheme,
 } from '@mui/material';
 import moment from 'moment';
 import React, { useEffect, useMemo } from 'react';
+import { UserSearchComponent } from '../../users/UserSearchComponent';
 import {
   MessageGroupWithInCommingMessages,
   useMessageGroupItem,
   useMessageGroupList,
 } from './MessageGroupAtom';
-import { UserSearchComponent } from '../../users/UserSearchComponent';
-import { usePromiseState } from '#/hooks/usePromiseState';
-import { useRouter } from '#/hooks/useCRouter';
+import { useNoti } from '#/hooks/useNoti';
+import { useSnackbar } from 'notistack';
 
 const DirectMessageSimpleViewer: React.FC<{
   group: MessageGroupWithInCommingMessages;
@@ -373,6 +373,7 @@ const GroupMessageAddComponent: React.FC<{
   me: User;
 }> = ({ open, onClose, me }) => {
   const router = useRouter();
+  const { enqueueSnackbar } = useSnackbar();
   const search = useValue('');
   const selectedUsers = useValue<User[]>([]);
   const { done, wrapper } = usePromiseState();
@@ -389,7 +390,15 @@ const GroupMessageAddComponent: React.FC<{
         is_direct_message: isDirectMessage,
       })
       .then((r) => r.data)
-      .then((g) => router.push(paths.groupMessage(g.id)));
+      .then((g) => router.push(paths.groupMessage(g.id)))
+      .catch((e) => {
+        if (e.status === 400) {
+          const messages: string[] = e.response.data.detail.users;
+          messages.forEach((error) => {
+            enqueueSnackbar(error, { variant: 'error' });
+          });
+        }
+      });
   });
   return (
     <Dialog

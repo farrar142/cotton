@@ -13,6 +13,7 @@ export type UserUpsert = {
   nickname: string;
   profile_image?: ImageType;
   header_image?: ImageType;
+  is_protected?: boolean;
 };
 type UserBase = UserUpsert & {
   id: number;

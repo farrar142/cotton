@@ -9,7 +9,9 @@ import {
   SxProps,
   Theme,
   styled,
+  Tooltip,
 } from '@mui/material';
+import { Lock } from '@mui/icons-material';
 import { SystemStyleObject } from '@mui/system/styleFunctionSx';
 import { MouseEventHandler, ReactNode, useMemo } from 'react';
 import NextLink from './NextLink';
@@ -91,7 +93,15 @@ export const SimpleProfileItem: React.FC<{
         </Link>
         <Link href={paths.mypage(profile.username)} flex={1}>
           <Stack spacing={-0.5}>
-            <Typography color='textPrimary'>{profile.nickname}</Typography>
+            <Stack direction='row' alignItems='center' spacing={1}>
+              <Typography color='textPrimary'>{profile.nickname}</Typography>
+
+              {profile.is_protected && (
+                <Tooltip title="It's protected accounts">
+                  <Lock fontSize='small' />
+                </Tooltip>
+              )}
+            </Stack>
             <Stack direction='row' spacing={1}>
               <Typography color='textDisabled' component='span'>
                 @{profile.username}
