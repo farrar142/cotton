@@ -80,7 +80,9 @@
   1. 유저와의 대화기록을 벡터db에 저장.
   2. 대화기록 벡터 db에서 유저의 게시글로 search후 document를 반환
   3. 뉴스 벡터 db에서 유저의 게시글로 연관 documents를 반환
+  4. 유저 post와 news documents로 포스트 작성
 [O] AI모델을 ollama에서 챗봇특화모델인 lumimaid로 변경
+10-10
 [X] 프롬프트에 AI유저의 정보를 주입 하도록
 [X] 에러로깅에 glitchtip적용
   1. 백엔드 glitchtip 적용
