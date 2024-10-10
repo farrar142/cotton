@@ -20,6 +20,7 @@
     "@mui/lab": "^6.0.0-beta.10",
     "@mui/material": "^6.1.1",
     "@mui/material-nextjs": "^6.1.1",
+    "@sentry/nextjs": "^8.33.1",
     "axios": "^1.7.2",
     "draft-js": "^0.11.7",
     "emoji-picker-react": "^4.12.0",
