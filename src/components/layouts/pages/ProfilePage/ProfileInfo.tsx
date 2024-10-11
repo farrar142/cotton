@@ -33,7 +33,7 @@ import {
   useTheme,
 } from '@mui/material';
 import moment from 'moment';
-import React, { ChangeEventHandler, createRef, useRef } from 'react';
+import React, { ChangeEventHandler, createRef, useMemo, useRef } from 'react';
 import { ProfileFollowInfo } from './ProfileFollowInfo';
 
 const HiddenInput = styled('input')({
@@ -432,6 +432,13 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
       .then((r) => router.push(paths.groupMessage(r.id)));
   };
 
+  const canCreateDm = useMemo(() => {
+    if (!user) return false;
+    if (isMyProfile) return false;
+    if (profile.is_protected && !profile.is_mutual_follow) return false;
+    return true;
+  }, [user, profile]);
+
   if (!profile.is_registered) return <></>;
   return (
     <Box>
@@ -499,7 +506,7 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
           </Box>
         </Box>
         <Box flex={1} />
-        {user && !isMyProfile ? (
+        {user && canCreateDm ? (
           <Box>
             <Tooltip title={`Direct Message with ${profile.nickname}`}>
               <IconButton
