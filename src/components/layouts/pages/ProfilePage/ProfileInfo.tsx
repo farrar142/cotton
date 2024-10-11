@@ -427,7 +427,7 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
   };
   const onDirectMessage = (me: User) => {
     API.Messages.message
-      .create({ users: [me.id, profile.id], is_direct_message: true })
+      .create({ users: [profile.id], is_direct_message: true })
       .then((r) => r.data)
       .then((r) => router.push(paths.groupMessage(r.id)));
   };
