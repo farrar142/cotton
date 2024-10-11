@@ -72,6 +72,14 @@ class MessageAPIGenerator extends GenericAPI<
     const endpoint = this.getEndpoint(`/has_unreaded_messages/`);
     return this.client.get<{ count: number }>(endpoint);
   };
+  exitRoom = (groupId: number) => {
+    const endpoint = this.getEndpoint(`/${groupId}/exit_room/`);
+    return this.client.delete(endpoint);
+  };
+  addUsers = (groupId: number, data: { users: number[] }) => {
+    const endpoint = this.getEndpoint(`/${groupId}/add_users/`);
+    return this.client.post(endpoint, data);
+  };
 }
 
 export const Messages = {

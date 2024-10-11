@@ -40,7 +40,8 @@ type WSEvent =
 const useMessageEventListener = (user: User) => {
   const [_, setInComingMessage] = useInComingMessages(user);
 
-  const { groupList, replaceGroup, groupListRef } = useMessageGroupList(user);
+  const { groupList, replaceGroup, removeGroup, groupListRef } =
+    useMessageGroupList(user);
 
   const onMessageReceived = (message: Message) => {
     const flattened = groupListRef.current;
@@ -63,7 +64,11 @@ const useMessageEventListener = (user: User) => {
       .then((r) => r.data)
       .then((group) => {
         if (!group.latest_message) return;
-        replaceGroup(group);
+        if (group.attendants.find((u) => u.id === user.id)) {
+          replaceGroup(group);
+        } else {
+          removeGroup(group);
+        }
       });
   };
   return { onMessageReceived, onGroupChanged };

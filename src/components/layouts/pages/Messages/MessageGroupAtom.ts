@@ -68,6 +68,7 @@ export const useMessageGroupList = (user: User) => {
       });
       return [...p, ...notAdded];
     });
+    console.log('handleGroupCalled');
   };
   const replaceGroup = (newGroup: MessageGroup) => {
     setOriginGroup((p) => {
@@ -79,12 +80,29 @@ export const useMessageGroupList = (user: User) => {
       }
       return [...p, newGroup];
     });
+    console.log('replaceGroupCalled');
   };
+  const removeGroup = (newGroup: MessageGroup) => {
+    setOriginGroup((p) => p.filter((pg) => pg.id !== newGroup.id));
+    console.log('removeGroupCalled');
+  };
+
+  const userFiltered = useMemo(() => {
+    return groupList.filter((g) =>
+      Boolean(g.attendants.find((u) => u.id === user.id))
+    );
+  }, [groupList]);
 
   useEffect(() => {
     groupListRef.current = groupList;
   }, [groupList]);
-  return { groupList, handleGroupList, replaceGroup, groupListRef };
+  return {
+    groupList: userFiltered,
+    handleGroupList,
+    replaceGroup,
+    removeGroup,
+    groupListRef,
+  };
 };
 //메시지 그룹아톰에서 특정한 그룹을 가져오는 셀렉터
 const messageGroupAtomSelector = selectorFamily<

@@ -36,6 +36,7 @@ import {
 } from './MessageGroupAtom';
 import { useNoti } from '#/hooks/useNoti';
 import { useSnackbar } from 'notistack';
+import { GroupMessageAddComponent } from './GroupMessageAddComponent';
 
 const DirectMessageSimpleViewer: React.FC<{
   group: MessageGroupWithInCommingMessages;
@@ -135,7 +136,6 @@ const GroupMessageSimpleViewer: React.FC<{
     }
     return group.latest_message;
   }, [group.latest_message, group.inComingMessages]);
-
   const renderedAttendants = useMemo(() => {
     if (group.attendants.length < 2) return group.attendants.length;
     return (
@@ -243,6 +243,8 @@ export const MessageGroupListViewer: React.FC<{
   me: User;
   currentGroup?: MessageGroup;
 }> = ({ me, currentGroup }) => {
+  const { enqueueSnackbar } = useSnackbar();
+  const router = useRouter();
   const [profile] = useUserProfile(me);
   const search = useValue('');
   const pagination = useTimelinePagination({
@@ -273,6 +275,27 @@ export const MessageGroupListViewer: React.FC<{
       return moment(bkey).diff(akey);
     });
   }, [groupList]);
+
+  const onGroupCreate = (users: User[]) => {
+    const isDirectMessage = users.length === 1;
+
+    return API.Messages.message
+      .create({
+        users: [...users.map((u) => u.id).filter((id) => id !== me.id)],
+        is_direct_message: isDirectMessage,
+      })
+      .then((r) => r.data)
+      .then((g) => router.push(paths.groupMessage(g.id)))
+      .catch((e) => {
+        if (e.status === 400) {
+          const messages: string[] = e.response.data.detail.users;
+          messages.forEach((error) => {
+            enqueueSnackbar(error, { variant: 'error' });
+          });
+        }
+      });
+  };
+
   const plusIconSize = 15;
   return (
     <Box maxWidth='100%'>
@@ -362,137 +385,8 @@ export const MessageGroupListViewer: React.FC<{
         me={me}
         open={showCreateMessageGroups.get}
         onClose={showCreateMessageGroups.wrap((v) => false)}
+        onPost={onGroupCreate}
       />
     </Box>
-  );
-};
-
-const GroupMessageAddComponent: React.FC<{
-  open: boolean;
-  onClose: () => void;
-  me: User;
-}> = ({ open, onClose, me }) => {
-  const router = useRouter();
-  const { enqueueSnackbar } = useSnackbar();
-  const search = useValue('');
-  const selectedUsers = useValue<User[]>([]);
-  const { done, wrapper } = usePromiseState();
-
-  const onCreate = wrapper(() => {
-    const isDirectMessage = selectedUsers.get.length === 1;
-
-    return API.Messages.message
-      .create({
-        users: [
-          ...selectedUsers.get.map((u) => u.id).filter((id) => id !== me.id),
-          me.id,
-        ],
-        is_direct_message: isDirectMessage,
-      })
-      .then((r) => r.data)
-      .then((g) => router.push(paths.groupMessage(g.id)))
-      .catch((e) => {
-        if (e.status === 400) {
-          const messages: string[] = e.response.data.detail.users;
-          messages.forEach((error) => {
-            enqueueSnackbar(error, { variant: 'error' });
-          });
-        }
-      });
-  });
-  return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      sx={glassmorphism}
-      PaperProps={{
-        sx: (theme) => ({ ...glassmorphism(theme), borderRadius: 5, py: 2 }),
-        variant: 'outlined',
-      }}
-    >
-      <Stack
-        width='100%'
-        maxWidth={(theme) => theme.breakpoints.values.xs * 1.5}
-        minHeight={(theme) => theme.breakpoints.values.sm}
-      >
-        <Stack direction='row' alignItems='center' px={1}>
-          <IconButton onClick={onClose}>
-            <Close />
-          </IconButton>
-          <Typography variant='h6'>New Message</Typography>
-          <Box flex={1} />
-          <Button
-            variant='contained'
-            size='small'
-            sx={{ mr: 1 }}
-            disabled={selectedUsers.get.length === 0 || !done}
-            onClick={onCreate}
-          >
-            Create
-          </Button>
-        </Stack>
-        <Box px={2} py={1}>
-          <TextInput
-            placeholder='Search User'
-            name='username'
-            value={search.get}
-            onChange={search.onTextChange}
-            size='small'
-            variant='standard'
-            fullWidth
-            slotProps={{
-              input: {
-                disableUnderline: true,
-                startAdornment: (
-                  <InputAdornment position='start'>
-                    <Search />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-        </Box>
-        <Divider />
-        <Box
-          display='inline-block'
-          flexDirection='row'
-          minHeight={48}
-          alignItems='center'
-          maxWidth='100%'
-          pt={1}
-          px={1}
-        >
-          {selectedUsers.get.map((user) => (
-            <Chip
-              key={user.id}
-              label={user.nickname}
-              avatar={
-                <Avatar
-                  src={user.profile_image?.small || user.profile_image?.url}
-                />
-              }
-              sx={{ mb: 1, mr: 1 }}
-              onDelete={() =>
-                selectedUsers.set((p) => p.filter((u) => u.id !== user.id))
-              }
-            />
-          ))}
-        </Box>
-        <Divider />
-        <UserSearchComponent
-          search={search.get}
-          id__isnot={me.id}
-          itemStyle={(theme) => ({ px: 1, py: 0.5 })}
-          onClick={(user) => {
-            selectedUsers.set((p) => {
-              if (p.find((u) => u.id == user.id)) {
-                return p.filter((u) => u.id !== user.id);
-              }
-              return [...p, user];
-            });
-          }}
-        />
-      </Stack>
-    </Dialog>
   );
 };

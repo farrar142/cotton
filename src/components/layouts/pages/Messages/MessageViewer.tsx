@@ -23,6 +23,7 @@ import { v4 as uuid } from 'uuid';
 import {
   MessageGroupWithInCommingMessages,
   useMessageGroupItem,
+  useMessageGroupList,
   useUnreadedMessagesCount,
 } from './MessageGroupAtom';
 import { MessgeItem } from './MessageItem';
@@ -39,6 +40,9 @@ import { glassmorphism } from '#/styles';
 import { TabContext, TabPanel } from '@mui/lab';
 import { SimpleProfileItem } from '#/components/SimpleProfileComponent';
 import { usePromiseState } from '#/hooks/usePromiseState';
+import { GroupMessageAddComponent } from './GroupMessageAddComponent';
+import { useRouter } from '#/hooks/useCRouter';
+import { useSnackbar } from 'notistack';
 
 const getYearToMinuteString = (isostring: string) =>
   moment(isostring).format('YYYY-MM-DD-hh-mm');
@@ -319,13 +323,43 @@ export const MessageGroupInfoPanel: React.FC<{
   profile: User;
   onPanelChange: () => void;
 }> = ({ group, profile, onPanelChange }) => {
+  const router = useRouter();
+  const snackBar = useSnackbar();
+  const { replaceGroup } = useMessageGroupList(profile);
   const title = useValue(group.title || '');
   const { done, wrapper } = usePromiseState();
+  const addUserOpen = useValue(false);
   const onEditTitle = wrapper(async () => {
     return API.Messages.message.changeTitle(group.id, title.get);
   });
+  const onExit = () => {
+    return API.Messages.message.exitRoom(group.id).then(() => {
+      router.push(paths.groupMessages);
+      replaceGroup({
+        ...group,
+        attendants: group.attendants.filter((u) => u.id !== profile.id),
+      });
+    });
+  };
+  const onAddUser = (users: User[]) => {
+    return API.Messages.message
+      .addUsers(group.id, {
+        users: users.map((u) => u.id),
+      })
+      .then(addUserOpen.wrap(false))
+      .catch((e) => {
+        if (e.status === 400) {
+          const detail: Record<string, string[]> = e.response.data.detail;
+          Object.entries(detail).forEach(([key, values]) => {
+            values.forEach((value) => {
+              snackBar.enqueueSnackbar(value, { variant: 'error' });
+            });
+          });
+        }
+      });
+  };
   return (
-    <Stack spacing={1}>
+    <Stack spacing={2}>
       <Stack
         position='sticky'
         top={0}
@@ -358,18 +392,32 @@ export const MessageGroupInfoPanel: React.FC<{
         </Button>
       </Box>
       <Divider />
-      <Stack p={1}>
-        <Typography px={1} pb={2} variant='h5'>
-          Participants
-        </Typography>
+      <Stack px={2} spacing={1}>
+        <Typography variant='h5'>Participants</Typography>
         <Stack>
           {group.attendants
             .filter((u) => u.id !== profile.id)
             .map((user) => (
               <SimpleProfileItem profile={user} key={user.id} />
             ))}
+          <Button onClick={addUserOpen.wrap(true)}>Add User</Button>
+        </Stack>
+        <Divider />
+        <Stack px={2}>
+          <Button color='error' onClick={onExit}>
+            Exit Message Group
+          </Button>
         </Stack>
       </Stack>
+      <GroupMessageAddComponent
+        open={addUserOpen.get}
+        onClose={addUserOpen.wrap(false)}
+        me={profile}
+        onPost={onAddUser}
+        title={'Add User'}
+        postButtonName='Add'
+        exclude_ids={group.attendants.map((u) => u.id).join(',')}
+      />
     </Stack>
   );
 };
