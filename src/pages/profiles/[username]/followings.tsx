@@ -29,11 +29,7 @@ const FollowingsPage: ExtendedNextPage<{ profile: User }> = ({ profile }) => {
   return (
     <Stack spacing={1}>
       {data.map((profile) => (
-        <SimpleProfileItem
-          profile={profile}
-          key={profile.id}
-          onClick={() => {}}
-        />
+        <SimpleProfileItem profile={profile} key={profile.id} />
       ))}
       <Box ref={fetchNextBlock} />
     </Stack>

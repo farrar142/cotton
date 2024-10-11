@@ -47,19 +47,19 @@ export const SimpleProfileItem: React.FC<{
         .then(setProfile);
     });
   };
-  const Link = useMemo(() => {
-    if (onClick) {
-      const Wrapper: React.FC<{
-        children: ReactNode;
-        href: string;
-        flex?: number;
-      }> = ({ children, flex }) => {
-        return <Box flex={flex}>{children}</Box>;
-      };
-      return Wrapper;
-    }
-    return NextLink;
-  }, [Boolean(onClick)]);
+  // const Link = useMemo(() => {
+  //   if (onClick) {
+  //     const Wrapper: React.FC<{
+  //       children: ReactNode;
+  //       href: string;
+  //       flex?: number;
+  //     }> = ({ children, flex }) => {
+  //       return <Box flex={flex}>{children}</Box>;
+  //     };
+  //     return Wrapper;
+  //   }
+  //   return NextLink;
+  // }, [Boolean(onClick)]);
   return (
     <Box
       display='relative'
@@ -73,6 +73,7 @@ export const SimpleProfileItem: React.FC<{
           bgcolor: isFocused ? theme.palette.action.focus : undefined,
         }),
       ]}
+      onClick={onClick}
     >
       <Stack
         key={profile.id}
@@ -84,15 +85,22 @@ export const SimpleProfileItem: React.FC<{
         }}
         width='100%'
       >
-        <Link href={paths.mypage(profile.username)}>
+        <NextLink
+          href={paths.mypage(profile.username)}
+          disabled={Boolean(onClick)}
+        >
           <Box display='flex' alignItems='center' justifyContent='center'>
             <Avatar
               src={profile.profile_image?.medium || profile.profile_image?.url}
             />
           </Box>
-        </Link>
-        <Link href={paths.mypage(profile.username)} flex={1}>
-          <Stack spacing={-0.5}>
+        </NextLink>
+        <NextLink
+          href={paths.mypage(profile.username)}
+          flex={1}
+          disabled={Boolean(onClick)}
+        >
+          <Stack spacing={-0.5} width='100%'>
             <Stack direction='row' alignItems='center' spacing={1}>
               <Typography color='textPrimary'>{profile.nickname}</Typography>
 
@@ -120,7 +128,7 @@ export const SimpleProfileItem: React.FC<{
               </Typography>
             )}
           </Stack>
-        </Link>
+        </NextLink>
         {!isMyProfile && (
           <Box display='flex' alignItems='center'>
             <Button
