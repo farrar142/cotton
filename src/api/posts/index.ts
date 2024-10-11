@@ -31,6 +31,7 @@ export type Post = PostUpsert & {
   relavant_repost?: User;
   latest_date: string;
   reply_row_number_desc: number;
+  deleted_at?: string;
 };
 
 type PostChildUrl = 'reposts' | 'views' | 'favorites' | 'bookmarks';

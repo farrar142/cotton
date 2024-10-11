@@ -9,6 +9,7 @@ import useUser from '#/hooks/useUser';
 import useValue from '#/hooks/useValue';
 import paths from '#/paths';
 import DraftEditor, { DraftOnPost } from '#/PostWriter/DraftEditor';
+import { MentionComponent } from '#/PostWriter/DraftEditor/mention';
 import {
   Stack,
   Collapse,
@@ -47,13 +48,13 @@ export const PostDetailItem: React.FC<{ post: Post }> = ({ post: _post }) => {
         showParent
         isDetailView
       />
-      {user ? (
+      {user && !post.deleted_at ? (
         <>
           <Stack px={2} spacing={1}>
             <Collapse in={replyClick.get}>
               <Stack direction='row' px={7} spacing={1}>
                 <Typography>reply to</Typography>
-                <Typography color='info'>@{post.user.nickname}</Typography>
+                <MentionComponent mention={post.user} />
               </Stack>
             </Collapse>
             <Stack display='flex' direction='row' spacing={2}>

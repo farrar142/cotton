@@ -8,16 +8,20 @@ import {
 } from '#/hooks/posts/usePostData';
 import { useRouter } from '#/hooks/useCRouter';
 import { useObserver } from '#/hooks/useObserver';
-import { useUserProfile } from '#/hooks/useUser';
+import useUser, { useUserProfile } from '#/hooks/useUser';
 import paths from '#/paths';
 import DraftEditor from '#/PostWriter/DraftEditor';
 import { MentionComponent } from '#/PostWriter/DraftEditor/mention';
 import { formatRelativeTime } from '#/utils/formats/formatRelativeTime';
-import { Cloud } from '@mui/icons-material';
+import { Cloud, Delete, MoreVert, Settings } from '@mui/icons-material';
 import {
   Avatar,
   Box,
   Divider,
+  IconButton,
+  ListItemIcon,
+  Menu,
+  MenuItem,
   Stack,
   Typography,
   useMediaQuery,
@@ -30,6 +34,7 @@ import { ImageViewer } from './ImageViewer';
 import { PickBoolean, useOverrideAtom } from './postActionAtoms';
 import { PostItemToolbar } from './PostItemToolbar';
 import useValue from '#/hooks/useValue';
+import moment from 'moment';
 
 const _PostItem: React.FC<{
   post: Post;
@@ -139,7 +144,13 @@ const _PostItem: React.FC<{
     if (haveToRoute.current) return;
     if (routingToDetail) router.push(paths.postDetail(post.id));
   };
-
+  if (post.deleted_at)
+    return (
+      <Stack px={1} spacing={1.5}>
+        <Typography>User deleted this post</Typography>
+        {disableDivider ? <></> : <Divider />}
+      </Stack>
+    );
   // if (routingToDetail)
   //   return (
   //   );
@@ -285,10 +296,11 @@ const _PostItem: React.FC<{
   );
 };
 
-const PostHeader: React.FC<{ post: Post; profile: User }> = ({
-  post,
-  profile,
-}) => {
+const PostHeader: React.FC<{
+  post: Post;
+  profile: User;
+  onDelete?: () => void;
+}> = ({ post, profile, onDelete }) => {
   const formattedTime = useValue(formatRelativeTime(post.created_at));
 
   useEffect(() => {
@@ -301,66 +313,78 @@ const PostHeader: React.FC<{ post: Post; profile: User }> = ({
     return () => clearInterval(interval);
   }, []);
   return (
-    <NextLink
-      onClick={(e) => e.stopPropagation()}
-      href={paths.mypage(profile.username)}
-    >
-      <Stack direction='row' spacing={1} alignItems='center'>
-        <ProfilePopper profileId={profile.id}>
-          <Typography
-            fontWeight='bold'
-            variant='h6'
-            color='textPrimary'
-            sx={(theme) => ({
-              ':hover': {
-                textDecorationLine: 'underline',
-                color: theme.palette.text.primary,
-              },
-            })}
-          >
-            {profile.nickname}
-          </Typography>
-        </ProfilePopper>
-        <ProfilePopper profileId={profile.id}>
+    <Stack direction='row' alignItems='center'>
+      <NextLink
+        onClick={(e) => e.stopPropagation()}
+        href={paths.mypage(profile.username)}
+      >
+        <Stack direction='row' spacing={1} alignItems='center'>
+          <ProfilePopper profileId={profile.id}>
+            <Typography
+              fontWeight='bold'
+              variant='h6'
+              color='textPrimary'
+              sx={(theme) => ({
+                ':hover': {
+                  textDecorationLine: 'underline',
+                  color: theme.palette.text.primary,
+                },
+              })}
+            >
+              {profile.nickname}
+            </Typography>
+          </ProfilePopper>
+          <ProfilePopper profileId={profile.id}>
+            <Typography
+              variant='caption'
+              sx={(theme) => ({ color: theme.palette.text.secondary })}
+            >
+              @{profile.username}
+            </Typography>
+          </ProfilePopper>
+          <Typography color='textDisabled'>·</Typography>
           <Typography
             variant='caption'
             sx={(theme) => ({ color: theme.palette.text.secondary })}
           >
-            @{profile.username}
+            {formattedTime.get}
           </Typography>
-        </ProfilePopper>
-        <Typography color='textDisabled'>·</Typography>
-        <Typography
-          variant='caption'
-          sx={(theme) => ({ color: theme.palette.text.secondary })}
-        >
-          {formattedTime.get}
-        </Typography>
-      </Stack>
-    </NextLink>
+        </Stack>
+      </NextLink>
+
+      <Box flex={1} />
+      <PostSettings post={post} profile={profile} />
+    </Stack>
   );
 };
-const PostDetailHeader: React.FC<{ post: Post; profile: User }> = ({
-  post,
-  profile,
-}) => {
+const PostDetailHeader: React.FC<{
+  post: Post;
+  profile: User;
+  onDelete?: () => void;
+}> = ({ post, profile, onDelete }) => {
   return (
-    <NextLink
-      onClick={(e) => e.stopPropagation()}
-      href={paths.mypage(profile.username)}
+    <Stack
+      direction='row'
+      alignItems='center'
       position='relative'
+      spacing={1}
+      left={-8}
+      pb={1}
     >
-      <Stack
-        direction='row'
-        alignItems='center'
+      <NextLink
+        onClick={(e) => e.stopPropagation()}
+        href={paths.mypage(profile.username)}
         position='relative'
-        spacing={1}
-        left={-8}
-        pb={1}
       >
         <Avatar
           src={profile.profile_image?.small || profile?.profile_image?.url}
         />
+      </NextLink>
+      <NextLink
+        onClick={(e) => e.stopPropagation()}
+        href={paths.mypage(profile.username)}
+        position='relative'
+      >
         <Stack>
           <ProfilePopper profileId={profile.id}>
             <Typography
@@ -387,8 +411,70 @@ const PostDetailHeader: React.FC<{ post: Post; profile: User }> = ({
             </Typography>
           </ProfilePopper>
         </Stack>
-      </Stack>
-    </NextLink>
+      </NextLink>
+      <Box flex={1} />
+      <PostSettings post={post} profile={profile} />
+    </Stack>
+  );
+};
+
+const PostSettings: React.FC<{ post: Post; profile: User }> = ({
+  post,
+  profile,
+}) => {
+  const [, setPost] = usePostData(post.id);
+  const [user] = useUser();
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const isMyPost = Boolean(user && user.id === profile.id);
+  const onDelete = isMyPost
+    ? () => {
+        API.Posts.post
+          .deleteItem(post.id)
+          .then(() => {
+            setPost((p) => ({ ...post, deleted_at: moment().toISOString() }));
+          })
+          .then(() => {
+            handleClose();
+          });
+      }
+    : undefined;
+  if (!isMyPost) return;
+  return (
+    <>
+      <IconButton onClick={handleClick}>
+        <MoreVert />
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+      >
+        {onDelete && (
+          <MenuItem onClick={onDelete}>
+            <ListItemIcon>
+              <Delete />
+            </ListItemIcon>
+            Delete
+          </MenuItem>
+        )}
+      </Menu>
+    </>
   );
 };
 

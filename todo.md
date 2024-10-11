@@ -96,5 +96,13 @@
   1. Post보기
   2. 메세지 그룹 생성
 10-11
-[X] 메세지그룹에 유저초대, 유저나가기 기능추가
-[X] 포스트 삭제 기능 추가
+[O] 메세지그룹에 유저초대, 유저나가기 기능추가
+[O] 포스트 삭제 기능 추가
+[O] Ollama 를 docker를 통해 gpu마다 실행하도록하기
+  1. deploy의 device_ids로는 특정 gpu를 사용하도록 설정이불가
+  2. environment에 CUDA_VISIBLE_DEVICES=0,1 옵션으로 설정해줘야됨
+  3. NVIDIA_VISIBLE_DEVICES는 작동하지않음
+  4. 모델을 ntfs base 파일시스템에서 mapping하여 사용하면 초기 로딩이 오래걸림
+  5. 이는 wsl2 backend의 고질적인 문제점인것같음
+  6. docker volume을 사용하여 해결함
+  7. docker로 실행시 5분마다 모델이 unload되는 문제를 OLLAMA_KEEP_ALIVE=-1로 해결
