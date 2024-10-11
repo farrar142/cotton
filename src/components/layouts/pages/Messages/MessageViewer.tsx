@@ -43,6 +43,7 @@ import { usePromiseState } from '#/hooks/usePromiseState';
 import { GroupMessageAddComponent } from './GroupMessageAddComponent';
 import { useRouter } from '#/hooks/useCRouter';
 import { useSnackbar } from 'notistack';
+import { atomFamily, useRecoilState } from 'recoil';
 
 const getYearToMinuteString = (isostring: string) =>
   moment(isostring).format('YYYY-MM-DD-hh-mm');
@@ -400,7 +401,9 @@ export const MessageGroupInfoPanel: React.FC<{
             .map((user) => (
               <SimpleProfileItem profile={user} key={user.id} />
             ))}
-          <Button onClick={addUserOpen.wrap(true)}>Add User</Button>
+          {group.is_direct_message || (
+            <Button onClick={addUserOpen.wrap(true)}>Add User</Button>
+          )}
         </Stack>
         <Divider />
         <Stack px={2}>
@@ -422,15 +425,18 @@ export const MessageGroupInfoPanel: React.FC<{
   );
 };
 
+const mvcTabAtom = atomFamily({ key: 'mvcTabAtom', default: () => '0' });
+const useMvcTab = (id: number) => useRecoilState(mvcTabAtom(id));
+
 export const MessageViewerContainer: React.FC<{
   group: MessageGroup;
   user: User;
 }> = ({ group: _group, user: profile }) => {
   const { group } = useMessageGroupItem(_group, profile);
-  const tabValue = useValue('0');
+  const [tabValue, setTab] = useMvcTab(group.id);
   return (
     <Box minHeight='100vh' height='100vh' maxWidth='100%'>
-      <TabContext value={tabValue.get}>
+      <TabContext value={tabValue}>
         <TabPanel
           value='0'
           sx={{ p: 0, minHeight: '100%', height: '100vh', maxWidth: '100%' }}
@@ -438,7 +444,7 @@ export const MessageViewerContainer: React.FC<{
           <MessageViewer
             group={group}
             profile={profile}
-            onPanelChange={() => tabValue.set('1')}
+            onPanelChange={() => setTab('1')}
           />
         </TabPanel>
         <TabPanel
@@ -448,7 +454,7 @@ export const MessageViewerContainer: React.FC<{
           <MessageGroupInfoPanel
             group={group}
             profile={profile}
-            onPanelChange={() => tabValue.set('0')}
+            onPanelChange={() => setTab('0')}
           />
         </TabPanel>
       </TabContext>

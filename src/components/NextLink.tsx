@@ -34,9 +34,10 @@ const NextLink = forwardRef(
       children,
       withunderline = false,
       onClick = (e) => {},
+      disabled,
       ...props
     }: Omit<MLinkProps, 'href'> &
-      Pick<LinkProps, 'href'> & { withunderline?: boolean },
+      Pick<LinkProps, 'href'> & { withunderline?: boolean; disabled?: boolean },
     ref
   ): JSX.Element => {
     const href = useMemo(() => {
@@ -47,6 +48,10 @@ const NextLink = forwardRef(
     }, [props.href]);
     const haveToMove = useRef(true);
     const lastMousePos = useRef({ x: 0, y: 0 });
+
+    if (disabled) {
+      return <>{children}</>;
+    }
 
     return (
       <CustomLink

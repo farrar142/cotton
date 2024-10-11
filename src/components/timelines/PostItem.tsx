@@ -139,7 +139,11 @@ const _PostItem: React.FC<{
     if (haveToRoute.current) return;
     if (routingToDetail) router.push(paths.postDetail(post.id));
   };
-  const render = (
+
+  // if (routingToDetail)
+  //   return (
+  //   );
+  return (
     <Stack>
       {_showOrigin ? (
         <_PostItem
@@ -256,11 +260,18 @@ const _PostItem: React.FC<{
           ) : (
             <></>
           )}
-          <DraftEditor
-            readOnly={true}
-            blocks={post.blocks}
-            quote={(showQuote && quote) || undefined}
-          />
+          <NextLink
+            draggable={false}
+            sx={{ color: 'inherit' }}
+            href={paths.postDetail(post.id)}
+            disabled={!Boolean(routingToDetail)}
+          >
+            <DraftEditor
+              readOnly={true}
+              blocks={post.blocks}
+              quote={(showQuote && quote) || undefined}
+            />
+          </NextLink>
           {disableImages ? <></> : <ImageViewer post={post} />}
           {disableAction ? (
             <></>
@@ -272,17 +283,6 @@ const _PostItem: React.FC<{
       {disableDivider ? <></> : <Divider />}
     </Stack>
   );
-  if (routingToDetail)
-    return (
-      <NextLink
-        draggable={false}
-        sx={{ color: 'inherit' }}
-        href={paths.postDetail(post.id)}
-      >
-        {render}
-      </NextLink>
-    );
-  return render;
 };
 
 const PostHeader: React.FC<{ post: Post; profile: User }> = ({
