@@ -44,11 +44,14 @@ export const usePostData = (id: number | undefined) => {
     if (!id) return;
     if (getter) return;
     if (fetchedPost.get(id)) return;
-    fetchedPost.set(id, true);
-    API.Posts.post
-      .getItem(id)
-      .then((r) => r.data)
-      .then(setter);
+    const timeout = setTimeout(() => {
+      fetchedPost.set(id, true);
+      API.Posts.post
+        .getItem(id)
+        .then((r) => r.data)
+        .then(setter);
+    }, 100);
+    return () => clearTimeout(timeout);
   }, [id, getter]);
   return [getter, setter] as const;
 };
