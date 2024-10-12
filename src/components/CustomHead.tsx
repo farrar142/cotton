@@ -17,10 +17,6 @@ const AuthenticatedHead: React.FC<{ meta: Meta; user: User }> = ({
   const totalNew = notifications.count + messages.count;
   return (
     <Head>
-      <meta
-        name='viewport'
-        content='width=device-width,height=device-height, initial-scale=1'
-      />
       <title>{`${meta.title} / Cotton ${
         totalNew ? `(${totalNew})` : ''
       }`}</title>
@@ -34,20 +30,12 @@ export const CustomHead: React.FC<{ meta?: Meta }> = ({ meta }) => {
   if (!meta)
     return (
       <Head>
-        <meta
-          name='viewport'
-          content='width=device-width,height=device-height, initial-scale=1'
-        />
         <title>Cotton</title>
       </Head>
     );
   if (!user) {
     return (
       <Head>
-        <meta
-          name='viewport'
-          content='width=device-width,height=device-height, initial-scale=1'
-        />
         <title>{`${meta.title} / Cotton`}</title>
         <RenderMeta meta={meta} />
       </Head>
