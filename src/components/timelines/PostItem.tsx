@@ -92,7 +92,7 @@ const _PostItem: React.FC<{
     );
   };
   const onView = () => {
-    getCaller(true)(post, 'views').then(refetchPost);
+    getCaller(true)(post, 'views');
     setView((p) => new Map(p.entries()).set(post.id, true));
   };
 
