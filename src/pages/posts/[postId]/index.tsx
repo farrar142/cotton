@@ -46,5 +46,8 @@ PostDetailPage.getInitialProps = getInitialPropsWrapper(
         .catch(() => rej({ error: true, statusCode: 404 }));
     })
 );
-
+PostDetailPage.getMeta = ({ post }) => ({
+  title: `${post.user.nickname}'s Post`,
+  description: post.text,
+});
 export default PostDetailPage;

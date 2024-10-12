@@ -2,7 +2,7 @@ import API from '#/api';
 import { User } from '#/api/users/types';
 import CommonLayout from '#/components/layouts/CommonLayout';
 import { CommonTab } from '#/components/layouts/CommonTab';
-import { SimpleProfileItem } from '#/components/SimpleProfileComponent';
+import { SimpleProfileItem } from '#/components/layouts/users/SimpleProfileComponent';
 import getInitialPropsWrapper from '#/functions/getInitialPropsWrapper';
 import { useCursorPagination } from '#/hooks/paginations/useCursorPagination';
 import { useRouter } from '#/hooks/useCRouter';
@@ -76,5 +76,8 @@ FollowersPage.getInitialProps = getInitialPropsWrapper(async ({ query }) => {
     .then((r) => r.data)
     .then((profile) => ({ profile }))
     .catch(() => ({ error: true, status: 404 }));
+});
+FollowersPage.getMeta = ({ profile }) => ({
+  title: `${profile.nickname}(@${profile.username}) / Followers`,
 });
 export default FollowersPage;

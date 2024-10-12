@@ -62,5 +62,5 @@ const BookmarkPage: ExtendedNextPage<{ user: User }> = ({ user }) => {
 BookmarkPage.getInitialProps = getInitialPropsWrapper(async ({}, { user }) => {
   if (!user) return { error: true, statusCode: 401 };
 });
-
+BookmarkPage.getMeta = () => ({ title: 'Bookmark' });
 export default BookmarkPage;

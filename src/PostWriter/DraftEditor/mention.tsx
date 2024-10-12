@@ -2,7 +2,7 @@ import { User } from '#/api/users/types';
 import { ProfileFollowInfo } from '#/components/layouts/pages/ProfilePage/ProfileFollowInfo';
 import { ProfilePopper } from '#/components/layouts/pages/ProfilePage/ProfilePopper';
 import NextLink from '#/components/NextLink';
-import { SimpleProfileItem } from '#/components/SimpleProfileComponent';
+import { SimpleProfileItem } from '#/components/layouts/users/SimpleProfileComponent';
 import { useFetchedProfile, useUserProfile } from '#/hooks/useUser';
 import useValue from '#/hooks/useValue';
 import paths from '#/paths';

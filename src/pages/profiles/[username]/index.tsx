@@ -53,7 +53,7 @@ ProfilePage.getInitialProps = getInitialPropsWrapper(async ({ query }) => {
     });
   });
 });
-ProfilePage.getMeta = ({ profile }) => (
-  <title>{`${profile.nickname} (@${profile.username})/Cotton`}</title>
-);
+ProfilePage.getMeta = ({ profile }) => ({
+  title: `${profile.nickname} (@${profile.username})`,
+});
 export default ProfilePage;

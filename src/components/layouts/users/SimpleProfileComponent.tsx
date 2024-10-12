@@ -14,7 +14,7 @@ import {
 import { Lock } from '@mui/icons-material';
 import { SystemStyleObject } from '@mui/system/styleFunctionSx';
 import { MouseEventHandler, ReactNode, useMemo } from 'react';
-import NextLink from './NextLink';
+import NextLink from '../../NextLink';
 import paths from '#/paths';
 import API from '#/api';
 import { usePromiseState } from '#/hooks/usePromiseState';

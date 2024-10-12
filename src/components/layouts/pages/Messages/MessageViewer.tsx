@@ -38,7 +38,7 @@ import paths from '#/paths';
 import NextLink from '#/components/NextLink';
 import { glassmorphism } from '#/styles';
 import { TabContext, TabPanel } from '@mui/lab';
-import { SimpleProfileItem } from '#/components/SimpleProfileComponent';
+import { SimpleProfileItem } from '#/components/layouts/users/SimpleProfileComponent';
 import { usePromiseState } from '#/hooks/usePromiseState';
 import { GroupMessageAddComponent } from './GroupMessageAddComponent';
 import { useRouter } from '#/hooks/useCRouter';

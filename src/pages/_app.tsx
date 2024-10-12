@@ -16,6 +16,7 @@ import { SnackbarProvider } from 'notistack';
 import React, { useEffect, useMemo } from 'react';
 import { RecoilEnv, RecoilRoot } from 'recoil';
 import NotAuthenticated from './401';
+import { CustomHead } from '#/components/CustomHead';
 
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false;
 
@@ -97,12 +98,11 @@ function App({ Component, pageProps }: CustomAppProps) {
   //   const el = document.getElementById('__next-build-watcher');
   //   el?.nextSibling?.remove();
   // }, []);
-  const Meta = useMemo(() => {
-    //@ts-ignore
-    if (pageProps.error) return <title>-</title>;
-    if (Component.getMeta) return Component.getMeta(pageProps);
-    else return <title>Cotton</title>;
-  }, [Component, pageProps]);
+  // const Meta = useMemo(() => {
+  //   if (pageProps.error) return <title>-</title>;
+  //   if (Component.getMeta) return Component.getMeta(pageProps);
+  //   else return <title>Cotton</title>;
+  // }, [Component, pageProps]);
   const isError = useMemo(() => {
     if (pageProps.error) {
       if (pageProps.statusCode === 401) return <NotAuthenticated />;
@@ -113,18 +113,21 @@ function App({ Component, pageProps }: CustomAppProps) {
     return Component.getLayout ? Component.getLayout : CommonLayout;
   }, [Component.getLayout]);
   const [user] = useUser();
+
   return (
     <React.Fragment>
       {user ? <WebsocketEventListener user={user} /> : <></>}
       <ExternalTokenHandler {...pageProps} />
       <UserHandler {...pageProps} />
-      <Head>
-        {Meta}
-        <meta
-          name='viewport'
-          content='width=device-width,height=device-height, initial-scale=1'
-        />
-      </Head>
+      <CustomHead
+        meta={
+          Component.getMeta
+            ? !pageProps.error
+              ? Component.getMeta(pageProps)
+              : { title: 'Error' }
+            : undefined
+        }
+      />
       <Box
         sx={{
           width: '100%',

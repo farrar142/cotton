@@ -1,6 +1,6 @@
 import API from '#/api';
 import { User } from '#/api/users/types';
-import { SimpleProfileItem } from '#/components/SimpleProfileComponent';
+import { SimpleProfileItem } from '#/components/layouts/users/SimpleProfileComponent';
 import { useCursorPagination } from '#/hooks/paginations/useCursorPagination';
 import { useRouter } from '#/hooks/useCRouter';
 import { useObserver } from '#/hooks/useObserver';

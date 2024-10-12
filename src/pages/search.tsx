@@ -4,7 +4,7 @@ import { User } from '#/api/users/types';
 import { ClientOnlyHOC } from '#/components/ClientOnlyHOC';
 import TextInput from '#/components/inputs/TextInput';
 import { UserSearchComponent } from '#/components/layouts/users/UserSearchComponent';
-import { SimpleProfileItem } from '#/components/SimpleProfileComponent';
+import { SimpleProfileItem } from '#/components/layouts/users/SimpleProfileComponent';
 import { PostTimeline } from '#/components/timelines';
 import { useCursorPagination } from '#/hooks/paginations/useCursorPagination';
 import { useRouter } from '#/hooks/useCRouter';
@@ -135,5 +135,5 @@ const SearchPage: ExtendedNextPage = () => {
     </Box>
   );
 };
-
+SearchPage.getMeta = () => ({ title: 'Search' });
 export default ClientOnlyHOC(SearchPage);

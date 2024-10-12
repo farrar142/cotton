@@ -63,5 +63,15 @@ MessageGroupPage.getInitialProps = getLoginRequiredInitialPropsWrapper<{
 MessageGroupPage.getLayout = ({ children }) => {
   return <CommonLayout disabledRightPanel>{children}</CommonLayout>;
 };
+MessageGroupPage.getMeta = ({ group }) => {
+  const attendants =
+    group.attendants
+      .filter((at, idx) => idx < 2)
+      .map((at) => at.nickname)
+      .join(',') + '...';
+  return {
+    title: group.title ? group.title : `${attendants}`,
+  };
+};
 
 export default MessageGroupPage;

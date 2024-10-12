@@ -106,3 +106,6 @@
   5. 이는 wsl2 backend의 고질적인 문제점인것같음
   6. docker volume을 사용하여 해결함
   7. docker로 실행시 5분마다 모델이 unload되는 문제를 OLLAMA_KEEP_ALIVE=-1로 해결
+
+10-12
+[O] SEO 작업

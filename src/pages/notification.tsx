@@ -77,5 +77,5 @@ const NotificationsPage: ExtendedNextPage = ({ user }) => {
 NotificationsPage.getInitialProps = getLoginRequiredInitialPropsWrapper(
   async () => {}
 );
-
+NotificationsPage.getMeta = () => ({ title: 'Notifications' });
 export default NotificationsPage;

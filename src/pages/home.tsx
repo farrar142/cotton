@@ -32,7 +32,7 @@ const useHomeTabAtom = () => {
   return { get, set };
 };
 
-const Home = () => {
+const Home: ExtendedNextPage = () => {
   const { isMd } = useMediaSize();
   const theme = useTheme();
   const [user] = useUser();
@@ -116,4 +116,5 @@ const Home = () => {
     </Box>
   );
 };
+Home.getMeta = () => ({ title: 'Home' });
 export default Home;
