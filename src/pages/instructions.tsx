@@ -11,6 +11,12 @@ const InstructionPage: ExtendedNextPage<{ blockMap: {} }> = ({ blockMap }) => {
         '.notion': {
           color: isDark ? 'rgb(255, 255, 255)' : 'inherit',
         },
+        '.notion-list-numbered>li': {
+          // lineHeight: '1.02em',
+        },
+        '.notion-column>p': {
+          lineHeight: '1.98em',
+        },
         px: 2,
       }}
     >
@@ -19,14 +25,12 @@ const InstructionPage: ExtendedNextPage<{ blockMap: {} }> = ({ blockMap }) => {
   );
 };
 
-export const getStaticProps = async () => {
+InstructionPage.getInitialProps = async () => {
   const data = await fetch(
     `https://notion-api.splitbee.io/v1/page/11d14ff5734480709083d5004e3e3062`
   ).then((d) => d.json());
   return {
-    props: {
-      blockMap: data,
-    },
+    blockMap: data,
   };
 };
 
