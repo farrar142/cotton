@@ -524,7 +524,9 @@ const ProfileInfo: React.FC<{ profile: RegisteredUser }> = ({
           </Box>
         ) : undefined}
         <Box>
-          {isMyProfile ? (
+          {!Boolean(user) ? (
+            <></>
+          ) : isMyProfile ? (
             <Button
               variant='outlined'
               color='inherit'
