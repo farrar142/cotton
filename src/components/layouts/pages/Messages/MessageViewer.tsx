@@ -302,14 +302,14 @@ export const MessageViewer: React.FC<{
                 maxWidth: 128,
               }}
             >
-              새 메세지 보기
+              Show New Messages
             </Button>
           </Box>
         )}
       </Stack>
       <Divider />
       <TextInput
-        label='새 쪽지 작성하기'
+        label='Send message'
         value={message.get}
         onChange={message.onTextChange}
         size='small'
