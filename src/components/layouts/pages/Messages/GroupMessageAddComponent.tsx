@@ -44,7 +44,11 @@ export const GroupMessageAddComponent: React.FC<{
   const selectedUsers = useValue<User[]>([]);
   const { done, wrapper } = usePromiseState();
 
-  const onCreate = wrapper(() => onPost(selectedUsers.get));
+  const onCreate = wrapper(() =>
+    onPost(selectedUsers.get).then(() => {
+      onClose();
+    })
+  );
   return (
     <Dialog
       open={open}
