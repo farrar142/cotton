@@ -130,7 +130,7 @@ export const GroupMessageAddComponent: React.FC<{
           itemStyle={(theme) => ({ px: 1, py: 0.5 })}
           onClick={(user) => {
             selectedUsers.set((p) => {
-              if (p.find((u) => u.id == user.id)) {
+              if (p.find((u) => u.id === user.id)) {
                 return p.filter((u) => u.id !== user.id);
               }
               return [...p, user];

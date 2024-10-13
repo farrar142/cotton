@@ -40,7 +40,9 @@ export const UserSearchComponent: React.FC<{
           containerStyle={itemStyle}
           key={user.id}
           profile={user}
-          onClick={() => onClick && onClick(user)}
+          onClick={() => {
+            onClick && onClick(user);
+          }}
         />
       ))}
       <Box ref={fetchBlockRef} />

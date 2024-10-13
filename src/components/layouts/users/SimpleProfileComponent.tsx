@@ -79,7 +79,6 @@ export const SimpleProfileItem: React.FC<{
         key={profile.id}
         direction='row'
         spacing={1}
-        onClick={onClick}
         sx={{
           p: 1,
         }}
