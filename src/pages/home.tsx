@@ -82,7 +82,8 @@ const Home: ExtendedNextPage = () => {
             key='global'
             getter={API.Posts.post.getGlobalTimeline}
             type='global'
-            fetchNew={fetchNew}
+            // fetchNew={fetchNew}
+            disablePrevfetch
           />,
           <PostTimeline
             key='followings'

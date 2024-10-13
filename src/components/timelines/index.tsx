@@ -36,6 +36,7 @@ export const PostTimeline: React.FC<{
   params?: {};
   fetchNew?: MutableRefObject<() => void>;
   pollingWhenEmpty?: boolean;
+  disablePrevfetch?: boolean;
 }> = ({
   getter,
   type,
@@ -45,6 +46,7 @@ export const PostTimeline: React.FC<{
   pollingWhenEmpty = true,
   params = {},
   fetchNew,
+  disablePrevfetch = false,
 }) => {
   useKeepScrollPosition(type, keepScrollPosition);
 
@@ -59,6 +61,7 @@ export const PostTimeline: React.FC<{
     apiKey: type,
     params,
     pollingWhenEmpty,
+    disablePrevfetch,
   });
 
   const observer = useObserver();
