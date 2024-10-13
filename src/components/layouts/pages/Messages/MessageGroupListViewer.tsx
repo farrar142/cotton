@@ -69,7 +69,6 @@ const DirectMessageSimpleViewer: React.FC<{
     }
     return group.latest_message;
   }, [group.latest_message, group.inComingMessages]);
-  console.log(otherUser);
   return (
     <NextLink
       href={paths.groupMessage(group.id)}
