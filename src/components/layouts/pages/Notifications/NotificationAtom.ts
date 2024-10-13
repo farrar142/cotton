@@ -23,6 +23,10 @@ const notificationLoadedAtom = atomFamily<boolean, number>({
   key: 'notificationLoadedAtom',
   default: (key) => false,
 });
+const deletedNotificationAtom = atomFamily<number[], number>({
+  key: 'deletedNotificationAtom',
+  default: () => [],
+});
 
 export const useInComingNotificationList = (user: User) => {
   return useRecoilState(inComingNotificationListAtom(user.id));
@@ -31,6 +35,9 @@ export const useInComingNotificationList = (user: User) => {
 export const useNotificationList = (user: User) => {
   const [notis, setNotis] = useRecoilState(notificationListAtom(user.id));
   const [inComings] = useRecoilState(inComingNotificationListAtom(user.id));
+  const [deleted, setDeleted] = useRecoilState(
+    deletedNotificationAtom(user.id)
+  );
   const handleNotifications = (notifications: NotificationType[]) => {
     setNotis((p) => filterDuplicate([...p, ...notifications]));
   };
@@ -39,9 +46,17 @@ export const useNotificationList = (user: User) => {
     const sorted = filtered.sort((a, b) =>
       moment(b.created_at).diff(a.created_at)
     );
-    return sorted;
-  }, [notis, inComings]);
-  return [combined, setNotis, handleNotifications] as const;
+    return sorted.filter((n) => !Boolean(deleted.find((d) => n.id === d)));
+  }, [notis, inComings, deleted]);
+  const removeNotifications = (ids: number[]) => {
+    setDeleted((p) => [...p, ...ids]);
+  };
+  return [
+    combined,
+    setNotis,
+    handleNotifications,
+    removeNotifications,
+  ] as const;
 };
 
 export const useUnCheckedNotification = (user: User) => {

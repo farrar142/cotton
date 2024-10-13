@@ -33,7 +33,7 @@ const NotificationsPage: ExtendedNextPage = ({ user }) => {
     return () => observer.unobserve(block);
   }, [data]);
 
-  const [notificationList, ___, handleNotifications] =
+  const [notificationList, ___, handleNotifications, deleteNotifications] =
     useNotificationList(user);
 
   useEffect(() => {
@@ -66,7 +66,18 @@ const NotificationsPage: ExtendedNextPage = ({ user }) => {
           </>
         )}
         {notificationList.map((noti) => (
-          <NotificationItem notification={noti} key={noti.id} user={user} />
+          <NotificationItem
+            notification={noti}
+            key={noti.id}
+            user={user}
+            onDelete={(id) => {
+              API.Notifications.notification
+                .deleteItem(noti.id)
+                .then(() => {})
+                .catch(() => {});
+              deleteNotifications([id]);
+            }}
+          />
         ))}
         <Box ref={patchNextBlock} />
       </Stack>
