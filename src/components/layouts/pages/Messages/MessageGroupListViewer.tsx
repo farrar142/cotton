@@ -44,7 +44,12 @@ const DirectMessageSimpleViewer: React.FC<{
   isSelected: boolean;
 }> = ({ group, me, isSelected }) => {
   const otherUser = useMemo(
-    () => group.attendants.filter((user) => user.id !== me.id)[0],
+    () =>
+      group.attendants.filter((user) => user.id !== me.id)[0] || {
+        profile_image: undefined,
+        nickname: 'User exited room',
+        username: 'User exited room',
+      },
     [group]
   );
   const lastMessageDate = useMemo(() => {
@@ -64,6 +69,7 @@ const DirectMessageSimpleViewer: React.FC<{
     }
     return group.latest_message;
   }, [group.latest_message, group.inComingMessages]);
+  console.log(otherUser);
   return (
     <NextLink
       href={paths.groupMessage(group.id)}
