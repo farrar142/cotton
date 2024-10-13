@@ -126,7 +126,7 @@ export const MessageViewer: React.FC<{
     const messages = [
       ...[...data].reverse(),
       ...group.inComingMessages,
-      ...typedMessage.get,
+      ...typedMessage.get.filter((m) => m.group === group.id),
     ];
     const filtered = filterDuplicate(messages, (e) => e.identifier);
     const sorted = filtered.sort((a, b) =>

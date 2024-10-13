@@ -65,7 +65,8 @@ export const PostItemToolbar: React.FC<{
         API.Posts.post
           .getItem(post.id)
           .then((r) => r.data)
-          .then(setPost),
+          .then(setPost)
+          .catch(),
       100
     );
   };

@@ -49,7 +49,8 @@ export const usePostData = (id: number | undefined) => {
       API.Posts.post
         .getItem(id)
         .then((r) => r.data)
-        .then(setter);
+        .then(setter)
+        .catch(() => {});
     }, 100);
     return () => clearTimeout(timeout);
   }, [id, getter]);
