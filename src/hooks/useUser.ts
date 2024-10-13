@@ -45,7 +45,6 @@ export const useTokenWatcher = () => {
   const userId = useMemo(() => user?.id, [user?.id]);
   useEffect(() => {
     if (!user) return;
-    console.log('hook called', user);
     const interval = setInterval(() => {
       const { access, refresh } = API.client.instance.getTokens();
       setToken({ access, refresh });
@@ -56,12 +55,6 @@ export const useTokenWatcher = () => {
     }, 1000);
     return () => clearInterval(interval);
   }, [userId]);
-
-  useEffect(() => {
-    return () => {
-      console.log('un mounted');
-    };
-  }, []);
 };
 
 //클라이언트사이드에서만 이용되어야됨. 중복요청방지
