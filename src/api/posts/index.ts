@@ -71,6 +71,11 @@ class PostAPIGenerator extends GenericAPI<Post, PostUpsert> {
       this.getEndpoint('/timeline/global/')
     );
   }
+  get getSearchTimeline() {
+    return this.getItemsRequest<Post, {}, TimeLinePaginated<Post>>(
+      this.getEndpoint('/timeline/search/')
+    );
+  }
   get getBookmarkItems() {
     return this.getItemsRequest<Post, {}, TimeLinePaginated<Post>>(
       this.getEndpoint('/bookmarks')

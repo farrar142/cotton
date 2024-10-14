@@ -112,7 +112,7 @@ const SearchPage: ExtendedNextPage = () => {
         >
           {search.get && (
             <PostTimeline
-              getter={API.Posts.post.getGlobalTimeline}
+              getter={API.Posts.post.getSearchTimeline}
               params={{ search: search.get }}
               type='searchPosts'
             />
