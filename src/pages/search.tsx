@@ -115,6 +115,7 @@ const SearchPage: ExtendedNextPage = () => {
               getter={API.Posts.post.getSearchTimeline}
               params={{ search: search.get }}
               type='searchPosts'
+              disablePrevfetch
             />
           )}
         </TabPanel>
