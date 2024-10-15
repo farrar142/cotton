@@ -49,7 +49,7 @@ export const PostItemToolbar: React.FC<{
   ) => {
     if (field === undefined) throw Error;
     const modified = target.get(post.id);
-    if (post[field]) return true;
+    // if (post[field]) return true;
     if (modified === undefined) return post[field];
     return modified;
   };
