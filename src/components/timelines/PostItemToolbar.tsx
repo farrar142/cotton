@@ -71,15 +71,15 @@ export const PostItemToolbar: React.FC<{
     );
   };
   const onRepost = (bool: boolean) => () => {
-    getCaller(bool)(post, 'reposts').then(refetchPost);
+    getCaller(bool)(post, 'reposts');
     setRepost((p) => new Map(p.entries()).set(post.id, bool));
   };
   const onBookmark = (bool: boolean) => () => {
-    getCaller(bool)(post, 'bookmarks').then(refetchPost);
+    getCaller(bool)(post, 'bookmarks');
     setBookmark((p) => new Map(p.entries()).set(post.id, bool));
   };
   const onFavorite = (bool: boolean) => () => {
-    getCaller(bool)(post, 'favorites').then(refetchPost);
+    getCaller(bool)(post, 'favorites');
     setFavorite((p) => new Map(p.entries()).set(post.id, bool));
   };
 
