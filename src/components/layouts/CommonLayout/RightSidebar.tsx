@@ -32,6 +32,7 @@ const TagRecommend: React.FC = () => {
               pathname: '/search',
               query: { search: u.key.substring(1, u.key.length) },
             }}
+            key={u.key}
           >
             <Stack key={u.key}>
               <Typography color='textPrimary' fontWeight='bold'>
@@ -68,9 +69,11 @@ const UserRecommend: React.FC = () => {
     >
       <Typography pl={1}>Recommend User</Typography>
       <Stack spacing={1}>
-        {recommended.get.map((u) => (
-          <SimpleProfileItem key={u.id} profile={u} />
-        ))}
+        {recommended.get
+          .sort(() => 0.5 - Math.random())
+          .map((u) => (
+            <SimpleProfileItem key={u.id} profile={u} />
+          ))}
       </Stack>
     </Stack>
   );
