@@ -14,7 +14,14 @@ import { DraftContentParser } from '#/utils/textEditor/draftParser';
 import createImagePlugin from '@draft-js-plugins/image';
 import createMentionPlugin, { MentionData } from '@draft-js-plugins/mention';
 import createHashtagPlugin from '@draft-js-plugins/hashtag';
-import { Box, Collapse, Divider, Stack, useTheme } from '@mui/material';
+import {
+  Box,
+  Collapse,
+  Divider,
+  Stack,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import { convertFromRaw, convertToRaw, EditorState, Modifier } from 'draft-js';
 import mentionsStyles from './MentionsStyles.module.css';
 import DraftEditorToolbar from './Toolbar';
@@ -106,11 +113,13 @@ const DraftEditor: React.FC<
     placeholder?: string;
     quote?: Post;
     showToolbar?: boolean;
+    makeShort?: boolean;
   } & (ReadOnly | EditOnly)
 > = ({
   maxLength = 300,
   onPost,
-  blocks,
+  blocks: _blocks,
+  makeShort = false,
   readOnly = false,
   showToolbar = true,
   additionalWidth = 0,
@@ -118,6 +127,38 @@ const DraftEditor: React.FC<
   placeholder,
   quote,
 }) => {
+  const [blocks, isLong] = useMemo(() => {
+    let length = 0;
+    let isLong = false;
+    if (!makeShort) {
+      return [_blocks, isLong] as const;
+    }
+    if (!_blocks) return [undefined, isLong] as const;
+    const nb: Block[][] = [];
+    for (const line of _blocks) {
+      const nl: Block[] = [];
+      for (const block of line) {
+        if (300 < length) {
+          isLong = true;
+          break;
+        }
+        const currentLength = block.value.length;
+        if (300 < length + currentLength) {
+          const over = length + currentLength - 300;
+          const trimmed = block.value.substring(0, currentLength - over);
+          nl.push({ ...block, value: trimmed + ' ...' });
+          isLong = true;
+        } else {
+          nl.push(block);
+        }
+        length += currentLength;
+      }
+      if (nl.length === 0) continue;
+      nb.push(nl);
+    }
+    return [nb, makeShort] as const;
+  }, [_blocks]);
+
   const theme = useTheme();
   const key = useMemo(
     () => (blocks ? JSON.stringify(blocks) : editorKey) || 'undefined',
@@ -131,7 +172,9 @@ const DraftEditor: React.FC<
   const getInitialEditorState = () =>
     blocks
       ? EditorState.createWithContent(
-          DraftContentParser.blocksToContentState(blocks)
+          DraftContentParser.blocksToContentState(
+            blocks.filter((l) => l.length !== 0)
+          )
         )
       : EditorState.createWithContent(emptyContentState);
 
@@ -230,6 +273,11 @@ const DraftEditor: React.FC<
         customStyleMap={styleMap}
         readOnly={readOnly}
       />
+      {isLong && (
+        <Typography mt={0} color='primary'>
+          Show more
+        </Typography>
+      )}
       <MentionSuggestions
         open={open}
         onOpenChange={onOpenChange}
