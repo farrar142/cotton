@@ -57,22 +57,17 @@ export const PostItemToolbar: React.FC<{
   const hasBookmark = isChecked('has_bookmark', bookmark);
   const hasFavorite = isChecked('has_favorite', favorite);
   const hasQuote = isChecked('has_quote', quote);
+  const adder = (bool: Boolean) => (bool ? 1 : -1);
   const getCaller = (bool: boolean) =>
     bool ? API.Posts.post.postChildItem : API.Posts.post.deleteChildItem;
-  const refetchPost = () => {
-    setTimeout(
-      () =>
-        API.Posts.post
-          .getItem(post.id)
-          .then((r) => r.data)
-          .then(setPost)
-          .catch(),
-      100
-    );
-  };
+
   const onRepost = (bool: boolean) => () => {
     getCaller(bool)(post, 'reposts');
     setRepost((p) => new Map(p.entries()).set(post.id, bool));
+    setPost((p) => {
+      if (!p) return p;
+      return { ...p, reposts_count: p.reposts_count + adder(bool) };
+    });
   };
   const onBookmark = (bool: boolean) => () => {
     getCaller(bool)(post, 'bookmarks');
@@ -81,6 +76,10 @@ export const PostItemToolbar: React.FC<{
   const onFavorite = (bool: boolean) => () => {
     getCaller(bool)(post, 'favorites');
     setFavorite((p) => new Map(p.entries()).set(post.id, bool));
+    setPost((p) => {
+      if (!p) return p;
+      return { ...p, favorites_count: p.favorites_count + adder(bool) };
+    });
   };
 
   //Repost액션
