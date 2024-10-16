@@ -22,5 +22,7 @@ export const handleTextLength = (
     else returned += `${block}\n`;
     return returned;
   }, '');
-  textLength.set(content.trim().length);
+  textLength.set(
+    content.replaceAll(' ', '').replaceAll('\n', '').trim().length
+  );
 };

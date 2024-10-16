@@ -138,6 +138,7 @@ export const PostTimeline: React.FC<{
           post={post}
           showParent={showParent}
           disableLatestRepost={disableLatestRepost}
+          makeShort
         />
       ))}
       <Box ref={nextCallblock} />

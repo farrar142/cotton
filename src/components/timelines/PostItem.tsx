@@ -47,6 +47,7 @@ const _PostItem: React.FC<{
   routingToDetail?: boolean;
   showQuote?: boolean;
   isDetailView?: boolean;
+  makeShort?: boolean;
 }> = ({
   post: _post,
   disableAction = false,
@@ -58,6 +59,7 @@ const _PostItem: React.FC<{
   showQuote = true,
   routingToDetail = true,
   isDetailView = false,
+  makeShort = false,
 }) => {
   const router = useRouter();
   const theme = useTheme();
@@ -282,6 +284,7 @@ const _PostItem: React.FC<{
               readOnly={true}
               blocks={post.blocks}
               quote={(showQuote && quote) || undefined}
+              makeShort={makeShort}
             />
           </NextLink>
           {disableImages ? <></> : <ImageViewer post={post} />}
