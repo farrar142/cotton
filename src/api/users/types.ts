@@ -21,6 +21,7 @@ type UserBase = UserUpsert & {
   name: string; //same as username
   email: string;
   is_staff: boolean;
+  is_superuser: boolean;
 
   followings_count: number;
   followers_count: number;

@@ -21,6 +21,7 @@ import React, { useEffect, useMemo } from 'react';
 import SigninComponent from '../pages/SigninComponent';
 import { ElevatedPostWriter } from './ElevatedPostWriter';
 import LeftSidebar from './LeftSidebar';
+import { RightSidebar } from './RightSidebar';
 
 const CommonLayout: React.FC<{
   children?: React.ReactNode;
@@ -130,7 +131,14 @@ const CommonLayout: React.FC<{
         </Box>
       </Box>
       <SideFlexBox display={isMd ? 'none' : 'block'} sx={DynamicPanel}>
-        <Box position='sticky' top={0}></Box>
+        <Box
+          position='sticky'
+          top={0}
+          display='flex'
+          justifyContent='flex-start'
+        >
+          <RightSidebar />
+        </Box>
       </SideFlexBox>
       <ElevatedPostWriter />
     </Box>

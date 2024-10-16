@@ -4,6 +4,7 @@ const useMediaSize = () => {
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
   const isMd = useMediaQuery(theme.breakpoints.down('md'));
-  return { isSmall, isMd };
+  const isLg = useMediaQuery(theme.breakpoints.down('lg'));
+  return { isSmall, isMd, isLg };
 };
 export default useMediaSize;

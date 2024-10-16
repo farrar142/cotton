@@ -434,7 +434,8 @@ const PostSettings: React.FC<{ post: Post; profile: User }> = ({
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const isMyPost = Boolean(user && user.id === profile.id);
+  const isMyPost =
+    Boolean(user && user.id === profile.id) || user?.is_superuser;
   const onDelete = isMyPost
     ? () => {
         API.Posts.post

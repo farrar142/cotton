@@ -45,12 +45,14 @@ const useSearchTabAtom = () => {
   const [get, set] = useRecoilState(searchTabAtom);
   return { get, set };
 };
-const SearchPage: ExtendedNextPage = () => {
+const SearchPage: ExtendedNextPage<{ search: string }> = ({
+  search: _search,
+}) => {
   const router = useRouter();
   const theme = useTheme();
   const tabValue = useSearchTabAtom();
 
-  const search = useValue('');
+  const search = useValue(_search);
 
   const handleChange = (event: SyntheticEvent, newValue: string) => {
     tabValue.set(newValue);
@@ -137,4 +139,8 @@ const SearchPage: ExtendedNextPage = () => {
   );
 };
 SearchPage.getMeta = () => ({ title: 'Search' });
+SearchPage.getInitialProps = async ({ query }) => {
+  const search = `${query.search || ''}`;
+  return { search };
+};
 export default ClientOnlyHOC(SearchPage);

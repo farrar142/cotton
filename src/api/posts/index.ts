@@ -66,6 +66,11 @@ class PostAPIGenerator extends GenericAPI<Post, PostUpsert> {
       this.getEndpoint('/timeline/followings/')
     );
   }
+  get getRecommendTimeline() {
+    return this.getItemsRequest<Post, {}, TimeLinePaginated<Post>>(
+      this.getEndpoint('/timeline/recommended/')
+    );
+  }
   get getGlobalTimeline() {
     return this.getItemsRequest<Post, {}, TimeLinePaginated<Post>>(
       this.getEndpoint('/timeline/global/')
@@ -100,6 +105,10 @@ class PostAPIGenerator extends GenericAPI<Post, PostUpsert> {
   getReplies = (postId: number) => {
     const endpoint = this.getEndpoint(`/${postId}/replies/`);
     return this.getItemsRequest<Post, {}, TimeLinePaginated<Post>>(endpoint);
+  };
+  getRecommendedTag = () => {
+    const endpoint = this.getEndpoint('/timeline/recommended/tags/');
+    return this.client.get<{ key: string; doc_count: number }[]>(endpoint);
   };
 }
 

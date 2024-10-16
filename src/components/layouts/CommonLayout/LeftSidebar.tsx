@@ -103,7 +103,7 @@ const NavBarItem: React.FC<{
 };
 
 const MessageNavItem: React.FC<{ user: User }> = ({ user }) => {
-  const { isMd, isSmall } = useMediaSize();
+  const { isMd, isSmall, isLg } = useMediaSize();
   const unreaded = useUnreadedMessagesCount(user);
   return (
     <NavBarItem
@@ -111,13 +111,13 @@ const MessageNavItem: React.FC<{ user: User }> = ({ user }) => {
       verbose='Messages'
       active={Email}
       deactive={EmailOutlined}
-      isMd={isMd}
+      isMd={isLg}
       badge={unreaded.count}
     />
   );
 };
 const NotificationNavItem: React.FC<{ user: User }> = ({ user }) => {
-  const { isMd, isSmall } = useMediaSize();
+  const { isMd, isSmall, isLg } = useMediaSize();
   const { count } = useUnCheckedNotification(user);
   return (
     <NavBarItem
@@ -125,7 +125,7 @@ const NotificationNavItem: React.FC<{ user: User }> = ({ user }) => {
       verbose='Notification'
       active={Notifications}
       deactive={NotificationsOutlined}
-      isMd={isMd}
+      isMd={isLg}
       badge={count}
     />
   );
@@ -135,7 +135,7 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
   openLoginWindow,
 }) => {
   const [user, _, signout] = useUser();
-  const { isMd, isSmall } = useMediaSize();
+  const { isMd, isSmall, isLg } = useMediaSize();
   const [isWrite, setIsWrite] = usePostWrite();
   return (
     <Box
@@ -159,14 +159,14 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
           verbose='Home'
           active={Home}
           deactive={HomeOutlined}
-          isMd={isMd}
+          isMd={isLg}
         />
         <NavBarItem
           url='/search'
           verbose='Search'
           active={SavedSearch}
           deactive={SearchOutlined}
-          isMd={isMd}
+          isMd={isLg}
         />
         {user && (
           <React.Fragment>
@@ -177,22 +177,22 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
               verbose='Profile'
               active={Person}
               deactive={PersonOutlineOutlined}
-              isMd={isMd}
+              isMd={isLg}
             />
             <NavBarItem
               url={`/bookmark`}
               verbose='Bookmark'
               active={Bookmark}
               deactive={BookmarkBorder}
-              isMd={isMd}
+              isMd={isLg}
             />
             <Box
               onClick={() => setIsWrite({ open: true })}
               display='flex'
               alignItems='center'
-              justifyContent={isMd ? 'center' : undefined}
+              justifyContent={isLg ? 'center' : undefined}
             >
-              {isMd ? (
+              {isLg ? (
                 <IconButton>
                   <Create />
                 </IconButton>
@@ -211,7 +211,7 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
         <Tooltip title={Boolean(user) ? 'Logout' : 'Login'}>
           <Box bottom={0} right={0} mb={isSmall ? undefined : 3}>
             {!Boolean(user) ? (
-              isMd ? (
+              isLg ? (
                 <IconButton onClick={openLoginWindow}>
                   <Login />
                 </IconButton>
@@ -220,7 +220,7 @@ const LeftSidebar: React.FC<{ openLoginWindow: () => void }> = ({
                   Login
                 </Button>
               )
-            ) : isMd ? (
+            ) : isLg ? (
               <IconButton onClick={signout} color='warning'>
                 <ExitToApp />
               </IconButton>

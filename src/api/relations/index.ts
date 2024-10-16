@@ -29,4 +29,8 @@ export const Relations = {
         params: { ...params, ...queries },
       });
     },
+  getRecommendedUser: () => {
+    const endpoint = `/relations/users/recommended/`;
+    return client.get<Paginated<User>>(endpoint);
+  },
 };

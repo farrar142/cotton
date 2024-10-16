@@ -59,13 +59,23 @@ const Home: ExtendedNextPage = () => {
       <CommonTab
         labels={[
           {
-            label: 'Recommended',
-            value: '추천',
+            label: 'Global',
+            value: '글로벌',
             onClick: (e) => {
               if (e.currentTarget.tabIndex !== 0) return;
               setScrollPosition({ key: 'global', value: 0 });
             },
           },
+          user
+            ? {
+                label: 'Recommended',
+                value: '추천',
+                onClick: (e) => {
+                  if (e.currentTarget.tabIndex !== 0) return;
+                  setScrollPosition({ key: 'followings', value: 0 });
+                },
+              }
+            : undefined,
           user
             ? {
                 label: 'Following',
@@ -82,6 +92,13 @@ const Home: ExtendedNextPage = () => {
             key='global'
             getter={API.Posts.post.getGlobalTimeline}
             type='global'
+            // fetchNew={fetchNew}
+            disablePrevfetch
+          />,
+          <PostTimeline
+            key='recommended'
+            getter={API.Posts.post.getRecommendTimeline}
+            type='recommended'
             // fetchNew={fetchNew}
             disablePrevfetch
           />,
