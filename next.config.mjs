@@ -1,12 +1,7 @@
 import { withSentryConfig } from '@sentry/nextjs';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: false,
-  images: {
-    remotePatterns: [
-      { protocol: "https", hostname: 'storage.moonpair.org' }
-    ]
-  }
+  reactStrictMode: false
 };
 
 export default withSentryConfig(nextConfig, {
